@@ -4,17 +4,17 @@ Create a new add-on project for Adobe Express.
 
 [![Version](https://img.shields.io/npm/v/@adobe/create-ccweb-add-on.svg)](https://npmjs.org/package/@adobe/create-ccweb-add-on)
 [![Downloads/week](https://img.shields.io/npm/dw/@adobe/create-ccweb-add-on.svg)](https://npmjs.org/package/@adobe/create-ccweb-add-on)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/license/mit)
 
 <!-- toc -->
-* [Getting Started](#getting-started)
-  * [Prerequisites](#prerequisites)
-  * [Create your first add-on project](#create-your-first-add-on-project)
-  * [Configure Developer Mode for Adobe Express](#configure-developer-mode-for-adobe-express)
-  * [Load your add-on in Adobe Express](#load-your-add-on-in-adobe-express)
-  * [Make changes to your add-on](#make-changes-to-your-add-on)
-* [Usage](#usage)
+
+-   [Getting Started](#getting-started)
+    -   [Prerequisites](#prerequisites)
+    -   [Create your first add-on project](#create-your-first-add-on-project)
+    -   [Configure Developer Mode for Adobe Express](#configure-developer-mode-for-adobe-express)
+    -   [Load your add-on in Adobe Express](#load-your-add-on-in-adobe-express)
+    -   [Make changes to your add-on](#make-changes-to-your-add-on)
+-   [Usage](#usage)
 <!-- tocstop -->
 
 ## Getting Started
@@ -27,10 +27,10 @@ To quickly get started building an Adobe Express add-on, follow these steps:
 
 You'll need:
 
-* Node 16 or better
-* NPM 8 or better
-* A text editor
-* An free Adobe account — don't have one? Get one [here]([https://www.adobe.com](https://www.adobe.com/express/))
+-   Node 16 or better
+-   NPM 8 or better
+-   A text editor
+-   A free Adobe account — don't have one? Get one [here](https://www.adobe.com/express/)
 
 ### Create your first add-on project
 
@@ -47,21 +47,21 @@ npm run start
 
 You'll only need to do these steps once:
 
-* Log in to Adobe Express (https://new.express.adobe.com) and click on your avatar icon (this is in the upper right-hand corner of the page).
-* Then click "Settings".
-* In the "General" tab of the Settings dialog, find the "Add-on Development" setting and toggle this to "on". 
+-   Log in to [Adobe Express](https://new.express.adobe.com) and click on your avatar icon (this is in the upper right-hand corner of the page).
+-   Then click "Settings".
+-   In the "General" tab of the Settings dialog, find the "Add-on Development" setting and toggle this to "on".
 
 ### Load your add-on in Adobe Express
 
 Now that you've enabled developer mode, you can load an add-on you're building into Adobe Express by following these steps:
 
-* Create a new document (or open an existing one)
-* Click the "Add-ons" icon in the left-hand rail
-* Click the "Your add-ons" tab
-* At the bottom of this tab you'll see an "Add-on testing" toggle — switch this to "on"
-* You'll get a prompt to specify the local connection address — the default is typically sufficent. Accept the default address.
-* A new "In development" section should appear in your add-ons list w/ a "hello-world" add-on.
-* Click this icon and your add-on will be running in a panel on the right-hand side of the page.
+-   Create a new document (or open an existing one)
+-   Click the "Add-ons" icon in the left-hand rail
+-   Click the "Your add-ons" tab
+-   At the bottom of this tab you'll see an "Add-on testing" toggle — switch this to "on"
+-   You'll get a prompt to specify the local connection address — the default is typically sufficent. Accept the default address.
+-   A new "In development" section should appear in your add-ons list w/ a "hello-world" add-on.
+-   Click this icon and your add-on will be running in a panel on the right-hand side of the page.
 
 ### Make changes to your add-on
 
@@ -70,4 +70,3 @@ Now you can make changes to your add-on's code and your add-on will be reloaded 
 ## Usage
 
 For full usage instructions on using the `create-ccweb-add-on` CLI, check the [Development Tools](https://developer.adobe.com/express/add-ons/docs/guides/getting_started/dev_tooling/) documentation.
-
