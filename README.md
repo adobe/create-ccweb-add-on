@@ -2,6 +2,16 @@
 
 Create a new add-on project for Adobe Express.
 
+<!-- toc -->
+* [Getting Started](#getting-started)
+  * [Prerequisites](#prerequisites)
+  * [Create your first add-on project](#create-your-first-add-on-project)
+  * [Configure Developer Mode for Adobe Express](#configure-developer-mode-for-adobe-express)
+  * [Load your add-on in Adobe Express](#load-your-add-on-in-adobe-express)
+  * [Make changes to your add-on](#make-changes-to-your-add-on)
+* [Usage](#usage)
+<!-- tocstop -->
+
 ## Getting Started
 
 Be sure to check out the [documentation for developing Adobe Express add-ons](https://developer.adobe.com/express/add-ons/). If you want to get started, quickly, be sure to take a look at the [Quick Start Guide](https://developer.adobe.com/express/add-ons/docs/guides/getting_started/quickstart/).
