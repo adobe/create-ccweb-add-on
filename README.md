@@ -2,6 +2,11 @@
 
 Create a new add-on project for Adobe Express.
 
+[![Version](https://img.shields.io/npm/v/@adobe/create-ccweb-add-on.svg)](https://npmjs.org/package/@adobe/create-ccweb-add-on)
+[![Downloads/week](https://img.shields.io/npm/dw/@adobe/create-ccweb-add-on.svg)](https://npmjs.org/package/@adobe/create-ccweb-add-on)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
+
 <!-- toc -->
 * [Getting Started](#getting-started)
   * [Prerequisites](#prerequisites)
