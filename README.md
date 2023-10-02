@@ -21,7 +21,7 @@ Create a new add-on project for Adobe Express.
 
 Be sure to check out the [documentation for developing Adobe Express add-ons](https://developer.adobe.com/express/add-ons/). If you want to get started, quickly, be sure to take a look at the [Quick Start Guide](https://developer.adobe.com/express/add-ons/docs/guides/getting_started/quickstart/).
 
-To quickly get started building an Adobe Express add-on, follow these steps:
+To quickly get started building an Adobe Express add-on, follow these steps, or watch [this video](https://www.youtube.com/watch?v=kSq4ykQGOdo).
 
 ### Prerequisites
 
