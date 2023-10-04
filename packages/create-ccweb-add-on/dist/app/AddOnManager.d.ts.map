@@ -1,1 +1,0 @@
-{"version":3,"file":"AddOnManager.d.ts","sourceRoot":"","sources":["../../src/app/AddOnManager.ts"],"names":[],"mappings":"AAAA;;;;;;;;;;;;;;;;;;;;;;kFAsBkF;AAElF,OAAO,EAAE,WAAW,EAAE,MAAM,0BAA0B,CAAC;AACvD,OAAO,KAAK,EAAE,cAAc,EAAE,MAAM,8BAA8B,CAAC;AAEnE;;GAEG;AACH,qBAAa,YAAY;IACrB;;;;;OAKG;IAGH,MAAM,CAAC,cAAc,CAAC,SAAS,EAAE,cAAc,EAAE,SAAS,EAAE,MAAM,GAAG,WAAW;CAanF"}

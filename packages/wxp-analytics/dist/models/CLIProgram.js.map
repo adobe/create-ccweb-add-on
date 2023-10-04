@@ -1,1 +1,0 @@
-{"version":3,"file":"CLIProgram.js","sourceRoot":"","sources":["../../src/models/CLIProgram.ts"],"names":[],"mappings":"AAAA;;;;;;;;;;;;;;;;;;;;;;kFAsBkF;AAElF;;GAEG;AACH,MAAM,OAAO,UAAU;IACnB;;OAEG;IACM,IAAI,CAAS;IAEtB;;OAEG;IACM,OAAO,CAAS;IAEzB;;;;;OAKG;IACH,YAAY,IAAY,EAAE,OAAe;QACrC,IAAI,CAAC,IAAI,GAAG,IAAI,CAAC;QACjB,IAAI,CAAC,OAAO,GAAG,OAAO,CAAC;IAC3B,CAAC;CACJ"}

@@ -1,1 +1,0 @@
-{"version":3,"file":"UncaughtExceptionHandler.d.ts","sourceRoot":"","sources":["../../src/utilities/UncaughtExceptionHandler.ts"],"names":[],"mappings":"AAAA;;;;;;;;;;;;;;;;;;;;;;kFAsBkF;AAMlF;;GAEG;AACH,qBAAa,wBAAwB;IACjC;;;OAGG;IACH,MAAM,CAAC,wBAAwB,CAAC,WAAW,EAAE,MAAM;IAInD;;;;OAIG;IACH,MAAM,CAAC,uBAAuB,CAAC,WAAW,EAAE,MAAM,EAAE,KAAK,EAAE,KAAK,GAAG,IAAI;CAK1E"}
