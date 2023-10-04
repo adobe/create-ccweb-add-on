@@ -1,0 +1,15 @@
+{
+    "all": true,
+    "include": ["src/**/*.ts"],
+    "exclude": [
+        "src/**/*.spec.ts",
+        "src/**/index.ts",
+        "src/**/Types.ts",
+        "src/config/*",
+        "src/constants.ts",
+        "src/templates/*",
+        "**/*.d.ts"
+    ],
+    "reporter": ["html", "text", "text-summary"],
+    "report-dir": "coverage"
+}

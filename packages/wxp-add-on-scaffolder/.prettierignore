@@ -1,0 +1,5 @@
+.rush
+rush-logs
+coverage
+dist
+node_modules

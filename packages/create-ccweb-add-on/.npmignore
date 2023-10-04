@@ -1,0 +1,12 @@
+.DS_Store
+.eslint*
+.gitignore
+.prettierignore
+.rush
+.vscode
+**/*.js.map
+**/*.log
+**/*.yml
+coverage
+rush-logs
+temp

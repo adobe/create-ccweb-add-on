@@ -1,0 +1,31 @@
+{
+    "compilerOptions": {
+        "allowSyntheticDefaultImports": true,
+        "declaration": true,
+        "declarationMap": true,
+        "emitDecoratorMetadata": true,
+        "esModuleInterop": true,
+        "experimentalDecorators": true,
+        "forceConsistentCasingInFileNames": true,
+        "importHelpers": true,
+        "incremental": true,
+        "isolatedModules": true,
+        "module": "ESNext",
+        "moduleResolution": "node",
+        "noImplicitOverride": false,
+        "noUnusedLocals": true,
+        "outDir": "dist",
+        "preserveConstEnums": true,
+        "resolveJsonModule": true,
+        "sourceMap": true,
+        "strict": true,
+        "target": "ESNext",
+        "types": ["reflect-metadata"],
+        "useUnknownInCatchVariables": false
+    },
+    "exclude": ["node_modules", "src/test/**/*"],
+    "include": ["src/**/*"],
+    "ts-node": {
+        "files": true
+    }
+}
