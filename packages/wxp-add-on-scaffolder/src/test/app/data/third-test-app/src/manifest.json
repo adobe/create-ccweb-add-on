@@ -1,0 +1,23 @@
+{
+    "id": "",
+    "name": "",
+    "version": "",
+    "manifestVersion": 1,
+    "requirements": {
+        "apps": ["Express"]
+    },
+    "icon": [
+        {
+            "width": 100,
+            "height": 100,
+            "path": "icon-light.png",
+            "theme": ["light"]
+        },
+        {
+            "width": 100,
+            "height": 100,
+            "path": "icon-dark.png",
+            "theme": ["dark"]
+        }
+    ]
+}

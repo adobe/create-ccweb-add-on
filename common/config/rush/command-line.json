@@ -1,0 +1,56 @@
+{
+    "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/command-line.schema.json",
+    "commands": [
+        {
+            "commandKind": "bulk",
+            "name": "test",
+            "summary": "Run Unit Tests",
+            "description": "Incrementally run unit tests on all packages.",
+            "safeForSimultaneousRushProcesses": false,
+            "enableParallelism": true,
+            "ignoreDependencyOrder": false,
+            "ignoreMissingScript": true,
+            "allowWarningsInSuccessfulBuild": false,
+            "incremental": true
+        },
+        {
+            "commandKind": "global",
+            "name": "change:bulk",
+            "summary": "Create change logs",
+            "description": "Create change logs for the modified packages.",
+            "safeForSimultaneousRushProcesses": false,
+            "shellCommand": "node common/scripts/install-run-rush.js change --bulk"
+        }
+    ],
+    "parameters": [
+        {
+            "parameterKind": "string",
+            "longName": "--message",
+            "description": "Summary of change",
+            "associatedCommands": ["change:bulk"],
+            "argumentName": "CHANGE_SUMMARY",
+            "required": true
+        },
+        {
+            "parameterKind": "choice",
+            "longName": "--bump-type",
+            "description": "Type of change",
+            "associatedCommands": ["change:bulk"],
+            "alternatives": [
+                {
+                    "name": "patch",
+                    "description": "Patch"
+                },
+                {
+                    "name": "minor",
+                    "description": "Minor"
+                },
+                {
+                    "name": "major",
+                    "description": "Major"
+                }
+            ],
+            "required": true
+        }
+    ]
+}

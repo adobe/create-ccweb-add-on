@@ -1,0 +1,53 @@
+{
+    "name": "@adobe/ccweb-add-on-manifest",
+    "version": "1.0.0",
+    "author": "Adobe",
+    "license": "MIT",
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "files": [
+        "dist/*"
+    ],
+    "exports": {
+        ".": "./dist/index.js",
+        "./test-manifests": "./dist/test/utils/TestManifests.js"
+    },
+    "typesVersions": {
+        "*": {
+            "test-manifests": [
+                "dist/test/utils/TestManifests.d.ts"
+            ]
+        }
+    },
+    "repository": {
+        "url": "https://github.com/adobe/create-ccweb-add-on"
+    },
+    "scripts": {
+        "_prebuild": "node scripts/generateManifestValidator.js",
+        "ibuild": "rushx _prebuild && tsc",
+        "build": "rushx clean && rushx ibuild",
+        "build:release": "rushx _prebuild && tsc",
+        "build:watch": "rushx _prebuild && tsc --watch",
+        "clean": "rimraf coverage dist src/generated",
+        "test": "c8 mocha && c8 check-coverage --lines 100 --functions 100 --branches 100"
+    },
+    "dependencies": {
+        "tslib": "2.4.0"
+    },
+    "devDependencies": {
+        "@types/chai": "4.2.14",
+        "@types/mocha": "9.1.1",
+        "@types/node": "16.11.62",
+        "@types/sinon": "9.0.8",
+        "ajv": "8.11.0",
+        "c8": "7.7.2",
+        "chai": "4.3.4",
+        "mocha": "10.0.0",
+        "prettier": "2.8.0",
+        "rimraf": "3.0.2",
+        "sinon": "9.2.1",
+        "ts-node": "10.9.1",
+        "typescript": "4.8.4"
+    }
+}

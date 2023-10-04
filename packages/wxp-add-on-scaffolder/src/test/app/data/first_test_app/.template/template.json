@@ -1,0 +1,10 @@
+{
+    "scripts": {
+        "clean": "ccweb-add-on-scripts clean",
+        "build": "ccweb-add-on-scripts build",
+        "start": "ccweb-add-on-scripts start"
+    },
+    "devDependencies": {
+        "prettier": "2.6.0"
+    }
+}

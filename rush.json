@@ -1,0 +1,73 @@
+{
+    "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/rush.schema.json",
+    "rushVersion": "5.97.1",
+    "pnpmVersion": "6.7.1",
+    "nodeSupportedVersionRange": ">=14.15.0 <15.0.0 || >=16.13.0 <17.0.0 || >=18.15.0 <19.0.0",
+    "repository": {
+        "url": "https://github.com/adobe/create-ccweb-add-on",
+        "defaultBranch": "main",
+        "defaultRemote": "origin"
+    },
+    "eventHooks": {
+        "preRushInstall": [],
+        "postRushInstall": [],
+        "preRushBuild": [],
+        "postRushBuild": []
+    },
+    "projects": [
+        {
+            "packageName": "@adobe/ccweb-add-on-manifest",
+            "projectFolder": "packages/add-on-manifest",
+            "reviewCategory": "production",
+            "shouldPublish": true
+        },
+        {
+            "packageName": "@adobe/ccweb-add-on-core",
+            "projectFolder": "packages/wxp-core",
+            "reviewCategory": "production",
+            "shouldPublish": true
+        },
+        {
+            "packageName": "@adobe/create-ccweb-add-on",
+            "projectFolder": "packages/create-ccweb-add-on",
+            "reviewCategory": "production",
+            "shouldPublish": true
+        },
+        {
+            "packageName": "@adobe/ccweb-add-on-scaffolder",
+            "projectFolder": "packages/wxp-add-on-scaffolder",
+            "reviewCategory": "production",
+            "shouldPublish": true
+        },
+        {
+            "packageName": "@adobe/ccweb-add-on-scripts",
+            "projectFolder": "packages/wxp-scripts",
+            "reviewCategory": "production",
+            "shouldPublish": true
+        },
+        {
+            "packageName": "@adobe/ccweb-add-on-ssl",
+            "projectFolder": "packages/wxp-ssl",
+            "reviewCategory": "production",
+            "shouldPublish": true
+        },
+        {
+            "packageName": "@adobe/ccweb-add-on-analytics",
+            "projectFolder": "packages/wxp-analytics",
+            "reviewCategory": "production",
+            "shouldPublish": true
+        },
+        {
+            "packageName": "@adobe/ccweb-add-on-developer-terms",
+            "projectFolder": "packages/wxp-developer-terms",
+            "reviewCategory": "production",
+            "shouldPublish": true
+        },
+        {
+            "packageName": "@adobe/ccweb-add-on-sdk-types",
+            "projectFolder": "packages/wxp-sdk-typings",
+            "reviewCategory": "production",
+            "shouldPublish": true
+        }
+    ]
+}

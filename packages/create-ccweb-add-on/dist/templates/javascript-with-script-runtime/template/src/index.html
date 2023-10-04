@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="description" content="Get started with Add-on development using JavaScript with Script Runtime" />
+        <meta name="keywords" content="Adobe, Express, Add-On, JavaScript, Script Runtime" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Get Started</title>
+        <style>
+            .container {
+                margin: 24px;
+                display: flex;
+                flex-direction: column;
+            }
+
+            button {
+                background-color: rgb(82, 88, 228);
+                border-color: rgb(82, 88, 228);
+                border-radius: 16px;
+                border-style: solid;
+                color: rgb(255, 255, 255);
+                font-family: sans-serif;
+                height: 32px;
+            }
+
+            button:disabled {
+                background-color: rgb(177, 177, 177);
+                border-color: rgb(177, 177, 177);
+            }
+
+            button:not([disabled]):hover {
+                background-color: rgb(64, 70, 202);
+                cursor: pointer;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- 
+            Please note that this document does not use the spectrum web components theme for Express.
+            You may use "addOnUISdk.app.ui.theme" to get the current theme and style accordingly.
+        -->
+        <div class="container">
+            <button id="createRectangle" disabled>Create Rectangle</button>
+        </div>
+
+        <script type="module">
+            import addOnUISdk from "https://new.express.adobe.com/static/add-on-sdk/sdk.js";
+
+            addOnUISdk.ready.then(async () => {
+                console.log("addOnUISdk is ready for use.");
+
+                // Get the UI runtime.
+                const { runtime } = addOnUISdk.instance;
+
+                // Get the proxy object, which is required
+                // to call the APIs defined in the Script runtime
+                // i.e., in the `code.js` file of this add-on.
+                const scriptApi = await runtime.apiProxy("script");
+
+                const createRectangleButton = document.getElementById("createRectangle");
+                createRectangleButton.addEventListener("click", async event => {
+                    await scriptApi.createRectangle();
+                });
+
+                // Enable the button only when:
+                // 1. `addOnUISdk` is ready,
+                // 2. `scriptApi` is available, and
+                // 3. `click` event listener is registered.
+                createRectangleButton.disabled = false;
+            });
+        </script>
+    </body>
+</html>

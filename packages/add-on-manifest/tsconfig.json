@@ -1,0 +1,28 @@
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "allowSyntheticDefaultImports": true,
+        "declaration": true,
+        "declarationMap": true,
+        "esModuleInterop": true,
+        "experimentalDecorators": true,
+        "forceConsistentCasingInFileNames": true,
+        "importHelpers": true,
+        "incremental": true,
+        "isolatedModules": true,
+        "module": "ESNext",
+        "moduleResolution": "node",
+        "noImplicitAny": true,
+        "noImplicitOverride": false,
+        "noUnusedLocals": true,
+        "outDir": "dist",
+        "preserveConstEnums": true,
+        "sourceMap": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "target": "ESNext",
+        "useUnknownInCatchVariables": false
+    },
+    "exclude": ["node_modules", "**/*.spec.ts"],
+    "include": ["src/**/*"]
+}
