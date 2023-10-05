@@ -1,6 +1,6 @@
 {
     "name": "@adobe/ccweb-add-on-developer-terms",
-    "version": "1.0.0",
+    "version": "0.1.0",
     "author": "Adobe",
     "license": "MIT",
     "description": "Developer Terms of Use libraries for Adobe Creative Cloud Web Add-on.",
