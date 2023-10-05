@@ -22,7 +22,7 @@ jobs:
             - name: npm set access level
               run: |
                   echo "//registry.npmjs.org/:_authToken=\${NPM_AUTH_TOKEN}" > ~/.npmrc
-                  npm unpublish @adobe/ccweb-add-on-sdk-types@0.1.0
+                  npm unpublish @adobe/ccweb-add-on-scaffolder@0.1.0
                   npm unpublish @adobe/ccweb-add-on-ssl@0.1.0
                   npm unpublish @adobe/ccweb-add-on-analytics@0.1.0
                   npm unpublish @adobe/ccweb-add-on-developer-terms@0.1.0
