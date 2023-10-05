@@ -2,10 +2,10 @@
   "changes": [
     {
       "comment": "Create an Adobe Express add-on using a single command",
-      "type": "patch",
-      "packageName": "@adobe/ccweb-add-on-sdk-types"
+      "type": "minor",
+      "packageName": "@adobe/create-ccweb-add-on"
     }
   ],
-  "packageName": "@adobe/ccweb-add-on-sdk-types",
+  "packageName": "@adobe/create-ccweb-add-on",
   "email": "abhishekdas@adobe.com"
 }
