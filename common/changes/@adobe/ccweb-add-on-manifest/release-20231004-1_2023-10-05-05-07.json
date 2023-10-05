@@ -2,10 +2,10 @@
   "changes": [
     {
       "comment": "Create an Adobe Express add-on using a single command",
-      "type": "minor",
-      "packageName": "@adobe/ccweb-add-on-developer-terms"
+      "type": "major",
+      "packageName": "@adobe/ccweb-add-on-manifest"
     }
   ],
-  "packageName": "@adobe/ccweb-add-on-developer-terms",
+  "packageName": "@adobe/ccweb-add-on-manifest",
   "email": "abhishekdas@adobe.com"
 }

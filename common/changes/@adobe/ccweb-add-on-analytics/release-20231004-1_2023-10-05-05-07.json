@@ -2,10 +2,10 @@
   "changes": [
     {
       "comment": "Create an Adobe Express add-on using a single command",
-      "type": "minor",
-      "packageName": "@adobe/ccweb-add-on-ssl"
+      "type": "major",
+      "packageName": "@adobe/ccweb-add-on-analytics"
     }
   ],
-  "packageName": "@adobe/ccweb-add-on-ssl",
+  "packageName": "@adobe/ccweb-add-on-analytics",
   "email": "abhishekdas@adobe.com"
 }
