@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-analytics",
+      "comment": "Improvements and bug fixes",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-analytics"
+}
