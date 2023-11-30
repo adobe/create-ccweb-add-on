@@ -1,6 +1,6 @@
 {
     "name": "@adobe/ccweb-add-on-analytics",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "author": "Adobe",
     "license": "MIT",
     "description": "Analytics libraries for Adobe Creative Cloud Web Add-on.",
