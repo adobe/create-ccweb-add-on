@@ -454,17 +454,15 @@ importers:
       ts-sinon: 2.0.1
       typescript: 4.8.4
 
-  ../../packages/wxp-sdk-typings:
+  ../../packages/wxp-sdk-types:
     specifiers:
       '@types/node': 16.11.62
-      comlink: 4.3.1
       gl-matrix: 3.3.0
       prettier: 2.8.0
       ts-node: 10.9.1
       tslib: 2.4.0
       typescript: 4.8.4
     dependencies:
-      comlink: 4.3.1
       gl-matrix: 3.3.0
       tslib: 2.4.0
     devDependencies:
@@ -589,6 +587,7 @@ packages:
       - encoding
       - supports-color
     dev: false
+    bundledDependencies: []
 
   /@adobe/aio-lib-core-tvm/3.0.1:
     resolution: {integrity: sha512-ysbXCJash1wwajMwDOuMUci4kFVPm0/dxqUpJMe6Wcf6LkzJralUOJoWlcmoHFO7ACZbFpHnEy5W2td5Fh0r7g==}
@@ -2533,10 +2532,6 @@ packages:
     engines: {node: '>= 0.8'}
     dependencies:
       delayed-stream: 1.0.0
-    dev: false
-
-  /comlink/4.3.1:
-    resolution: {integrity: sha512-+YbhUdNrpBZggBAHWcgQMLPLH1KDF3wJpeqrCKieWQ8RL7atmgsgTQko1XEBK6PsecfopWNntopJ+ByYG1lRaA==}
     dev: false
 
   /command-exists/1.2.9:

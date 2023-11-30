@@ -114,13 +114,6 @@ describe("CLIPreferences", () => {
             const preferenceFilePath = `/some-directory/${CCWEB_ADDON_DIRECTORY}/${ADD_ON_PREFERENCES_FILE}`;
             const expectedPreference = {
                 hasTelemetryConsent: false,
-                ims: {
-                    contexts: {
-                        cli: {
-                            "cli.bare-output": true
-                        }
-                    }
-                },
                 clientId: 1096361282655,
                 ssl: {
                     localhost: {
@@ -148,7 +141,6 @@ describe("CLIPreferences", () => {
             const actualPreference = cliPreferences.get();
 
             assert.equal(actualPreference.hasTelemetryConsent, expectedPreference.hasTelemetryConsent);
-            assert.deepEqual(actualPreference.ims, expectedPreference.ims);
             assert.equal(actualPreference.clientId, expectedPreference.clientId);
             assert.deepEqual(actualPreference.ssl, new Map(Object.entries(expectedPreference.ssl)));
 
@@ -165,13 +157,6 @@ describe("CLIPreferences", () => {
             const preferenceFilePath = `/some-directory/${CCWEB_ADDON_DIRECTORY}/${ADD_ON_PREFERENCES_FILE}`;
             const preference = {
                 hasTelemetryConsent: false,
-                ims: {
-                    contexts: {
-                        cli: {
-                            "cli.bare-output": true
-                        }
-                    }
-                },
                 clientId: 1096361282655,
                 ssl: {
                     localhost: {

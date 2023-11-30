@@ -65,7 +65,7 @@
         },
         {
             "packageName": "@adobe/ccweb-add-on-sdk-types",
-            "projectFolder": "packages/wxp-sdk-typings",
+            "projectFolder": "packages/wxp-sdk-types",
             "reviewCategory": "production",
             "shouldPublish": true
         }

@@ -50,11 +50,6 @@ export class PreferenceJson {
     hasTelemetryConsent?: boolean;
 
     /**
-     * stores the auth_token and refresh_token
-     */
-    ims?: { [k: string]: unknown };
-
-    /**
      * stores the clientId used to identify client while sending analytics
      */
     clientId?: number;
@@ -72,7 +67,6 @@ export class PreferenceJson {
     constructor(content: { [k: string]: unknown }) {
         this.ssl = this._getSSL(content);
         this.hasTelemetryConsent = content.hasTelemetryConsent as boolean;
-        this.ims = content.ims as { [k: string]: unknown };
         this.clientId = content.clientId as number;
     }
 
@@ -83,7 +77,6 @@ export class PreferenceJson {
     toJSON(): string {
         return getJSONString({
             hasTelemetryConsent: this.hasTelemetryConsent,
-            ims: this.ims,
             clientId: this.clientId,
             ssl: this.ssl ? Object.fromEntries(this.ssl) : undefined
         });

@@ -97,10 +97,12 @@ export class AddOnManifestEntrypoint {
         return this._entrypoint;
     }
 
-    get script(): Readonly<string> | undefined {
+    get documentSandbox(): Readonly<string> | undefined {
         switch (this._manifestVersion) {
             case ManifestVersion.V2: {
-                return (this._entrypoint as ManifestEntrypointType<ManifestVersion.V2>).script;
+                const entrypoint = this._entrypoint as ManifestEntrypointType<ManifestVersion.V2>;
+                // Support deprecated entrypoint script
+                return entrypoint.documentSandbox || entrypoint.script;
             }
             default: {
                 return undefined;

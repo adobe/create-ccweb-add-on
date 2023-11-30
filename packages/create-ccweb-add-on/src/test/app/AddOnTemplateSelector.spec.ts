@@ -36,7 +36,7 @@ import { stubInterface } from "ts-sinon";
 import { AnalyticsErrorMarkers } from "../../AnalyticsMarkers.js";
 import { AddOnTemplateSelector } from "../../app/AddOnTemplateSelector.js";
 import type { TemplateSelector } from "../../app/TemplateSelector.js";
-import { ADD_ON_TEMPLATES, PROGRAM_NAME } from "../../constants.js";
+import { ADD_ON_TEMPLATES, PROGRAM_NAME, WITH_DOCUMENT_SANDBOX } from "../../constants.js";
 import { CLIOptions } from "../../models/index.js";
 
 describe("AddOnTemplateSelector", () => {
@@ -159,7 +159,7 @@ describe("AddOnTemplateSelector", () => {
         });
 
         it("should ask the user to select template name if an invalid templateName is present in CLIOptions.", async () => {
-            const scriptRuntimeChoices = [
+            const documentSandboxChoices = [
                 {
                     title: "No",
                     value: false
@@ -173,7 +173,7 @@ describe("AddOnTemplateSelector", () => {
             const promptsStub = sandbox.stub(prompts, "prompt");
             promptsStub.resolves({
                 selectedTemplate: templateChoices[1].value,
-                includeScriptRuntime: scriptRuntimeChoices[0].value
+                includeDocumentSandbox: documentSandboxChoices[0].value
             });
 
             const cliOptions = new CLIOptions(EntrypointType.PANEL, "test-app", "incorrect-template", false);
@@ -183,12 +183,12 @@ describe("AddOnTemplateSelector", () => {
 
             assert.equal(template, templateChoices[1].value);
             assert.equal(logger.warning.callCount, 1);
-            assert.equal(logger.warning.calledWith("You have chosen an invalid template", { prefix: "\n" }), true);
+            assert.equal(logger.warning.calledWith("You have chosen an invalid template.", { prefix: "\n" }), true);
             assert.equal(analyticsService.postEvent.callCount, 0);
         });
 
         it("should prompt the user to select template if not present in CLIOptions.", async () => {
-            const scriptRuntimeChoices = [
+            const documentSandboxChoices = [
                 {
                     title: "No",
                     value: false
@@ -202,7 +202,7 @@ describe("AddOnTemplateSelector", () => {
             const promptsStub = sandbox.stub(prompts, "prompt");
             promptsStub.resolves({
                 selectedTemplate: templateChoices[1].value,
-                includeScriptRuntime: scriptRuntimeChoices[0].value
+                includeDocumentSandbox: documentSandboxChoices[0].value
             });
 
             const cliOptions = new CLIOptions(EntrypointType.PANEL, "test-app", "", false);
@@ -214,8 +214,8 @@ describe("AddOnTemplateSelector", () => {
             assert.equal(analyticsService.postEvent.callCount, 0);
         });
 
-        it("should return the template name when script runtime is included.", async () => {
-            const scriptRuntimeChoices = [
+        it("should return the template name when document sandbox is included.", async () => {
+            const documentSandboxChoices = [
                 {
                     title: "No",
                     value: false
@@ -229,7 +229,7 @@ describe("AddOnTemplateSelector", () => {
             const promptsStub = sandbox.stub(prompts, "prompt");
             promptsStub.resolves({
                 selectedTemplate: templateChoices[1].value,
-                includeScriptRuntime: scriptRuntimeChoices[1].value
+                includeDocumentSandbox: documentSandboxChoices[1].value
             });
 
             const cliOptions = new CLIOptions(EntrypointType.PANEL, "test-app", "", false);
@@ -238,7 +238,7 @@ describe("AddOnTemplateSelector", () => {
             const template = await templateSelector.setupTemplate(cliOptions);
 
             assert.equal(logger.warning.callCount, 0);
-            assert.equal(template, templateChoices[1].value + "-with-script-runtime");
+            assert.equal(template, templateChoices[1].value + `-${WITH_DOCUMENT_SANDBOX}`);
             assert.equal(analyticsService.postEvent.callCount, 0);
         });
 
@@ -257,10 +257,10 @@ describe("AddOnTemplateSelector", () => {
             assert.equal(analyticsService.postEvent.callCount, 0);
         });
 
-        it("should exit if user doesnt select any option in script runtime prompt.", async () => {
+        it("should exit if user doesnt select any option in document sandbox prompt.", async () => {
             const promptsStub = sandbox.stub(prompts, "prompt");
             const exitProcessStub = sandbox.stub(process, "exit");
-            promptsStub.resolves({ selectedTemplate: templateChoices[1].value, includeScriptRuntime: undefined });
+            promptsStub.resolves({ selectedTemplate: templateChoices[1].value, includeDocumentSandbox: undefined });
 
             const cliOptions = new CLIOptions(EntrypointType.PANEL, "test-app", "", false);
 

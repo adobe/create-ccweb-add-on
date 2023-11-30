@@ -13,9 +13,9 @@ This package provides commands which can be used to build, start and package you
 | Command | Description                        | Basic Usage                                     |
 | ------- | ---------------------------------- | ----------------------------------------------- |
 | clean   | Clean the build output directory.  | ccweb-add-on-scripts clean                      |
-| build   | Build the add-on.                  | ccweb-add-on-scripts build --use <transpiler>   |
-| start   | Host the add-on on a local server. | ccweb-add-on-scripts start --port <port-number> |
-| package | Package the add-on for submission. | ccweb-add-on-scripts package                    |
+| build   | Build the add-on.                  | ccweb-add-on-scripts build --use [transpiler]   |
+| start   | Host the add-on on a local server. | ccweb-add-on-scripts start --port [port-number] |
+| package | Package the add-on for submission. | ccweb-add-on-scripts package --use [transpiler] |
 
 For detailed usage guides, you may check `npx @adobe/ccweb-add-on-scripts --help`.
 

@@ -33,7 +33,7 @@ import prompts from "prompts";
 import "reflect-metadata";
 import format from "string-template";
 import { AnalyticsErrorMarkers } from "../AnalyticsMarkers.js";
-import { ADD_ON_TEMPLATES, AVAILABLE_ADD_ON_TEMPLATES, PROGRAM_NAME, WITH_SCRIPT_RUNTIME } from "../constants.js";
+import { ADD_ON_TEMPLATES, AVAILABLE_ADD_ON_TEMPLATES, PROGRAM_NAME, WITH_DOCUMENT_SANDBOX } from "../constants.js";
 import type { CLIOptions } from "../models/index.js";
 import type { TemplateSelector } from "./TemplateSelector.js";
 
@@ -99,11 +99,11 @@ export class AddOnTemplateSelector implements TemplateSelector {
 
         /* c8 ignore next 4 */
         /* All templates are currently available. */
-        if (!AVAILABLE_ADD_ON_TEMPLATES.includes(`${templateResponse.selectedTemplate}-${WITH_SCRIPT_RUNTIME}`)) {
+        if (!AVAILABLE_ADD_ON_TEMPLATES.includes(`${templateResponse.selectedTemplate}-${WITH_DOCUMENT_SANDBOX}`)) {
             return templateResponse.selectedTemplate;
         }
 
-        const scriptRuntimeChoices = [
+        const documentSandboxChoices = [
             {
                 title: this._promptMessageOption(LOGS.no),
                 value: false
@@ -113,22 +113,22 @@ export class AddOnTemplateSelector implements TemplateSelector {
                 value: true
             }
         ];
-        const scriptRuntimeResponse = await prompts.prompt({
+        const documentSandboxResponse = await prompts.prompt({
             type: "select",
-            name: "includeScriptRuntime",
-            message: this._promptMessage(LOGS.includeScriptRuntime),
-            choices: scriptRuntimeChoices,
+            name: "includeDocumentSandbox",
+            message: this._promptMessage(LOGS.includeDocumentSandbox),
+            choices: documentSandboxChoices,
             initial: 0
         });
 
-        if (!scriptRuntimeResponse || scriptRuntimeResponse.includeScriptRuntime === undefined) {
+        if (!documentSandboxResponse || documentSandboxResponse.includeDocumentSandbox === undefined) {
             console.log();
             return process.exit(0);
         }
 
-        // Append `with-script-runtime` to the template name if user wants to include script runtime
-        return scriptRuntimeResponse.includeScriptRuntime
-            ? `${templateResponse.selectedTemplate}-${WITH_SCRIPT_RUNTIME}`
+        // Append `with-document-sandbox` to the template name if user wants to include document sandbox
+        return documentSandboxResponse.includeDocumentSandbox
+            ? `${templateResponse.selectedTemplate}-${WITH_DOCUMENT_SANDBOX}`
             : templateResponse.selectedTemplate;
     }
 
@@ -184,10 +184,10 @@ const LOGS = {
     chooseValidKind: "Please choose a valid Add-on kind (valid kind: panel)",
     executeProgramWithValidKind: "{PROGRAM_NAME} <add-on-name> --kind <panel>",
     executeProgramWithValidKindExample: "{PROGRAM_NAME} my-add-on --kind panel",
-    chooseValidTemplate: "You have chosen an invalid template",
+    chooseValidTemplate: "You have chosen an invalid template.",
     forExample: "For example:",
     analyticsInvalidKind: "Invalid Add-on kind specified",
-    includeScriptRuntime: "Do you want to include script runtime?",
+    includeDocumentSandbox: "Do you want to include document sandbox runtime?",
     yes: "Yes",
     no: "No"
 };

@@ -35,7 +35,6 @@ describe("PreferenceJson", () => {
 
             assert.isDefined(preferenceJson);
             assert.isUndefined(preferenceJson.hasTelemetryConsent);
-            assert.isUndefined(preferenceJson.ims);
             assert.isUndefined(preferenceJson.clientId);
             assert.isUndefined(preferenceJson.ssl);
         });
@@ -43,13 +42,6 @@ describe("PreferenceJson", () => {
         it("should set the properties from the 'content' constructor argument.", () => {
             const content = {
                 hasTelemetryConsent: false,
-                ims: {
-                    contexts: {
-                        cli: {
-                            "cli.bare-output": true
-                        }
-                    }
-                },
                 clientId: 1096361282655,
                 ssl: {
                     localhost: {
@@ -67,7 +59,6 @@ describe("PreferenceJson", () => {
 
             assert.isDefined(preferenceJson);
             assert.equal(preferenceJson.hasTelemetryConsent, content.hasTelemetryConsent);
-            assert.deepEqual(preferenceJson.ims, content.ims);
             assert.equal(preferenceJson.clientId, content.clientId);
             assert.deepEqual(Object.fromEntries(preferenceJson.ssl!), content.ssl);
         });
@@ -75,13 +66,6 @@ describe("PreferenceJson", () => {
         it("should set the backward compatible SSL properties from the 'content' constructor argument.", () => {
             const content = {
                 hasTelemetryConsent: false,
-                ims: {
-                    contexts: {
-                        cli: {
-                            "cli.bare-output": true
-                        }
-                    }
-                },
                 clientId: 1096361282655,
                 sslCertPath: "/some-directory/localhost/ssl/certificate.cert",
                 sslKeyPath: "/some-directory/localhost/ssl/private-key.key"
@@ -91,7 +75,6 @@ describe("PreferenceJson", () => {
 
             assert.isDefined(preferenceJson);
             assert.equal(preferenceJson.hasTelemetryConsent, content.hasTelemetryConsent);
-            assert.deepEqual(preferenceJson.ims, content.ims);
             assert.equal(preferenceJson.clientId, content.clientId);
             assert.deepEqual(Object.fromEntries(preferenceJson.ssl!), {
                 [DEFAULT_HOST_NAME]: {
@@ -104,13 +87,6 @@ describe("PreferenceJson", () => {
         it("should set the latest SSL version when both versions are present in the 'content' constructor argument.", () => {
             const content = {
                 hasTelemetryConsent: false,
-                ims: {
-                    contexts: {
-                        cli: {
-                            "cli.bare-output": true
-                        }
-                    }
-                },
                 clientId: 1096361282655,
                 ssl: {
                     localhost: {
@@ -130,7 +106,6 @@ describe("PreferenceJson", () => {
 
             assert.isDefined(preferenceJson);
             assert.equal(preferenceJson.hasTelemetryConsent, content.hasTelemetryConsent);
-            assert.deepEqual(preferenceJson.ims, content.ims);
             assert.equal(preferenceJson.clientId, content.clientId);
             assert.deepEqual(Object.fromEntries(preferenceJson.ssl!), content.ssl);
         });
@@ -147,13 +122,6 @@ describe("PreferenceJson", () => {
             {
                 content: {
                     hasTelemetryConsent: false,
-                    ims: {
-                        contexts: {
-                            cli: {
-                                "cli.bare-output": true
-                            }
-                        }
-                    },
                     clientId: 1096361282655,
                     ssl: {
                         localhost: {

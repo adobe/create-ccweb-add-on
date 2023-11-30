@@ -31,7 +31,8 @@ import {
     ManifestError,
     ManifestValidationResult,
     OTHER_MANIFEST_ERRORS,
-    ManifestEntrypoint
+    ManifestEntrypoint,
+    EntrypointV2
 } from "./AddOnManifestTypes.js";
 import { developerVersionValidation, getManifestVersion, getValidationErrors } from "./ValidationUtils.js";
 import { validateSchemaV1, validateSchemaV2 } from "./generated/validateManifestSchema.mjs";
@@ -88,6 +89,31 @@ export class AddOnManifestValidator {
                 }
             });
         }
+        if (this._manifestVersion > ManifestVersion.V1) {
+            const documentSandboxValidation = this._isValidDocumentSandboxEntry(manifest);
+            if (!documentSandboxValidation.success) {
+                isValidSchema = false;
+                validationErrors.push(...documentSandboxValidation.errorDetails!);
+            }
+        }
+        return {
+            success: isValidSchema,
+            errorDetails: validationErrors
+        };
+    }
+
+    private _isValidDocumentSandboxEntry(manifest: ReturnType<typeof JSON.parse>): ManifestValidationResult {
+        let isValidSchema = true;
+        const validationErrors: ManifestError[] = [];
+        manifest.entryPoints?.forEach((entrypoint: EntrypointV2) => {
+            if (entrypoint.documentSandbox && entrypoint.script) {
+                this._logError(
+                    `Manifest entrypoint '${entrypoint.id}' should have either 'documentSandbox' or 'script', not both`
+                );
+                validationErrors.push(OTHER_MANIFEST_ERRORS.DocumentSandboxWithScript);
+                isValidSchema = false;
+            }
+        });
         return {
             success: isValidSchema,
             errorDetails: validationErrors

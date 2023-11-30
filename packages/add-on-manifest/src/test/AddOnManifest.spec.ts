@@ -94,7 +94,7 @@ describe("AddOnManifest", () => {
         assert.equal(manifest.requirements.privilegedApis, false);
         assert.equal(false, manifest.requirements.supportsTouch);
         assert.equal(false, manifest.requirements.renditionPreview);
-        assert.equal(manifest.entryPoints[0].script, undefined);
+        assert.equal(manifest.entryPoints[0].documentSandbox, undefined);
     });
 
     it("should return AddOn - Manifest Version 2", () => {
@@ -145,7 +145,7 @@ describe("AddOnManifest", () => {
         const manifest = AddOnManifest.createManifest({ manifest: testManifest, additionalInfo }).manifest!;
 
         verifyCommonManifestFields(manifest, testManifest);
-        assert.equal(manifest.entryPoints[0].script, testManifest.entryPoints[0].script);
+        assert.equal(manifest.entryPoints[0].documentSandbox, testManifest.entryPoints[0].script);
     });
 
     it("should return error for invalid manifest", () => {

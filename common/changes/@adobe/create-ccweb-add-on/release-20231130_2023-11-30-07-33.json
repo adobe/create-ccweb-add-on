@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/create-ccweb-add-on",
+      "comment": "Template changes to accomodate renaming from script to documentSandbox",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@adobe/create-ccweb-add-on"
+}

@@ -23,7 +23,7 @@
  ********************************************************************************/
 
 import type { Logger } from "@adobe/ccweb-add-on-core";
-import { ADD_ON_PREFERENCES_FILE, CCWEB_ADDON_DIRECTORY, ITypes } from "@adobe/ccweb-add-on-core";
+import { CCWEB_ADDON_DIRECTORY, ITypes } from "@adobe/ccweb-add-on-core";
 import applicationConfigPath from "application-config-path";
 import axios from "axios";
 import chalk from "chalk";
@@ -34,7 +34,7 @@ import prompts from "prompts";
 import "reflect-metadata";
 import format from "string-template";
 import terminalLink from "terminal-link";
-import { API_URL, PRIVILEGED_EMAILS } from "../constants.js";
+import { AIO_CONFIG_FILE, API_URL, PRIVILEGED_EMAILS } from "../constants.js";
 import type { DtouAcceptanceData, UserOrgData } from "../models/Types.js";
 import { AcceptTermsOfUse } from "../models/Types.js";
 import { AuthLibManager } from "../utilities/AuthLibManager.js";
@@ -54,7 +54,7 @@ export class DeveloperAccountService implements AccountService {
      */
     constructor(@inject(ITypes.Logger) logger: Logger) {
         this._logger = logger;
-        process.env.AIO_CONFIG_FILE = path.join(applicationConfigPath(CCWEB_ADDON_DIRECTORY), ADD_ON_PREFERENCES_FILE);
+        process.env.AIO_CONFIG_FILE = path.join(applicationConfigPath(CCWEB_ADDON_DIRECTORY), AIO_CONFIG_FILE);
     }
 
     /**

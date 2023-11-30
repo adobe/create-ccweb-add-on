@@ -12,7 +12,7 @@ rm -rf wxp-scripts/config
 rm -rf create-ccweb-add-on/config
 rm -rf wxp-analytics/config
 rm -rf wxp-developer-terms/config
-rm -rf wxp-sdk-typings/config
+rm -rf wxp-sdk-types/config
 echo $'Done!\n'
 
 echo 'Removing lint scripts ...'
@@ -30,6 +30,10 @@ find -E ./add-on-manifest -type f -regex '.*package\.json' -exec sed -i '.bak' '
 find ./add-on-manifest -name '*.bak' -type f -delete
 
 find -E ./create-ccweb-add-on -type f -regex '.*package\.json' -exec sed -i '.bak' 's/branches 100",/branches 100"/g' {} \;
+find ./create-ccweb-add-on -name '*.bak' -type f -delete
+find -E ./create-ccweb-add-on -type f -regex '.*package\.json' -exec sed -i '.bak' 's/"copy-assets": "copy-files -a -s \\"templates\/\*\*\/\*\\" -d dist"/"_postbuild": "cp -R templates\/ dist\/templates"/g' {} \;
+find ./create-ccweb-add-on -name '*.bak' -type f -delete
+find -E ./create-ccweb-add-on -type f -regex '.*package\.json' -exec sed -i '.bak' 's/rushx copy-assets/rushx _postbuild/g' {} \;
 find ./create-ccweb-add-on -name '*.bak' -type f -delete
 
 find -E ./wxp-analytics -type f -regex '.*package\.json' -exec sed -i '.bak' 's/branches 100",/branches 100"/g' {} \;
@@ -50,8 +54,8 @@ find ./wxp-scripts -name '*.bak' -type f -delete
 find -E ./wxp-ssl -type f -regex '.*package\.json' -exec sed -i '.bak' 's/branches 100",/branches 100"/g' {} \;
 find ./wxp-ssl -name '*.bak' -type f -delete
 
-find -E ./wxp-sdk-typings -type f -regex '.*package\.json' -exec sed -i '.bak' 's/"test": "",/"test": ""/g' {} \;
-find ./wxp-sdk-typings -name '*.bak' -type f -delete
+find -E ./wxp-sdk-types -type f -regex '.*package\.json' -exec sed -i '.bak' 's/"test": "",/"test": ""/g' {} \;
+find ./wxp-sdk-types -name '*.bak' -type f -delete
 echo $'Done!\n'
 
 echo 'Removing eslint configurations ...'

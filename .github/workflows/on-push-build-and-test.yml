@@ -2,6 +2,7 @@ name: build and test
 on:
     pull_request:
         branches: ["main"]
+        paths: ["packages/**/*"]
 jobs:
     build-and-test:
         runs-on: ubuntu-latest

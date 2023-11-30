@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-scaffolder",
+      "comment": "Improvements and bug fixes",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-scaffolder"
+}
