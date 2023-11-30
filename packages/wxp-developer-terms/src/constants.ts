@@ -22,6 +22,8 @@
  * SOFTWARE.
  ********************************************************************************/
 
+export const AIO_CONFIG_FILE = "aio.config.json";
+
 export const API_URL = {
     FETCH_ORG_ID: "https://ffc-addon.adobe.io/v1/developer/organizations",
     FETCH_DEVELOPER_TERMS_ACCEPTANCE: "https://ffc-addon.adobe.io/v1/developer/terms",

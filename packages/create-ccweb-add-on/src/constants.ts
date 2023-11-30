@@ -33,15 +33,15 @@ export const ADD_ON_TEMPLATES = new Map<string, string>([
 
 export const TEMP_TEMPLATE_PATH = ".template";
 
-export const WITH_SCRIPT_RUNTIME = "with-script-runtime";
+export const WITH_DOCUMENT_SANDBOX = "with-document-sandbox";
 
 export const AVAILABLE_ADD_ON_TEMPLATES = [
     "javascript",
     "typescript",
     "react-javascript",
     "react-typescript",
-    `javascript-${WITH_SCRIPT_RUNTIME}`,
-    `typescript-${WITH_SCRIPT_RUNTIME}`,
-    `react-javascript-${WITH_SCRIPT_RUNTIME}`,
-    `react-typescript-${WITH_SCRIPT_RUNTIME}`
+    `javascript-${WITH_DOCUMENT_SANDBOX}`,
+    `typescript-${WITH_DOCUMENT_SANDBOX}`,
+    `react-javascript-${WITH_DOCUMENT_SANDBOX}`,
+    `react-typescript-${WITH_DOCUMENT_SANDBOX}`
 ];

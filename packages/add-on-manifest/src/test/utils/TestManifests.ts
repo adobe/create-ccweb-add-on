@@ -224,3 +224,19 @@ export function getTestManifestV2WithScript(script: string | undefined = undefin
     };
     return manifest;
 }
+
+export function getTestManifestV2WithDocumentSandbox(documentSandbox: string | undefined = undefined): AddOnManifestV2 {
+    const manifest = {
+        ...getTestManifestV2(),
+        entryPoints: [
+            {
+                type: EntrypointType.PANEL,
+                id: `#testId${count}`,
+                main: "index.html",
+                documentSandbox,
+                permissions: { sandbox: [] }
+            }
+        ]
+    };
+    return manifest;
+}

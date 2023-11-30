@@ -30,6 +30,7 @@ import {
     getTestDeveloperManifestV1,
     getTestDeveloperManifestV2,
     getTestManifestV1,
+    getTestManifestV2WithDocumentSandbox,
     getTestManifestV2WithScript
 } from "./utils/TestManifests.js";
 
@@ -108,6 +109,31 @@ describe("Developer ManifestSchema Validation - Version 2", () => {
     it("should fail if 'script' field is other than string", () => {
         // @ts-ignore -- negative test case
         const testManifest = getTestManifestV2WithScript({});
+        assert.equal(
+            validator.validateManifestSchema(testManifest, { ...additionInfo, isDeveloperAddOn: true }).success,
+            false
+        );
+    });
+
+    it("should pass if 'documentSandbox' field is present in entrypoint", () => {
+        const testManifest = getTestManifestV2WithDocumentSandbox("code.js");
+        assert.equal(
+            validator.validateManifestSchema(testManifest, { ...additionInfo, isDeveloperAddOn: true }).success,
+            true
+        );
+    });
+
+    it("should fail if both 'script' and 'documentSandbox' fields are present in entrypoint", () => {
+        const manifest = getTestManifestV2WithDocumentSandbox("code.js");
+        const testManifest = {
+            ...manifest,
+            entryPoints: [
+                {
+                    ...manifest.entryPoints[0],
+                    script: "code.js"
+                }
+            ]
+        };
         assert.equal(
             validator.validateManifestSchema(testManifest, { ...additionInfo, isDeveloperAddOn: true }).success,
             false

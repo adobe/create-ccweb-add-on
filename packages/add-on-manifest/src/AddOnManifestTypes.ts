@@ -100,7 +100,11 @@ export type EntrypointV1 = {
 };
 
 export type EntrypointV2 = Omit<EntrypointV1, "defaultSize" | "label"> & {
+    /**
+     * @deprecated Use `documentSandbox` instead.
+     */
     readonly script?: string;
+    readonly documentSandbox?: string;
 };
 
 export type ManifestEntrypoint = EntrypointV1 | EntrypointV2;
@@ -182,6 +186,10 @@ export const OTHER_MANIFEST_ERRORS: ManifestErrorType = {
     AdditionPropertyExperimentalApis: {
         instancePath: "/requirements/experimentalApis",
         message: "Experimental apis are not supported for production add-ons"
+    },
+    DocumentSandboxWithScript: {
+        instancePath: "/entryPoints/documentSandbox",
+        message: "Manifest entrypoint should have either 'documentSandbox' or 'script', not both"
     }
 };
 

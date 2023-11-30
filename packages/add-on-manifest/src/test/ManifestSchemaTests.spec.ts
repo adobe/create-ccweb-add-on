@@ -39,7 +39,12 @@ import {
     Size
 } from "../AddOnManifestTypes.js";
 import { AddOnManifestValidator } from "../AddOnManifestValidator.js";
-import { getTestManifestV1, getTestManifestV2, getTestManifestV2WithScript } from "./utils/TestManifests.js";
+import {
+    getTestManifestV1,
+    getTestManifestV2,
+    getTestManifestV2WithDocumentSandbox,
+    getTestManifestV2WithScript
+} from "./utils/TestManifests.js";
 
 const _addOnLogger: Map<AddOnLogLevel, AddOnLogAction> | undefined = new Map([
     [AddOnLogLevel.error, (...args: unknown[]) => console.log(args)],
@@ -528,6 +533,25 @@ describe("ManifestSchema Validations - Version 2", () => {
                 validator.validateManifestSchema(testManifest, { ...additionInfo, isDeveloperAddOn: true }).success,
                 false
             );
+        });
+
+        it("should pass if 'documentSandbox' field is present in entrypoint", () => {
+            const testManifest = getTestManifestV2WithDocumentSandbox("code.js");
+            assert.equal(validator.validateManifestSchema(testManifest, additionInfo).success, true);
+        });
+
+        it("should fail if both 'script' and 'documentSandbox' fields are present in entrypoint", () => {
+            const manifest = getTestManifestV2WithDocumentSandbox("code.js");
+            const testManifest = {
+                ...manifest,
+                entryPoints: [
+                    {
+                        ...manifest.entryPoints[0],
+                        script: "code.js"
+                    }
+                ]
+            };
+            assert.equal(validator.validateManifestSchema(testManifest, additionInfo).success, false);
         });
     });
 });
