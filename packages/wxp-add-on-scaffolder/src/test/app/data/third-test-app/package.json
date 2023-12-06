@@ -1,6 +1,6 @@
 {
     "name": "iframe-panel",
-    "version": "1.0.0",
+    "version": "1.1.1",
     "description": "Iframe Add-on",
     "scripts": {
         "clean": "ccweb-add-on-scripts clean",
