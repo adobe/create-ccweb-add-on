@@ -563,6 +563,10 @@ declare interface Document_2 {
      */
     createRenditions(renditionOptions: RenditionOptions, renditionIntent?: RenditionIntent): Promise<Rendition[]>;
     /**
+     * Get metadata of all or range of pages of the document
+     */
+    getPagesMetadata(options: PageMetadataOptions): Promise<PageMetadata[]>;
+    /**
      * Get document id
      */
     id(): Promise<string | undefined>;
@@ -792,6 +796,53 @@ export declare interface OAuth {
     authorizeWithOwnRedirect(request: AuthorizeWithOwnRedirectRequest): Promise<AuthorizationResult>;
 }
 
+/**
+ * Represents the metadata of the Page
+ */
+export declare interface PageMetadata {
+    /**
+     * Unique id that represent the given page
+     */
+    id: string;
+    /**
+     * Page title
+     */
+    title: string;
+    /**
+     * Page size in pixels
+     */
+    size: {
+        width: number;
+        height: number;
+    };
+    /**
+     * Whether page contains any premium content
+     */
+    hasPremiumContent: boolean;
+    /**
+     * Whether page contains timelines
+     */
+    hasTemporalContent: boolean;
+    /**
+     * Pixels per inch of the page
+     */
+    pixelsPerInch?: number;
+}
+
+/**
+ * Options for fetching page metadata
+ */
+export declare interface PageMetadataOptions {
+    /**
+     * Page range of the document to get the metadata
+     */
+    range: Range_2;
+    /**
+     * Ids of the pages (Only required if the range is "specificPages")
+     */
+    pageIds?: string[];
+}
+
 export declare interface PageRendition extends Rendition {
     /**
      * Page rendition type
@@ -801,6 +852,10 @@ export declare interface PageRendition extends Rendition {
      * Page title
      */
     title: string;
+    /**
+     * Page metadata
+     */
+    metadata: PageMetadata;
 }
 
 export declare interface PngRenditionOptions extends RenditionOptions {
@@ -857,7 +912,11 @@ declare enum Range_2 {
     /**
      * Generate rendition for all the pages
      */
-    entireDocument = "entireDocument"
+    entireDocument = "entireDocument",
+    /**
+     * Generate rendition for specific pages
+     */
+    specificPages = "specificPages"
 }
 export { Range_2 as Range };
 
@@ -958,6 +1017,10 @@ export declare interface RenditionOptions {
      * Format of the rendition
      */
     format: RenditionFormat;
+    /**
+     * Ids of the pages (Only required if the range is "specificPages")
+     */
+    pageIds?: string[];
 }
 
 /**
@@ -980,7 +1043,6 @@ export declare interface Runtime {
     dialog?: Dialog;
 
     /**
-     * @experimental - Experimental API
      * Exposes the concrete object/function of type T,
      * which can be accessed into different runtime part of this AddOn e.g., "document model sandbox" runtime.
      * Note that only concrete objects / class instances are supported. We can't expose entire class
@@ -995,7 +1057,6 @@ export declare interface Runtime {
      */
     exposeApi?<T>(apiObj: T): void;
     /**
-     * @experimental - Experimental API
      * Requests a promise based proxy object for other runtimes, which will be used
      * by this UI runtime to directly call the APIs exposed (using exposeApi) from the other runtimes.
      * await or .then is necessary, since returned object is a promise.

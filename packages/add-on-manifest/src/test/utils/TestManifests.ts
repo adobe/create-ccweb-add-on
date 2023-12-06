@@ -166,14 +166,18 @@ export function getTestManifestV2(privileged?: boolean): AddOnManifestV2 {
             supportsTouch: true,
             renditionPreview: true,
             privilegedApis: privileged ?? false,
-            _blessedPartnerAccess: "blessedPartnerAccess"
+            _blessedPartnerAccess: "blessedPartnerAccess",
+            trustedPartnerApis: {
+                messaging: false
+            }
         },
         entryPoints: [
             {
                 type: EntrypointType.PANEL,
                 id: `#testId${count}`,
                 main: "index.html",
-                permissions: privileged ? { sandbox: ["allow-downloads"], analytics: true } : { sandbox: [] }
+                permissions: privileged ? { sandbox: ["allow-downloads"], analytics: true } : { sandbox: [] },
+                discoverable: true
             }
         ]
     };

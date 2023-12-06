@@ -1,9 +1,18 @@
 {
     "name": "@adobe/ccweb-add-on-sdk-types",
-    "version": "1.1.0",
+    "version": "1.0.0",
     "author": "Adobe",
     "license": "MIT",
     "description": "Type definitions for Adobe Creative Cloud Web Add-on SDK.",
+    "keywords": [
+        "adobe",
+        "creative cloud web",
+        "express",
+        "add-on",
+        "typescript",
+        "sdk",
+        "typings"
+    ],
     "main": "",
     "types": "index.d.ts",
     "repository": {

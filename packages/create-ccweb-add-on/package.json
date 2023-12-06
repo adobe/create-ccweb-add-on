@@ -1,9 +1,17 @@
 {
     "name": "@adobe/create-ccweb-add-on",
-    "version": "1.1.0",
+    "version": "1.0.0",
     "author": "Adobe",
     "license": "MIT",
     "description": "Create an Adobe Creative Cloud Web Add-on.",
+    "keywords": [
+        "adobe",
+        "creative cloud web",
+        "express",
+        "create",
+        "add-on",
+        "templates"
+    ],
     "type": "module",
     "bin": {
         "create-ccweb-add-on": "./bin/run.js"

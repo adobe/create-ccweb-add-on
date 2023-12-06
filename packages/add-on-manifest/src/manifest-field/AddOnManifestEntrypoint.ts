@@ -109,4 +109,15 @@ export class AddOnManifestEntrypoint {
             }
         }
     }
+
+    get discoverable(): Readonly<boolean> | undefined {
+        switch (this._manifestVersion) {
+            case ManifestVersion.V1: {
+                return undefined;
+            }
+            default: {
+                return (this._entrypoint as ManifestEntrypointType<ManifestVersion.V2>).discoverable;
+            }
+        }
+    }
 }

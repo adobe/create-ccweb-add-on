@@ -124,11 +124,12 @@ export class WxpAddOnFactory implements AddOnFactory {
             const rootDirectory = process.cwd();
             process.chdir(addOnDirectory);
 
-            const devDependencyArgs = ["install", "--save-dev", "@adobe/ccweb-add-on-scripts"];
-
-            if (templateName.includes("typescript")) {
-                devDependencyArgs.push("@adobe/ccweb-add-on-sdk-types");
-            }
+            const devDependencyArgs = [
+                "install",
+                "--save-dev",
+                "@adobe/ccweb-add-on-scripts",
+                "@adobe/ccweb-add-on-sdk-types"
+            ];
 
             if (options.verbose) {
                 devDependencyArgs.push("--verbose");

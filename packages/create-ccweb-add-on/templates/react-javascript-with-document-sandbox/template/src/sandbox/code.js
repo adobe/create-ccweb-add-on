@@ -1,5 +1,5 @@
 import addOnSandboxSdk from "add-on-sdk-document-sandbox";
-import { editor, utils } from "express-document-sdk";
+import { editor } from "express-document-sdk";
 
 // Get the document sandbox runtime.
 const { runtime } = addOnSandboxSdk.instance;
@@ -19,11 +19,11 @@ function start() {
             rectangle.translation = { x: 10, y: 10 };
 
             // Define rectangle color.
-            const [red, green, blue, alpha] = [0.32, 0.34, 0.89, 1];
+            const color = { red: 0.32, green: 0.34, blue: 0.89, alpha: 1 };
 
             // Fill the rectangle with the color.
-            const rectangleFill = editor.createColorFill(utils.createColor(red, green, blue, alpha));
-            rectangle.fills.append(rectangleFill);
+            const rectangleFill = editor.makeColorFill(color);
+            rectangle.fill = rectangleFill;
 
             // Add the rectangle to the document.
             const insertionParent = editor.context.insertionParent;
