@@ -213,11 +213,12 @@ describe("WxpAddOnFactory", () => {
                     run.verbose
                 );
 
-                const npmInstallArgs = ["install", "--save-dev", "@adobe/ccweb-add-on-scripts"];
-
-                if (run.templateName.includes("typescript")) {
-                    npmInstallArgs.push("@adobe/ccweb-add-on-sdk-types");
-                }
+                const npmInstallArgs = [
+                    "install",
+                    "--save-dev",
+                    "@adobe/ccweb-add-on-scripts",
+                    "@adobe/ccweb-add-on-sdk-types"
+                ];
 
                 if (run.verbose) {
                     npmInstallArgs.push("--verbose");

@@ -23,7 +23,13 @@
  ********************************************************************************/
 
 import { ManifestVersion } from "../AddOnManifest.js";
-import { App, ManifestRequirements, RequirementsV1, RequirementsV2 } from "../AddOnManifestTypes.js";
+import {
+    App,
+    ManifestRequirements,
+    RequirementsV1,
+    RequirementsV2,
+    TrustedPartnerApis
+} from "../AddOnManifestTypes.js";
 import { AddOnManifestApp } from "./AddOnManifestApp.js";
 
 interface ManifestRequirementTypeMap {
@@ -110,6 +116,17 @@ export class AddOnManifestRequirement {
             }
             default: {
                 return (this._requirements as ManifestRequirementType<ManifestVersion.V2>)._blessedPartnerAccess;
+            }
+        }
+    }
+
+    get trustedPartnerApis(): Readonly<TrustedPartnerApis> | undefined {
+        switch (this._manifestVersion) {
+            case ManifestVersion.V1: {
+                return undefined;
+            }
+            default: {
+                return (this._requirements as ManifestRequirementType<ManifestVersion.V2>).trustedPartnerApis;
             }
         }
     }

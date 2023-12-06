@@ -114,7 +114,8 @@ export const EntrypointSchemaV2 = {
             },
             required: [],
             additionalProperties: false
-        }
+        },
+        discoverable: { type: "boolean" }
     },
     required: ["type", "id", "main"],
     additionalProperties: false
@@ -149,7 +150,13 @@ export const RequirementSchemaV2 = {
         supportsTouch: { type: "boolean" },
         renditionPreview: { type: "boolean" },
         privilegedApis: { type: "boolean" },
-        _blessedPartnerAccess: { type: "string" }
+        _blessedPartnerAccess: { type: "string" },
+        trustedPartnerApis: {
+            type: "object",
+            properties: {
+                messaging: { type: "boolean" }
+            }
+        }
     },
     required: ["apps"],
     additionalProperties: false

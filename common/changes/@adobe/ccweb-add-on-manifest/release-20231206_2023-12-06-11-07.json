@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-manifest",
+      "comment": "New properties added",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-manifest"
+}

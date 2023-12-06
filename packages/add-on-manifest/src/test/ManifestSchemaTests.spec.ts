@@ -456,6 +456,13 @@ describe("ManifestSchema Validations - Version 2", () => {
         assert.equal(testManifest.requirements._blessedPartnerAccess, "blessedPartnerAccess");
     });
 
+    it("should have the required fields for trustedPartnerApis", () => {
+        const testManifest = getTestManifestV2();
+        assert.equal(typeof testManifest.requirements.trustedPartnerApis === "object", true);
+        assert.equal(typeof testManifest.requirements.trustedPartnerApis?.messaging === "boolean", true);
+        assert.equal(testManifest.requirements.trustedPartnerApis?.messaging, false);
+    });
+
     it("should have at least one entrypoint", () => {
         const testManifest = JSON.parse(JSON.stringify(getTestManifestV2()));
         verifyEntrypoint(testManifest);

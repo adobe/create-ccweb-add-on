@@ -30,20 +30,8 @@ declare namespace ApiConstants {
 
 declare interface ApiModuleExport {
     editor: ExpressEditor;
-    utils: ApiUtils;
     constants: unknown;
-}
-
-declare interface ApiUtils {
-    /**
-     * Create a new Color. All color components should be in a 0 - 1 range.
-     *
-     * @param red - The red component in a range from 0 - 1.
-     * @param green - The green component in a range from 0 - 1.
-     * @param blue - The blue component in a range from 0 - 1.
-     * @param alpha - (optional) The alpha component in a range from 0 - 1. Defaults to 1 (fully opaque).
-     */
-    createColor(red: number, green: number, blue: number, alpha?: number): Color;
+    colorUtils: ExpressColorUtils;
 }
 
 /**
@@ -82,7 +70,20 @@ export declare class ArtboardList extends RestrictedItemList<ArtboardNode> {
  *
  * When multiple artboards exist on a page, the artboards represent "scenes" in a linear timeline sequence.
  */
-export declare class ArtboardNode extends ContainerNode implements IRectangularNode, IStrokableNode {
+export declare class ArtboardNode extends BaseNode implements IRectangularNode, ContainerNode {
+    /**
+     * Returns a read-only list of all children of the node. General-purpose content containers such as ArtboardNode or
+     * GroupNode also provide a mutable {@link ContainerNode.children} list. Other nodes with a more specific structure can
+     * hold children in various discrete "slots"; this `allChildren` list includes *all* such children and reflects their
+     * overall display z-order.
+     *
+     * The children of an Artboard are always other Node classes (never the more minimal BaseNode).
+     */
+    get allChildren(): Readonly<Iterable<Node>>;
+    /**
+     * The node's children. Use the methods on this ItemList object to get, add, and remove children.
+     */
+    get children(): ItemList<Node>;
     /**
      * The node's parent. Undefined if the node is an orphan.
      */
@@ -96,14 +97,44 @@ export declare class ArtboardNode extends ContainerNode implements IRectangularN
      */
     get height(): number;
     /**
-     * The background fill of the artboard.
+     * The background fill of the artboard. Artboards must always have a fill.
      */
-    get fill(): Fill;
+    get fill(): Readonly<Fill>;
     set fill(fill: Fill);
+}
+
+/**
+ * A "node" represents an object in the scenegraph, the document's visual content tree. This base class includes only the
+ * most fundamental nonvisual properties that even nodes near the top of the document structure share (such as PageNode).
+ * The more tangible visual content typically extends the richer Node class which extends BaseNode with additional
+ * properties.
+ */
+export declare class BaseNode {
     /**
-     * Any strokes(s) on the shape. Use the methods on this ItemList object to get, add, and remove strokes.
+     * Returns a read-only list of all children of the node. General-purpose content containers such as ArtboardNode or
+     * GroupNode also provide a mutable {@link ContainerNode.children} list. Other nodes with a more specific structure can
+     * hold children in various discrete "slots"; this `allChildren` list includes *all* such children and reflects their
+     * overall display z-order.
+     *
+     * Although BaseNode's allChildren may yield other BaseNodes, the subclasses Node and ArtboardNode override allChildren
+     * to guarantee all their children are full-fledged Node instances.
      */
-    get strokes(): ItemList<Stroke>;
+    get allChildren(): Readonly<Iterable<BaseNode>>;
+
+    /**
+     * The node's type.
+     */
+    get type(): SceneNodeType;
+    /**
+     * The node's parent. Undefined if the node is an orphan, or if the node is the artwork root.
+     */
+    get parent(): BaseNode | undefined;
+    /**
+     * Removes the node from its parent - for a basic ContainerNode, this is equivalent to `node.parent.children.remove(node)`.
+     * For nodes with other slots, removes the child from whichever slot it resides in, if possible. Throws if the slot does
+     * not support removal. Also throws if node is the artwork root. No-op if node is already an orphan.
+     */
+    removeFromParent(): void;
 }
 
 /**
@@ -166,33 +197,25 @@ declare enum BlendMode {
 }
 
 /**
- * Represents a color in a defined RGB colorspace. Value is immutable – to change, create a new Color object.
+ * Represents an RGBA color.
  */
-export declare class Color {
+export declare interface Color {
     /**
      * The red channel in range from 0 - 1.
      */
-    get red(): number;
+    red: number;
     /**
      * The green channel in range from 0 - 1.
      */
-    get green(): number;
+    green: number;
     /**
      * The blue channel in range from 0 - 1.
      */
-    get blue(): number;
+    blue: number;
     /**
      * The alpha channel in range from 0 - 1.
      */
-    get alpha(): number;
-    /**
-     * This color's color space. Currently only sRGB is supported.
-     */
-    get colorSpace(): ColorSpace;
-    /**
-     * Get the color in 8-digit hex "#RRGGBBAA" format.
-     */
-    getHex(): string;
+    alpha: number;
 }
 
 /**
@@ -206,15 +229,43 @@ export declare interface ColorFill extends Fill {
     /**
      * The fill color.
      */
-    readonly color: Color;
+    color: Color;
 }
 
 /**
- * Available color spaces. Currently only sRGB is supported.
+ * Utility methods for working with color values.
  */
-export declare enum ColorSpace {
-    sRGB = "sRGB"
+export declare class ColorUtils {
+    /**
+     * Create a new Color. All color components should be in a 0 - 1 range.
+     *
+     * @param redOrPartialColor - The red component in a range from 0 - 1; or Partial Color object having alpha component as partial.
+     * @param green - The green component in a range from 0 - 1.
+     * @param blue - The blue component in a range from 0 - 1.
+     * @param alpha - (optional) The alpha component in a range from 0 - 1. Defaults to 1 (fully opaque).
+     */
+    fromRGB(red: number, green: number, blue: number, alpha?: number): Color;
+    fromRGB(color: { red: number; green: number; blue: number; alpha?: number }): Color;
+    /**
+     * Create a new color from its equivalent RGBA hex representation. Currently only
+     * supports formats "#RRGGBBAA" or "RRGGBBAA". If the hex value is invalid, this
+     * method will return transparent black.
+     *
+     * @param hex - The color in hex representation.
+     * @returns A new color matching the given hex representation, or transparent black if
+     * the hex string cannot be parsed.
+     */
+    fromHex(hex: string): Color;
+    /**
+     * Get the color in 8-digit hex "#RRGGBBAA" format.
+     * @privateRemarks
+     * Future: Since this format is only valid for the sRGB color space, if the color is in another color space once other
+     * spaces are supported, the value return here would be a lossy conversion.
+     */
+    toHex(color: Color): string;
 }
+
+export declare const colorUtils: ExpressColorUtils;
 
 /**
  * A ComplexShapeNode is complex prepackaged shape that appears as a leaf node in the UI, even if it is composed
@@ -225,11 +276,14 @@ export declare class ComplexShapeNode extends FillableNode {}
 export declare const constants: typeof ApiConstants;
 
 /**
- * Base class for a Node that contains an entirely generic collection of children. Some ContainerNode subclasses may host
+ * Interface for any node that contains an entirely generic collection of children. Some ContainerNode classes may host
  * *additional* children in other specific "slots," such as background or mask layers; and non-ContainerNode classes may
  * also hold children in specified "slots." Use {@link Node.allChildren} for read access to children regardless of node type.
+ *
+ * Some ContainerNode classes may be full-fledged Node subclasses (such as Group), while others may be a subclass of the
+ * more minimal BaseNode (such as Artboard).
  */
-export declare class ContainerNode extends Node {
+export declare interface ContainerNode extends BaseNode {
     /**
      * The node's children. Use the methods on this ItemList object to get, add, and remove children.
      */
@@ -280,12 +334,12 @@ export declare class Editor {
      */
     get documentRoot(): ExpressRootNode;
     /**
-     * @returns an ellipse node with default x/y radii, and *no* initial stroke or fill.
+     * @returns an ellipse node with default x/y radii, a black fill, and no initial stroke.
      * Transform values default to 0.
      */
     createEllipse(): EllipseNode;
     /**
-     * @returns a rectangle node with default width and height, and *no* initial stroke or fill.
+     * @returns a rectangle node with default width and height, a black fill, and no initial stroke.
      * Transform values default to 0.
      */
     createRectangle(): RectangleNode;
@@ -299,10 +353,10 @@ export declare class Editor {
      */
     createGroup(): GroupNode;
     /**
+     * Convenience helper to create a complete ColorFill value given just its color.
      * @param color - The color to use for the fill.
-     * @returns a solid color fill.
      */
-    createColorFill(color: Color): ColorFill;
+    makeColorFill(color: Color): ColorFill;
     /**
      * Creates a bitmap image, represented as a multi-node MediaContainerNode structure. Always creates a "full-frame,"
      * uncropped image initially, but cropping can be changed after it is created by modifying the properties of the
@@ -337,20 +391,20 @@ export declare class Editor {
      */
     loadBitmapImage(bitmapData: Blob): Promise<BitmapImage>;
     /**
-     * See {@link StrokeOptions} for more details on the `options` fields. Defaults:
+     * Convenience helper to create a complete Stroke value given just a subset of its fields. All other fields are
+     * populated with default values.
+     *
+     * See {@link Stroke} for more details on the `options` fields. Defaults:
      * - `color` has default value {@link DEFAULT_STROKE_COLOR} if none is provided.
      * - `width` has default value {@link DEFAULT_STROKE_WIDTH} if none is provided.
-     * - `dashPattern` has default value [] if none is provided. Array must be
-     *   of even length. Values cannot be negative.
-     * - `dashOffset` has default value 0 if none is provided. This options field is ignored
+     * - `position` has default value `center` if none is provided.
+     * - `dashPattern` has default value [] if none is provided.
+     * - `dashOffset` has default value 0 if none is provided. This field is ignored
      *   if no `dashPattern` was provided.
-     *
-     * The stroke's `position` field cannot be specified via options yet because only
-     * {@link StrokePosition.center} is supported.
      *
      * @returns a stroke configured with the given options.
      */
-    createStroke(options?: Partial<StrokeOptions>): Stroke;
+    makeStroke(options?: Partial<Stroke>): Stroke;
     /**
      * @returns a text node with default styles. The text content is initially empty, so the text node will be
      * invisible until its `text` property is set. Creates point text, so the node's width will automatically
@@ -424,12 +478,14 @@ export declare class EllipseNode extends FillableNode {
 declare const expressApiModule: ApiModuleExport;
 export default expressApiModule;
 
+declare class ExpressColorUtils extends ColorUtils {}
+
 declare class ExpressEditor extends Editor {}
 
 /**
  * An ExpressRootNode represents the root node of the document's "scenegraph" artwork tree.
  */
-export declare class ExpressRootNode extends Node {
+export declare class ExpressRootNode extends BaseNode {
     /**
      * The pages of the document. All visual content is contained on artboards within the pages.
      */
@@ -451,9 +507,10 @@ export declare interface Fill {
  */
 export declare class FillableNode extends StrokableNode implements IFillableNode {
     /**
-     * Any fill(s) on the shape. Use the methods on this ItemList object to get, add, and remove fills.
+     * The fill applied to the shape, if any.
      */
-    get fills(): ItemList<Fill>;
+    get fill(): Readonly<Fill> | undefined;
+    set fill(fill: Fill | undefined);
 }
 
 /**
@@ -494,7 +551,7 @@ export declare class GridLayoutNode extends Node implements IRectangularNode {
     /**
      * The background fill of the GridLayout.
      */
-    get fill(): Fill;
+    get fill(): Readonly<Fill>;
     set fill(fill: Fill);
 }
 
@@ -502,7 +559,7 @@ export declare class GridLayoutNode extends Node implements IRectangularNode {
  * A GroupNode represents a Group object in the scenegraph, which has a collection of generic children as well as a separate,
  * optional vector mask child.
  */
-export declare class GroupNode extends ContainerNode {
+export declare class GroupNode extends Node implements ContainerNode {
     /**
      * The Group's regular children. Does not include the maskShape if one is present.
      * Use the methods on this ItemList object to get, add, and remove children.
@@ -523,11 +580,11 @@ export declare class GroupNode extends ContainerNode {
 }
 
 /**
- * Interface for {@link FillableNode} *and* any other nodes with a similar `fills` API that do not directly inherit from the
- * FillableNode class.
+ * Interface for {@link FillableNode} *and* any other nodes with a similar `fill` property that do not directly inherit from
+ * the FillableNode class.
  */
 declare interface IFillableNode {
-    fills: ItemList<Fill>;
+    fill: Fill | undefined;
 }
 
 /**
@@ -559,11 +616,11 @@ declare interface IRectangularNode {
 }
 
 /**
- * Interface for {@link StrokableNode} *and* any other nodes with a similar `strokes` API that do not directly inherit from
- * the StrokableNode class. (See {@link ArtboardNode}, for example).
+ * Interface for {@link StrokableNode} *and* any other nodes with a similar `stroke` property that do not directly inherit
+ * from the StrokableNode class. (See {@link ArtboardNode}, for example).
  */
 declare interface IStrokableNode {
-    strokes: ItemList<Stroke>;
+    stroke: Stroke | undefined;
 }
 
 /**
@@ -640,31 +697,23 @@ export declare class LineNode extends StrokableNode {
      */
     get endY(): number;
     /**
-     * The shape encapsulating the start of a line. The size and color of the arrowhead
-     * depends on the first available stroke's weight and color assigned to the node.
-     * Removal of all strokes on this line leads to the arrowhead's removal.
+     * The shape encapsulating the start of a line.
      *
-     * The getter returns {@link ArrowHeadType.none} when there are no strokes on the line
-     * or no arrowhead on the first stroke of the line.
+     * Returns {@link ArrowHeadType.none} if there is no stroke on the line.
      */
     get startArrowHeadType(): ArrowHeadType;
     /**
-     * The setter creates a default stroke for the line when there are no strokes on the line,
-     * and updates the arrowhead on only the first stroke of the line.
+     * The setter sets a default stroke on the line if it did not have one.
      */
     set startArrowHeadType(type: ArrowHeadType);
     /**
-     * The shape encapsulating the end of a line. The size and color of the arrowhead
-     * depends on the first available stroke's weight and color assigned to the node.
-     * Removal of all strokes on this line leads to the arrowhead's removal.
+     * The shape encapsulating the end of a line.
      *
-     * The getter returns {@link ArrowHeadType.none} when there are no strokes on the line
-     * or no arrowhead on the first stroke of the line.
+     * Returns {@link ArrowHeadType.none} if there is no stroke on the line.
      */
     get endArrowHeadType(): ArrowHeadType;
     /**
-     * The setter creates a default stroke for the line when there are no strokes on the line,
-     * and updates the arrowhead on only the first stroke of the line.
+     * The setter sets a default stroke on the line if it did not have one.
      */
     set endArrowHeadType(type: ArrowHeadType);
 }
@@ -696,21 +745,21 @@ export declare class MediaContainerNode extends Node {
 }
 
 /**
- * A Node represents an object in the scenegraph, the document's visual content tree.
+ * A Node represents an object in the scenegraph, the document's visual content tree. Most tangible visual content is a
+ * subclass of Node, but note that some abstract top-level structural nodes (such as PageNode) only extend the more minimal
+ * BaseNode. As a general rule, if you can click or drag an object with the select/move tool in the UI, then it extends
+ * from Node.
  */
-declare class Node {
+declare class Node extends BaseNode {
     /**
      * Returns a read-only list of all children of the node. General-purpose content containers such as ArtboardNode or
      * GroupNode also provide a mutable {@link ContainerNode.children} list. Other nodes with a more specific structure can
      * hold children in various discrete "slots"; this `allChildren` list includes *all* such children and reflects their
      * overall display z-order.
+     *
+     * The children of a Node are always other Node classes (never the more minimal BaseNode).
      */
     get allChildren(): Readonly<Iterable<Node>>;
-
-    /**
-     * The node's type.
-     */
-    get type(): SceneNodeType;
     /**
      * The translation of the node along its parent's axes. This is identical to the translation component of
      * `transformMatrix`. It is often simpler to set a node's position using `setPositionInParent` than by
@@ -761,16 +810,6 @@ declare class Node {
      */
     get rotationInScreen(): number;
     /**
-     * The node's parent. Undefined if the node is an orphan, or if the node is the artwork root.
-     */
-    get parent(): Node | undefined;
-    /**
-     * Removes the node from its parent - for a basic ContainerNode, this is equivalent to `node.parent.children.remove(node)`.
-     * For nodes with other slots, removes the child from whichever slot it resides in, if possible. Throws if the slot does
-     * not support removal. Also throws if node is the artwork root. No-op if node is already an orphan.
-     */
-    removeFromParent(): void;
-    /**
      * The node's opacity, from 0.0 to 1.0
      */
     get opacity(): number;
@@ -816,7 +855,7 @@ export declare class PageList extends RestrictedItemList<PageNode> {
  * A PageNode represents a page in the document. A page contains one or more artboards, representing "scenes" in a linear
  * timeline sequence. Those artboards in turn contain all the visual content of the document.
  */
-export declare class PageNode extends Node implements Readonly<IRectangularNode> {
+export declare class PageNode extends BaseNode implements Readonly<IRectangularNode> {
     /**
      * The artboards or "scenes" of a page, ordered by timeline sequence.
      */
@@ -1048,7 +1087,7 @@ export declare class SolidColorShapeNode extends Node {
     /**
      * The color of the single color shape.
      */
-    get color(): Color | undefined;
+    get color(): Readonly<Color> | undefined;
     set color(color: Color | undefined);
 }
 
@@ -1057,43 +1096,39 @@ export declare class SolidColorShapeNode extends Node {
  */
 export declare class StrokableNode extends Node implements IStrokableNode {
     /**
-     * Any stroke(s) on the shape. Use the methods on this ItemList object to get, add, and remove strokes.
+     * The stroke applied to the shape, if any.
      */
-    get strokes(): ItemList<Stroke>;
+    get stroke(): Readonly<Stroke> | undefined;
+    set stroke(stroke: Stroke | undefined);
 }
 
 /**
  * Represents a stroke in the scenegraph. See {@link StrokableNode}.
  */
-export declare interface Stroke extends StrokeOptions {
-    /**
-     * The position of the stroke relative to the outline of the shape.
-     */
-    readonly position: StrokePosition;
-}
-
-/**
- * Properties that can be provided to create a stroke.
- */
-export declare interface StrokeOptions {
+export declare interface Stroke {
     /**
      * The color of a stroke.
      */
-    readonly color: Color;
+    color: Color;
     /**
      * The thickness of a stroke. Must be from {@link MIN_STROKE_WIDTH} to {@link MAX_STROKE_WIDTH}.
      */
-    readonly width: number;
+    width: number;
     /**
      * If empty, this is a solid stroke.
      * If non-empty, the values alternate between length of a rendered and blank segment,
      * repeated along the length of the stroke. The first value represents the first solid segment.
+     * Array must be of even length. Values cannot be negative.
      */
-    readonly dashPattern: number[];
+    dashPattern: number[];
     /**
      * Number of pixels the beginning of dash pattern should be offset along the stroke.
      */
-    readonly dashOffset: number;
+    dashOffset: number;
+    /**
+     * The position of the stroke relative to the outline of the shape.
+     */
+    position: StrokePosition;
 }
 
 /**
@@ -1112,13 +1147,7 @@ declare enum StrokePosition {
  * A StrokeShapeNode is prepackaged shape that has a single stroke property and appears as a leaf node in the UI, even
  * if it is composed of multiple separate paths.
  */
-export declare class StrokeShapeNode extends Node {
-    /**
-     * Stroke on the shape.
-     */
-    get stroke(): Stroke | undefined;
-    set stroke(stroke: Stroke | undefined);
-}
+export declare class StrokeShapeNode extends StrokableNode {}
 
 /**
  * <InlineAlert slots="text" variant="warning"/>
@@ -1150,7 +1179,5 @@ export declare class TextNode extends Node {
  * An UnknownNode is a node with limited support and therefore treated as a leaf node.
  */
 export declare class UnknownNode extends Node {}
-
-export declare const utils: ApiUtils;
 
 export {};

@@ -38,6 +38,10 @@ export type App = {
     readonly supportedDeviceClass?: string[];
 };
 
+export type TrustedPartnerApis = {
+    readonly messaging: boolean;
+};
+
 export type RequirementsV2 = {
     readonly apps: readonly App[];
     readonly experimentalApis?: boolean;
@@ -45,6 +49,7 @@ export type RequirementsV2 = {
     readonly renditionPreview?: boolean;
     readonly privilegedApis?: boolean;
     readonly _blessedPartnerAccess?: string;
+    readonly trustedPartnerApis?: TrustedPartnerApis;
 };
 
 export type IconType = {
@@ -105,6 +110,7 @@ export type EntrypointV2 = Omit<EntrypointV1, "defaultSize" | "label"> & {
      */
     readonly script?: string;
     readonly documentSandbox?: string;
+    readonly discoverable?: boolean;
 };
 
 export type ManifestEntrypoint = EntrypointV1 | EntrypointV2;

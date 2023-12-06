@@ -176,6 +176,8 @@ function verifyCommonManifestFields(
     assert.equal(manifest.entryPoints[0].label, testManifest.entryPoints[0].label);
     assert.equal(manifest.entryPoints[0].defaultSize, testManifest.entryPoints[0].defaultSize);
     assert.equal(manifest.entryPoints[0].entrypointProperties, testManifest.entryPoints[0]);
+    assert.equal(manifest.entryPoints[0].discoverable, testManifest.entryPoints[0].discoverable);
     assert.equal(manifest.requirements.experimentalApis, testManifest.requirements.experimentalApis);
     assert.equal(manifest.requirements._blessedPartnerAccess, testManifest.requirements._blessedPartnerAccess);
+    assert.equal(manifest.requirements.trustedPartnerApis, testManifest.requirements.trustedPartnerApis);
 }
