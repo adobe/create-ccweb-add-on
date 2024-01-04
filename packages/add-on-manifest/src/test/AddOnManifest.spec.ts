@@ -113,7 +113,7 @@ describe("AddOnManifest", () => {
         assert.equal(manifest.authorInfo, undefined);
 
         assert.equal(manifest.entryPoints[0].label, undefined);
-        assert.equal(manifest.entryPoints[0].defaultSize, undefined);
+        assert.equal(manifest.entryPoints[0].defaultSize, testManifest.entryPoints[0].defaultSize);
 
         const apps = manifest.requirements.apps as AddOnManifestApp[];
         assert.equal(testManifest.requirements.supportsTouch, manifest.requirements.supportsTouch);
@@ -180,4 +180,14 @@ function verifyCommonManifestFields(
     assert.equal(manifest.requirements.experimentalApis, testManifest.requirements.experimentalApis);
     assert.equal(manifest.requirements._blessedPartnerAccess, testManifest.requirements._blessedPartnerAccess);
     assert.equal(manifest.requirements.trustedPartnerApis, testManifest.requirements.trustedPartnerApis);
+    if (manifest.requirements.trustedPartnerApis) {
+        assert.equal(
+            manifest.requirements.trustedPartnerApis.messaging,
+            testManifest.requirements.trustedPartnerApis.messaging
+        );
+        assert.equal(
+            manifest.requirements.trustedPartnerApis.expressPrint,
+            testManifest.requirements.trustedPartnerApis.expressPrint
+        );
+    }
 }

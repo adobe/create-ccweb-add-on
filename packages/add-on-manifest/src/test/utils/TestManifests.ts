@@ -168,7 +168,8 @@ export function getTestManifestV2(privileged?: boolean): AddOnManifestV2 {
             privilegedApis: privileged ?? false,
             _blessedPartnerAccess: "blessedPartnerAccess",
             trustedPartnerApis: {
-                messaging: false
+                messaging: false,
+                expressPrint: true
             }
         },
         entryPoints: [
@@ -177,6 +178,7 @@ export function getTestManifestV2(privileged?: boolean): AddOnManifestV2 {
                 id: `#testId${count}`,
                 main: "index.html",
                 permissions: privileged ? { sandbox: ["allow-downloads"], analytics: true } : { sandbox: [] },
+                defaultSize: { width: 100 + count, height: 100 + count },
                 discoverable: true
             }
         ]

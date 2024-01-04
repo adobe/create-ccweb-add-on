@@ -65,7 +65,13 @@ describe("AddOnResourceUtils", () => {
                         localizedMetadata: {
                             name: "Test App"
                         }
-                    }
+                    },
+                    entryPoints: [
+                        {
+                            type: "panel",
+                            discoverable: true
+                        }
+                    ]
                 }
             ];
 
@@ -96,7 +102,8 @@ describe("AddOnResourceUtils", () => {
                         localizedMetadata: {
                             name: DEFAULT_ADD_ON_NAME
                         }
-                    }
+                    },
+                    entryPoints: []
                 }
             ];
 

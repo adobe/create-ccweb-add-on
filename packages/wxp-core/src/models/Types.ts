@@ -70,6 +70,11 @@ export type AddOn = {
     localizedMetadata: AddOnMetaData;
 };
 
+export type EntryPointData = {
+    type: string;
+    discoverable: boolean;
+};
+
 export type Schema = {
     addonId: string;
     versionString: string;
@@ -77,4 +82,5 @@ export type Schema = {
     supportedApps: string[];
     downloadUrl: string;
     addon: AddOn;
+    entryPoints: EntryPointData[];
 };

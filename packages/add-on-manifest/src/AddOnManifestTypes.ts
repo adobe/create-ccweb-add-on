@@ -39,7 +39,8 @@ export type App = {
 };
 
 export type TrustedPartnerApis = {
-    readonly messaging: boolean;
+    readonly messaging?: boolean;
+    readonly expressPrint?: boolean;
 };
 
 export type RequirementsV2 = {
@@ -104,7 +105,7 @@ export type EntrypointV1 = {
     readonly main: string;
 };
 
-export type EntrypointV2 = Omit<EntrypointV1, "defaultSize" | "label"> & {
+export type EntrypointV2 = Omit<EntrypointV1, "label"> & {
     /**
      * @deprecated Use `documentSandbox` instead.
      */
@@ -128,7 +129,8 @@ export enum Allow {
 export enum EntrypointType {
     WIDGET = "widget",
     COMMAND = "command",
-    PANEL = "panel"
+    PANEL = "panel",
+    SHARE = "share"
 }
 
 export type AuthorInfo = {
@@ -216,7 +218,7 @@ export interface AdditionalAddOnInfo {
     isDeveloperAddOn: boolean;
     id?: string;
     name?: string;
-    icon?: IconType;
+    icon?: IconType[];
     visibility?: string;
 }
 

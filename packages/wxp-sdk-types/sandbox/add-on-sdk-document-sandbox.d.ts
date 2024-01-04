@@ -183,8 +183,7 @@ export declare class Runtime {
      * Exposes the concrete object/function of type T,
      * which can be accessed into different runtime part of this AddOn e.g., "panel" (iframe) runtime.
      * Note that only concrete objects / class instances are supported. We can't expose entire class
-     * from one runtime and create instance of that class in another runtime. Trying to do
-     * so may result in undefined behaviour.
+     * from one runtime and create instance of that class in another runtime. Trying to do so will throw an exception.
      * @param obj - the concrete object to expose to other runtimes
      * Note: This method call is allowed only once. Subsequent calls are ignored.
      */

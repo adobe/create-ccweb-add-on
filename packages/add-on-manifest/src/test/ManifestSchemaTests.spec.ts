@@ -460,7 +460,9 @@ describe("ManifestSchema Validations - Version 2", () => {
         const testManifest = getTestManifestV2();
         assert.equal(typeof testManifest.requirements.trustedPartnerApis === "object", true);
         assert.equal(typeof testManifest.requirements.trustedPartnerApis?.messaging === "boolean", true);
+        assert.equal(typeof testManifest.requirements.trustedPartnerApis?.expressPrint === "boolean", true);
         assert.equal(testManifest.requirements.trustedPartnerApis?.messaging, false);
+        assert.equal(testManifest.requirements.trustedPartnerApis?.expressPrint, true);
     });
 
     it("should have at least one entrypoint", () => {

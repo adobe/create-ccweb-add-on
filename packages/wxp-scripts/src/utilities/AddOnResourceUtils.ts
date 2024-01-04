@@ -22,7 +22,7 @@
  * SOFTWARE.
  ********************************************************************************/
 
-import type { Schema as AddOnSchema } from "@adobe/ccweb-add-on-core";
+import type { Schema as AddOnSchema, EntryPointData } from "@adobe/ccweb-add-on-core";
 import { DEFAULT_OUTPUT_DIRECTORY, traverseDirectory } from "@adobe/ccweb-add-on-core";
 import type { AddOnManifest } from "@adobe/ccweb-add-on-manifest";
 import path from "path";
@@ -48,6 +48,14 @@ export class AddOnResourceUtils {
 
         const addOnName = (manifest?.manifestProperties?.name as string) ?? DEFAULT_ADD_ON_NAME;
 
+        const entryPointsData: EntryPointData[] = [];
+        manifest?.entryPoints?.map((entryPoint: ReturnType<typeof JSON.parse>) => {
+            entryPointsData.push({
+                type: entryPoint.type,
+                discoverable: entryPoint.discoverable ?? true
+            });
+        });
+
         return [
             {
                 addonId: testId,
@@ -59,7 +67,8 @@ export class AddOnResourceUtils {
                     localizedMetadata: {
                         name: addOnName
                     }
-                }
+                },
+                entryPoints: entryPointsData
             }
         ];
     }
