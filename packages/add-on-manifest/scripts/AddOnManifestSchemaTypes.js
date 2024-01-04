@@ -22,7 +22,7 @@
  * SOFTWARE.
  ********************************************************************************/
 
-const typePattern = "^(panel)$";
+const typePattern = "^(panel|share)$";
 const sandboxPattern = "^(allow-popups|allow-presentation|allow-downloads|allow-popups-to-escape-sandbox)$";
 const clipboardPattern = "^(clipboard-write|clipboard-read)$";
 const iconPattern = "^(lightest|light|medium|dark|darkest|all)$";
@@ -115,6 +115,15 @@ export const EntrypointSchemaV2 = {
             required: [],
             additionalProperties: false
         },
+        defaultSize: {
+            type: "object",
+            properties: {
+                width: { type: "number" },
+                height: { type: "number" }
+            },
+            required: ["width", "height"],
+            additionalProperties: false
+        },
         discoverable: { type: "boolean" }
     },
     required: ["type", "id", "main"],
@@ -154,7 +163,8 @@ export const RequirementSchemaV2 = {
         trustedPartnerApis: {
             type: "object",
             properties: {
-                messaging: { type: "boolean" }
+                messaging: { type: "boolean" },
+                expressPrint: { type: "boolean" }
             }
         }
     },

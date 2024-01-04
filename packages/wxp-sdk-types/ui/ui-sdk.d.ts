@@ -219,6 +219,13 @@ declare interface ApplicationBase {
     showModalDialog(dialogOptions: AlertDialogOptions): Promise<AlertDialogResult>;
     showModalDialog(dialogOptions: InputDialogOptions): Promise<InputDialogResult>;
     showModalDialog(dialogOptions: CustomDialogOptions): Promise<CustomDialogResult>;
+
+    /**
+     * @experimental - Experimental API
+     * Triggers/Starts the in-app monetization upgrade flow
+     * @returns if the user is premium user or not
+     */
+    startPremiumUpgradeIfFreeUser(): Promise<boolean>;
 }
 
 /**
@@ -344,6 +351,36 @@ export declare type AuthorizeWithOwnRedirectRequest = AuthorizationRequest & {
     state: string;
 };
 
+/**
+ * Bleed for the page.
+ * In printing, bleed is printing that goes beyond the edge of where the sheet will be trimmed.
+ * In other words, the bleed is the area to be trimmed off.
+ */
+export declare interface Bleed {
+    /**
+     * The amount for the bleed
+     */
+    amount: number;
+    /**
+     * The unit in which the bleed amount is expressed
+     */
+    unit: BleedUnit;
+}
+
+/**
+ * Units for the page bleed.
+ */
+export declare enum BleedUnit {
+    /**
+     * Inch
+     */
+    Inch = "in",
+    /**
+     * Millimeter
+     */
+    Millimeter = "mm"
+}
+
 export declare interface ButtonLabels {
     /**
      * Primary action label
@@ -424,6 +461,7 @@ declare namespace Constants {
         DialogResultType,
         ButtonType,
         RuntimeType,
+        BleedUnit,
         AuthorizationStatus
     };
 }
@@ -437,6 +475,12 @@ export declare interface CurrentUser {
      * Get user Id
      */
     userId(): Promise<string>;
+
+    /**
+     * @experimental - Experimental API
+     * @returns if the current user is a premium user
+     */
+    isPremiumUser(): Promise<boolean>;
 }
 
 /**
@@ -563,6 +607,7 @@ declare interface Document_2 {
      */
     createRenditions(renditionOptions: RenditionOptions, renditionIntent?: RenditionIntent): Promise<Rendition[]>;
     /**
+     * @experimental - Experimental API
      * Get metadata of all or range of pages of the document
      */
     getPagesMetadata(options: PageMetadataOptions): Promise<PageMetadata[]>;
@@ -827,6 +872,10 @@ export declare interface PageMetadata {
      * Pixels per inch of the page
      */
     pixelsPerInch?: number;
+    /**
+     * Whether page is ready to print
+     */
+    isPrintReady?: boolean;
 }
 
 /**
@@ -856,6 +905,17 @@ export declare interface PageRendition extends Rendition {
      * Page metadata
      */
     metadata: PageMetadata;
+}
+
+export declare interface PdfRenditionOptions extends RenditionOptions {
+    /**
+     * PDF rendition format
+     */
+    format: RenditionFormat.pdf;
+    /**
+     * Bleed for the page. If undefined, then no bleed (zero).
+     */
+    bleed?: Bleed;
 }
 
 export declare interface PngRenditionOptions extends RenditionOptions {
@@ -1046,8 +1106,7 @@ export declare interface Runtime {
      * Exposes the concrete object/function of type T,
      * which can be accessed into different runtime part of this AddOn e.g., "document model sandbox" runtime.
      * Note that only concrete objects / class instances are supported. We can't expose entire class
-     * from one runtime and create instance of that class in another runtime. Trying to do
-     * so may result in undefined behaviour.
+     * from one runtime and create instance of that class in another runtime. Trying to do so will throw an exception.
      * @param apiObj - the concrete object to expose to other runtimes
      *
      * Notes:

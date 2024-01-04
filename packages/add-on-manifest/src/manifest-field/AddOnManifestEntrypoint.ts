@@ -79,14 +79,7 @@ export class AddOnManifestEntrypoint {
     }
 
     get defaultSize(): Readonly<Size | undefined> {
-        switch (this._manifestVersion) {
-            case ManifestVersion.V1: {
-                return (this._entrypoint as ManifestEntrypointType<ManifestVersion.V1>).defaultSize;
-            }
-            default: {
-                return undefined;
-            }
-        }
+        return this._entrypoint.defaultSize;
     }
 
     get main(): Readonly<string> {
