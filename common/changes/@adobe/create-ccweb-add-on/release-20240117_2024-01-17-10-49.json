@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/create-ccweb-add-on",
+      "comment": "Improvements",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@adobe/create-ccweb-add-on"
+}
