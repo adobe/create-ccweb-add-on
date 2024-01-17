@@ -126,20 +126,28 @@ export declare class BaseNode {
      */
     get type(): SceneNodeType;
     /**
-     * The node's parent. Undefined if the node is an orphan, or if the node is the artwork root.
+     * The node's parent. The parent chain will eventually reach ExpressRootNode for all nodes that are part of the document
+     * content.
+     *
+     * Nodes that have been deleted are "orphaned," with a parent chain that terminates in `undefined` without reaching the
+     * root node. Such nodes cannot be selected, so it is unlikely to encounter one unless you retain a reference to a node
+     * that was part of the document content earlier. Deleted nodes can be reattached to the scenegraph, e.g. via Undo.
      */
     get parent(): BaseNode | undefined;
     /**
-     * Removes the node from its parent - for a basic ContainerNode, this is equivalent to `node.parent.children.remove(node)`.
-     * For nodes with other slots, removes the child from whichever slot it resides in, if possible. Throws if the slot does
-     * not support removal. Also throws if node is the artwork root. No-op if node is already an orphan.
+     * Removes the node from its parent - effectively deleting it, if the node is not re-added to another parent before the
+     * document is closed.
+     *
+     * If parent is a basic ContainerNode, this is equivalent to `node.parent.children.remove(node)`. For nodes with other
+     * child "slots," removes the child from whichever slot it resides in, if possible. Throws if the slot does not permit
+     * removal. No-op if node is already an orphan.
      */
     removeFromParent(): void;
 }
 
 /**
- * Represents a bitmap image resource. Can be displayed in the document by creating a MediaContainerNode structure via
- * {@link Editor.createImageContainer}.
+ * Represents a bitmap image resource. Use {@link Editor.loadBitmapImage} to create a BitmapImage, and then {@link Editor.createImageContainer}
+ * to display it in the document by creating a MediaContainerNode structure.
  */
 export declare interface BitmapImage {
     /**
@@ -197,7 +205,7 @@ declare enum BlendMode {
 }
 
 /**
- * Represents an RGBA color.
+ * Represents an RGBA color value.
  */
 export declare interface Color {
     /**
@@ -220,6 +228,8 @@ export declare interface Color {
 
 /**
  * Represents a solid-color fill.
+ *
+ * The most convenient way to create a stroke is via `Editor.makeColorFill()`.
  */
 export declare interface ColorFill extends Fill {
     /**
@@ -237,30 +247,31 @@ export declare interface ColorFill extends Fill {
  */
 export declare class ColorUtils {
     /**
-     * Create a new Color. All color components should be in a 0 - 1 range.
-     *
-     * @param redOrPartialColor - The red component in a range from 0 - 1; or Partial Color object having alpha component as partial.
-     * @param green - The green component in a range from 0 - 1.
-     * @param blue - The blue component in a range from 0 - 1.
-     * @param alpha - (optional) The alpha component in a range from 0 - 1. Defaults to 1 (fully opaque).
+     * Create a new color object with the given RGBA values.
+     * @param red - The red channel, from 0 - 1.
+     * @param green - The green channel, from 0 - 1.
+     * @param blue - The blue channel, from 0 - 1.
+     * @param alpha - Optional alpha channel, from 0 - 1. Defaults to 1 (opaque).
+     * @returns A new color object.
      */
     fromRGB(red: number, green: number, blue: number, alpha?: number): Color;
+    /**
+     * Create a new color object given a partial color object where the alpha field may be missing.
+     * @param color - Partial color object. Alpha defaults to 1 (opaque).
+     * @returns A new color object with all fields present.
+     */
     fromRGB(color: { red: number; green: number; blue: number; alpha?: number }): Color;
     /**
-     * Create a new color from its equivalent RGBA hex representation. Currently only
-     * supports formats "#RRGGBBAA" or "RRGGBBAA". If the hex value is invalid, this
-     * method will return transparent black.
+     * Create a new color from its equivalent RGBA hex representation. Can specify in 6 digits (RRGGBB) or 8 digits
+     * (RRGGBBAA), uppercase or lowercase, with or without leading "#". Alpha defaults to FF (100% opaque) if ommitted.
      *
-     * @param hex - The color in hex representation.
-     * @returns A new color matching the given hex representation, or transparent black if
-     * the hex string cannot be parsed.
+     * @param hex - The color represented as a hexadecimal string.
+     * @returns A new color value matching the given hex string.
+     * @throws if the hex string cannot be parsed.
      */
     fromHex(hex: string): Color;
     /**
      * Get the color in 8-digit hex "#RRGGBBAA" format.
-     * @privateRemarks
-     * Future: Since this format is only valid for the sRGB color space, if the color is in another color space once other
-     * spaces are supported, the value return here would be a lossy conversion.
      */
     toHex(color: Color): string;
 }
@@ -268,7 +279,7 @@ export declare class ColorUtils {
 export declare const colorUtils: ExpressColorUtils;
 
 /**
- * A ComplexShapeNode is complex prepackaged shape that appears as a leaf node in the UI, even if it is composed
+ * A ComplexShapeNode is a complex prepackaged shape that appears as a leaf node in the UI, even if it is composed
  * of multiple separate paths.
  */
 export declare class ComplexShapeNode extends FillableNode {}
@@ -316,7 +327,9 @@ export declare class Context {
      */
     get hasSelection(): boolean;
     /**
-     * @returns the preferred parent to insert newly added content into.
+     * @returns the preferred parent to insert newly added content into (i.e., the location content would get inserted if a
+     * user were to Paste or use the Shapes panel in the UI). This will vary depending on the user's current selection and
+     * other UI state.
      */
     get insertionParent(): ContainerNode;
 }
@@ -383,10 +396,13 @@ export declare class Editor {
      * Creates a bitmap image resource in the document, which can be displayed in the scenegraph by passing it to {@link createImageContainer}
      * to create a MediaContainerNode. The same BitmapImage can be used to create multiple MediaContainerNodes.
      *
-     * Note: image resources that are unused will be automatically cleaned up after the document is closed.
+     * Because the resulting BitmapImage is returned asynchronously, to use it you must schedule an edit lambda to run at a
+     * safe later time in order to call {@link createImageContainer}. See {@link queueAsyncEdit}.
      *
-     * Async steps to upload image resource data continue in the background after this call's Promise resolves, but the BitmapImage
-     * return value can be used immediately. The local client will act as having unsaved changes until the upload has finished.
+     * Further async steps to upload image resource data may continue in the background after this call's Promise resolves,
+     * but the resulting BitmapImage can be used right away (via the queue API noted above). The local client will act as
+     * having unsaved changes until all the upload steps have finished.
+     *
      * @param bitmapData - Encoded image data in PNG or JPEG format.
      */
     loadBitmapImage(bitmapData: Blob): Promise<BitmapImage>;
@@ -483,7 +499,11 @@ declare class ExpressColorUtils extends ColorUtils {}
 declare class ExpressEditor extends Editor {}
 
 /**
- * An ExpressRootNode represents the root node of the document's "scenegraph" artwork tree.
+ * An ExpressRootNode represents the root node of the document's "scenegraph" artwork tree. The root contains a collection
+ * of {@link pages}. Each page contains one or more artboards, arranged in a timeline sequence. All the visual content of
+ * the document lies within those artboards.
+ *
+ * The parent of ExpressRootNode is undefined, since it is the root of the document tree.
  */
 export declare class ExpressRootNode extends BaseNode {
     /**
@@ -494,6 +514,7 @@ export declare class ExpressRootNode extends BaseNode {
 
 /**
  * Base interface representing any fill in the scenegraph. See {@link FillableNode}.
+ * The only fill type currently supported is {@link ColorFill}.
  */
 export declare interface Fill {
     /**
@@ -516,6 +537,9 @@ export declare class FillableNode extends StrokableNode implements IFillableNode
 /**
  * <InlineAlert slots="text" variant="warning"/>
  * *Do not depend on the literal numeric values of these constants*, as they may change. Always reference the enum identifiers in your code.
+ *
+ * The fill rule, aka "winding rule," specifies how the interior area of a path is determined in cases where the path is
+ * self-intersecting or contains separate, nested closed loops.
  */
 declare enum FillRule {
     nonZero = 0,
@@ -1104,6 +1128,9 @@ export declare class StrokableNode extends Node implements IStrokableNode {
 
 /**
  * Represents a stroke in the scenegraph. See {@link StrokableNode}.
+ *
+ * The most convenient way to create a stroke is via `Editor.makeStroke()`. This also futureproofs your code in case any
+ * other required fields are added to the Stroke descriptor in the future.
  */
 export declare interface Stroke {
     /**

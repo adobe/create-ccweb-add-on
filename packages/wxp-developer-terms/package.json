@@ -1,6 +1,6 @@
 {
     "name": "@adobe/ccweb-add-on-developer-terms",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "author": "Adobe",
     "license": "MIT",
     "description": "Developer Terms of Use libraries for Adobe Creative Cloud Web Add-on.",
@@ -27,7 +27,7 @@
         "@adobe/aio-lib-ims": "6.0.0",
         "@adobe/ccweb-add-on-core": "workspace:*",
         "application-config-path": "0.1.0",
-        "axios": "0.26.1",
+        "axios": "1.6.0",
         "chalk": "4.1.1",
         "inversify": "6.0.1",
         "prompts": "2.4.2",
