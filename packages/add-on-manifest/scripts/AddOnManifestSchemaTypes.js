@@ -165,7 +165,9 @@ export const RequirementSchemaV2 = {
             properties: {
                 messaging: { type: "boolean" },
                 expressPrint: { type: "boolean" }
-            }
+            },
+            required: [],
+            additionalProperties: false
         }
     },
     required: ["apps"],

@@ -1,6 +1,6 @@
 {
     "name": "@adobe/ccweb-add-on-sdk-types",
-    "version": "1.2.0",
+    "version": "1.0.0",
     "author": "Adobe",
     "license": "MIT",
     "description": "Type definitions for Adobe Creative Cloud Web Add-on SDK.",
@@ -14,6 +14,25 @@
         "typings"
     ],
     "main": "",
+    "exports": {
+        ".": "./index.d.ts",
+        "./iframe-ui": "./ui/ui-sdk.d.ts",
+        "./express-document-sdk": "./sandbox/express-document-sdk.d.ts",
+        "./add-on-sdk-document-sandbox": "./sandbox/add-on-sdk-document-sandbox.d.ts"
+    },
+    "typesVersions": {
+        "*": {
+            "iframe-ui": [
+                "./ui/ui-sdk.d.ts"
+            ],
+            "express-document-sdk": [
+                "./sandbox/express-document-sdk.d.ts"
+            ],
+            "add-on-sdk-document-sandbox": [
+                "./sandbox/add-on-sdk-document-sandbox.d.ts"
+            ]
+        }
+    },
     "types": "index.d.ts",
     "repository": {
         "url": "https://github.com/adobe/create-ccweb-add-on"
