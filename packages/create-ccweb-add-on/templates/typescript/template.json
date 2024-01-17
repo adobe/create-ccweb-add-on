@@ -6,8 +6,8 @@
         "package": "ccweb-add-on-scripts package --use webpack"
     },
     "dependencies": {
-        "@spectrum-web-components/button": "0.40.0",
-        "@spectrum-web-components/theme": "0.40.0",
+        "@spectrum-web-components/button": "0.39.4",
+        "@spectrum-web-components/theme": "0.39.4",
         "lit": "2.8.0"
     },
     "devDependencies": {
