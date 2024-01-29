@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/create-ccweb-add-on",
+      "comment": "Remove redundant dependencies from react templates",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@adobe/create-ccweb-add-on"
+}
