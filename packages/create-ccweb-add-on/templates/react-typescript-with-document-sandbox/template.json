@@ -6,7 +6,6 @@
         "package": "ccweb-add-on-scripts package --use webpack"
     },
     "dependencies": {
-        "@spectrum-web-components/theme": "0.39.4",
         "@swc-react/button": "0.39.4",
         "@swc-react/theme": "0.39.4",
         "react-dom": "18.2.0",
