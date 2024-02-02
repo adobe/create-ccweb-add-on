@@ -22,7 +22,7 @@
  * SOFTWARE.
  ********************************************************************************/
 
-const typePattern = "^(panel|share)$";
+const typePattern = "^(panel|share|content-hub)$";
 const sandboxPattern = "^(allow-popups|allow-presentation|allow-downloads|allow-popups-to-escape-sandbox)$";
 const clipboardPattern = "^(clipboard-write|clipboard-read)$";
 const iconPattern = "^(lightest|light|medium|dark|darkest|all)$";

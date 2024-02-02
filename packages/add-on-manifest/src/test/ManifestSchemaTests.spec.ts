@@ -523,6 +523,24 @@ describe("ManifestSchema Validations - Version 2", () => {
         assert.equal(res.success, true);
     });
 
+    it("should fail and return error response if content hub entrypoint type is used by non-privileged add-on", () => {
+        const manifest = getTestManifestV2();
+        const testManifest = {
+            ...manifest,
+            entryPoints: [
+                {
+                    ...manifest.entryPoints[0],
+                    type: "content-hub"
+                }
+            ]
+        };
+        const additionalAddOnInfo = { ...additionInfo, privileged: false };
+        const validationResult = validator.validateManifestSchema(testManifest, additionalAddOnInfo);
+        assert.equal(validationResult.success, false);
+        assert.notEqual(validationResult.errorDetails, undefined);
+        assert.equal(validationResult.errorDetails?.[0], OTHER_MANIFEST_ERRORS.RestrictedContentHubEntrypoint);
+    });
+
     describe("ManifestSchema Validation with 'script' field", () => {
         it("should pass if 'script' field is undefined", () => {
             const testManifest = getTestManifestV2WithScript(undefined);

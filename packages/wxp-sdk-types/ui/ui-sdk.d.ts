@@ -25,7 +25,7 @@
 /**
  * Base interface for all type of add-ons
  */
-export declare interface AddOn {
+export declare interface AddOn extends AddOnBase {
     /**
      * Represents the current add-on runtime
      */
@@ -39,6 +39,11 @@ export declare interface AddOn {
      */
     readonly clientStorage: ClientStorage;
 }
+
+/**
+ * Interface that represents the APIs directly exposed by the AddOn interface
+ */
+declare interface AddOnBase {}
 
 /**
  * @public

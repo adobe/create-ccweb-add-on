@@ -130,7 +130,8 @@ export enum EntrypointType {
     WIDGET = "widget",
     COMMAND = "command",
     PANEL = "panel",
-    SHARE = "share"
+    SHARE = "share",
+    CONTENT_HUB = "content-hub"
 }
 
 export type AuthorInfo = {
@@ -198,6 +199,10 @@ export const OTHER_MANIFEST_ERRORS: ManifestErrorType = {
     DocumentSandboxWithScript: {
         instancePath: "/entryPoints/documentSandbox",
         message: "Manifest entrypoint should have either 'documentSandbox' or 'script', not both"
+    },
+    RestrictedContentHubEntrypoint: {
+        instancePath: "/entryPoints/type",
+        message: "Entrypoint type 'content-hub' is allowed only for privileged add-ons"
     }
 };
 
@@ -234,3 +239,12 @@ export enum AddOnLogLevel {
 }
 
 export type AddOnLogAction = (...args: unknown[]) => unknown;
+
+export function isIframeEntryPointType(entryPointType: EntrypointType): boolean {
+    return (
+        entryPointType === EntrypointType.PANEL ||
+        entryPointType === EntrypointType.WIDGET ||
+        entryPointType === EntrypointType.SHARE ||
+        entryPointType === EntrypointType.CONTENT_HUB
+    );
+}
