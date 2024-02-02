@@ -19,13 +19,13 @@
             "packageName": "@adobe/ccweb-add-on-manifest",
             "projectFolder": "packages/add-on-manifest",
             "reviewCategory": "production",
-            "shouldPublish": false
+            "shouldPublish": true
         },
         {
             "packageName": "@adobe/ccweb-add-on-core",
             "projectFolder": "packages/wxp-core",
             "reviewCategory": "production",
-            "shouldPublish": false
+            "shouldPublish": true
         },
         {
             "packageName": "@adobe/create-ccweb-add-on",
@@ -37,37 +37,37 @@
             "packageName": "@adobe/ccweb-add-on-scaffolder",
             "projectFolder": "packages/wxp-add-on-scaffolder",
             "reviewCategory": "production",
-            "shouldPublish": false
+            "shouldPublish": true
         },
         {
             "packageName": "@adobe/ccweb-add-on-scripts",
             "projectFolder": "packages/wxp-scripts",
             "reviewCategory": "production",
-            "shouldPublish": false
+            "shouldPublish": true
         },
         {
             "packageName": "@adobe/ccweb-add-on-ssl",
             "projectFolder": "packages/wxp-ssl",
             "reviewCategory": "production",
-            "shouldPublish": false
+            "shouldPublish": true
         },
         {
             "packageName": "@adobe/ccweb-add-on-analytics",
             "projectFolder": "packages/wxp-analytics",
             "reviewCategory": "production",
-            "shouldPublish": false
+            "shouldPublish": true
         },
         {
             "packageName": "@adobe/ccweb-add-on-developer-terms",
             "projectFolder": "packages/wxp-developer-terms",
             "reviewCategory": "production",
-            "shouldPublish": false
+            "shouldPublish": true
         },
         {
             "packageName": "@adobe/ccweb-add-on-sdk-types",
             "projectFolder": "packages/wxp-sdk-types",
             "reviewCategory": "production",
-            "shouldPublish": false
+            "shouldPublish": true
         }
     ]
 }
