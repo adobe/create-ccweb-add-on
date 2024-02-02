@@ -32,7 +32,8 @@ import {
     ManifestValidationResult,
     OTHER_MANIFEST_ERRORS,
     ManifestEntrypoint,
-    EntrypointV2
+    EntrypointV2,
+    EntrypointType
 } from "./AddOnManifestTypes.js";
 import { developerVersionValidation, getManifestVersion, getValidationErrors } from "./ValidationUtils.js";
 import { validateSchemaV1, validateSchemaV2 } from "./generated/validateManifestSchema.mjs";
@@ -69,6 +70,14 @@ export class AddOnManifestValidator {
             isValidSchema = false;
             validationErrors.push(OTHER_MANIFEST_ERRORS.EmptyEntrypoint);
         }
+
+        manifest.entryPoints?.forEach((entryPoint: ManifestEntrypoint) => {
+            if (entryPoint.type === EntrypointType.CONTENT_HUB && !manifest.requirements?.privilegedApis) {
+                this._logError("Entrypoint type 'content-hub' is allowed only for privileged add-ons");
+                isValidSchema = false;
+                validationErrors.push(OTHER_MANIFEST_ERRORS.RestrictedContentHubEntrypoint);
+            }
+        });
 
         if (!additionalInfo.privileged) {
             if (manifest.requirements?.privilegedApis) {
