@@ -386,6 +386,61 @@ describe("ManifestSchema Validations - Version 2", () => {
         assert.equal(errorDetails?.[0], OTHER_MANIFEST_ERRORS.InvalidClipboardPermission);
     });
 
+    it("should fail for invalid host name", () => {
+        const testManifest = getTestManifestV2();
+        const invalidHostDomains = [
+            "",
+            "*",
+            "https://",
+            "https://.",
+            "https://a",
+            "https://a.a",
+            "https://adobe.",
+            "https://adobe..",
+            "https://.com",
+            "http://localhost.adobe.com"
+        ];
+        invalidHostDomains.forEach(hostDomain => {
+            const entryPoints = [
+                {
+                    ...testManifest.entryPoints[0],
+                    hostDomain
+                }
+            ];
+            const { success, errorDetails } = validator.validateManifestSchema(
+                { ...testManifest, entryPoints },
+                additionInfo
+            );
+            assert.equal(success, false);
+            assert.equal(errorDetails?.[0], OTHER_MANIFEST_ERRORS.InvalidHostDomain);
+        });
+    });
+
+    it("should pass for valid hostName", () => {
+        const testManifest = getTestManifestV2();
+        const validHostDomains = [
+            "https://localhost.adobe.com",
+            "https://ci-hub.azureweb.net/",
+            "https://ci-hub.azureweb.net/index.html",
+            "https://example.com:8080/path/to/resource",
+            "https://example.com/path/to/resource?param1=value1"
+        ];
+        validHostDomains.forEach(hostDomain => {
+            const entryPoints = [
+                {
+                    ...testManifest.entryPoints[0],
+                    hostDomain
+                }
+            ];
+            const { success, errorDetails } = validator.validateManifestSchema(
+                { ...testManifest, entryPoints },
+                additionInfo
+            );
+            assert.equal(success, true);
+            assert.equal(errorDetails, undefined);
+        });
+    });
+
     it("should support valid version values", () => {
         const testManifest = getTestManifestV2();
         const validManifestVersion = ["1.1.1", "1.0.0", "99.0.1"];

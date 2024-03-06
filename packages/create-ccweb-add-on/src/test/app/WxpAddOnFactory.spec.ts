@@ -217,7 +217,7 @@ describe("WxpAddOnFactory", () => {
                     "install",
                     "--save-dev",
                     "@adobe/ccweb-add-on-scripts",
-                    "@adobe/ccweb-add-on-sdk-types"
+                    "@types/adobe__ccweb-add-on-sdk"
                 ];
 
                 if (run.verbose) {

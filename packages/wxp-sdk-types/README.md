@@ -10,11 +10,8 @@ This package exports type definitions for [@adobe/create-ccweb-add-on](https://w
 
 ## Usage Notes
 
-For TypeScript add-on projects created using [@adobe/create-ccweb-add-on](https://www.npmjs.com/package/@adobe/create-ccweb-add-on), this package is pre-installed. Additionally, the below files are included in the add-on project (based on the selected runtime):
+This package contains Add-on SDK type definitions. However, in itself this package is unusable. You must install [@types/adobe\_\_ccweb-add-on-sdk](https://www.npmjs.com/package/@types/adobe__ccweb-add-on-sdk) instead, to use the Add-on SDK type definitions in your Add-on project.
 
--   [add-on-ui-sdk.d.ts](https://github.com/adobe/create-ccweb-add-on/blob/main/packages/wxp-sdk-types/add-on-ui-sdk.d.ts)
--   [add-on-sandbox-sdk.d.ts](https://github.com/adobe/create-ccweb-add-on/blob/main/packages/wxp-sdk-types/add-on-sandbox-sdk.d.ts)
-
-However, if you are installing this package on your existing add-on project, ensure to include the above type definition files in your `src` directory.
+For add-on projects created using [@adobe/create-ccweb-add-on](https://www.npmjs.com/package/@adobe/create-ccweb-add-on), [@types/adobe\_\_ccweb-add-on-sdk](https://www.npmjs.com/package/@types/adobe__ccweb-add-on-sdk) is pre-installed.
 
 For more information about developing Adobe Express add-ons, check out the [documentation](https://developer.adobe.com/express/add-ons/).

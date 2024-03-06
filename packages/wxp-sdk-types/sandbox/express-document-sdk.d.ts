@@ -122,6 +122,11 @@ export declare class BaseNode {
     get allChildren(): Readonly<Iterable<BaseNode>>;
 
     /**
+     * A unique identifier for this node that stays the same when the file is closed & reopened, or if the node is
+     * moved to a different part of the document.
+     */
+    get id(): string;
+    /**
      * The node's type.
      */
     get type(): SceneNodeType;
@@ -421,6 +426,14 @@ export declare class Editor {
      * @returns a stroke configured with the given options.
      */
     makeStroke(options?: Partial<Stroke>): Stroke;
+    /**
+     * @returns a path node with a default stroke and no initial fill.
+     * @param path - a string representing any [SVG path element](https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths).
+     * Note that the path data will be normalized, and therefore the `path` getter may return a different SVG string from the path creation input.
+     * For example, "M 10 80 Q 52.5 10, 95 80 T 180 80" becomes "M 10 80 C 38.33 33.33 66.67 33.33 95 80...".
+     * Throws if the input is empty or is not legal SVG path syntax.
+     */
+    createPath(path: string): PathNode;
     /**
      * @returns a text node with default styles. The text content is initially empty, so the text node will be
      * invisible until its `text` property is set. Creates point text, so the node's width will automatically
@@ -908,14 +921,16 @@ export declare class PageNode extends BaseNode implements Readonly<IRectangularN
 export declare class PathNode extends FillableNode {
     /**
      * The path definition as an SVG string. The path data is read-only and cannot be modified via this API yet.
-     * Example: "M 0 0 L 10 15".
+     * Note that the path data will be normalized, and therefore the `path` getter may return a different SVG string from the path creation input.
+     * For example, "M 10 80 Q 52.5 10, 95 80 T 180 80" becomes "M 10 80 C 38.33 33.33 66.67 33.33 95 80...".
      */
     get path(): string;
     /**
      * The fill rule specifies how the interior area of a path is determined in cases where the path is self-intersecting or
-     * has multiple disjoint parts. This value is read-only and cannot be modified via this API yet.
+     * has multiple disjoint parts. The default value is nonZero.
      */
     get fillRule(): FillRule;
+    set fillRule(fillRule: FillRule);
 }
 
 /**

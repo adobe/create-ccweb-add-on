@@ -102,6 +102,7 @@ export const EntrypointSchemaV2 = {
         main: { type: "string" },
         script: { type: "string" },
         documentSandbox: { type: "string" },
+        hostDomain: { type: "string" },
         permissions: {
             type: "object",
             properties: {

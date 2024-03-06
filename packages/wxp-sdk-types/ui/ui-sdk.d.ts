@@ -226,7 +226,6 @@ declare interface ApplicationBase {
     showModalDialog(dialogOptions: CustomDialogOptions): Promise<CustomDialogResult>;
 
     /**
-     * @experimental - Experimental API
      * Triggers/Starts the in-app monetization upgrade flow
      * @returns if the user is premium user or not
      */
@@ -467,6 +466,7 @@ declare namespace Constants {
         ButtonType,
         RuntimeType,
         BleedUnit,
+        VideoResolution,
         AuthorizationStatus
     };
 }
@@ -482,7 +482,6 @@ export declare interface CurrentUser {
     userId(): Promise<string>;
 
     /**
-     * @experimental - Experimental API
      * @returns if the current user is a premium user
      */
     isPremiumUser(): Promise<boolean>;
@@ -596,9 +595,9 @@ export declare type DisableDragToDocument = () => void;
  */
 declare interface Document_2 {
     /**
-     * Add image/gif to the current page
+     * Add image/gif/Ps/Ai files to the current page
      */
-    addImage(blob: Blob): Promise<void>;
+    addImage(blob: Blob, attributes?: MediaAttributes): Promise<void>;
     /**
      * Add video to the current page
      */
@@ -612,7 +611,6 @@ declare interface Document_2 {
      */
     createRenditions(renditionOptions: RenditionOptions, renditionIntent?: RenditionIntent): Promise<Rendition[]>;
     /**
-     * @experimental - Experimental API
      * Get metadata of all or range of pages of the document
      */
     getPagesMetadata(options: PageMetadataOptions): Promise<PageMetadata[]>;
@@ -754,8 +752,8 @@ export declare interface JpgRenditionOptions extends RenditionOptions {
      * Requested size
      */
     requestedSize?: {
-        width: number;
-        height: number;
+        width?: number;
+        height?: number;
     };
 }
 
@@ -825,6 +823,21 @@ export declare interface MediaAttributes {
      * Media title
      */
     title: string;
+}
+
+export declare interface Mp4RenditionOptions extends RenditionOptions {
+    /**
+     * mp4 rendition format
+     */
+    format: RenditionFormat.mp4;
+    /**
+     * Video resolution
+     */
+    resolution?: VideoResolution;
+    /**
+     * Custom Resolution (in pixel)
+     */
+    customResolution?: number;
 }
 
 /**
@@ -912,15 +925,78 @@ export declare interface PageRendition extends Rendition {
     metadata: PageMetadata;
 }
 
+/**
+ * Represents a PDF Page box
+ */
+export declare interface PdfPageBox {
+    /**
+     * Margins for a box
+     */
+    margins: PdfPageBoxMargins;
+}
+
+/**
+ * All the PDF Page boxes (MediaBox, BleedBox, CropBox, TrimBox)
+ */
+export declare interface PdfPageBoxes {
+    /**
+     * Media box
+     */
+    mediaBox?: PdfPageBox;
+    /**
+     * Bleed box
+     */
+    bleedBox?: PdfPageBox;
+    /**
+     * Crop box
+     */
+    cropBox?: PdfPageBox;
+    /**
+     * Trim box
+     */
+    trimBox?: PdfPageBox;
+}
+
+/**
+ * Margins for a PDF page box
+ */
+export declare interface PdfPageBoxMargins {
+    /**
+     * Top margin
+     */
+    top?: Bleed;
+    /**
+     * Bottom margin
+     */
+    bottom?: Bleed;
+    /**
+     * Left margin
+     */
+    left?: Bleed;
+    /**
+     * Right margin
+     */
+    right?: Bleed;
+}
+
 export declare interface PdfRenditionOptions extends RenditionOptions {
     /**
      * PDF rendition format
      */
     format: RenditionFormat.pdf;
     /**
-     * Bleed for the page. If undefined, then no bleed (zero).
+     * Bleed for the page.
+     * If bleed is defined, then CropBox and TrimBox will be the size of the express document. BleedBox and MediaBox will be equal to each other,
+     * and they will expand on all sides (left, top, right, bottom) with the amount/unit specified by bleed.
+     * If undefined, then no bleed (zero).
      */
     bleed?: Bleed;
+    /**
+     * Exposes ability to customize each PDF Page Box (MediaBox, BleedBox, CropBox, TrimBox) dimensions,
+     * by defining how much it should expand on each side beyond the express document page size.
+     * If pageBoxes are defined, then PdfRenditionOptions.bleed is ignored.
+     */
+    pageBoxes?: PdfPageBoxes;
 }
 
 export declare interface PngRenditionOptions extends RenditionOptions {
@@ -938,8 +1014,8 @@ export declare interface PngRenditionOptions extends RenditionOptions {
      * Requested size
      */
     requestedSize?: {
-        width: number;
-        height: number;
+        width?: number;
+        height?: number;
     };
 }
 
@@ -1070,7 +1146,11 @@ export declare enum RenditionIntent {
     /**
      * Intent to preview the content
      */
-    preview = "preview"
+    preview = "preview",
+    /**
+     * Intent to export and print the content
+     */
+    print = "print"
 }
 
 export declare interface RenditionOptions {
@@ -1222,6 +1302,28 @@ export declare enum Variant {
     input = "input",
     /**
      *  A dialog that can render complex forms and content
+     */
+    custom = "custom"
+}
+
+/**
+ * Video resolution options for the mp4 renditions
+ */
+export declare enum VideoResolution {
+    /**
+     * SD 480p video resolution
+     */
+    sd480p = "480p",
+    /**
+     * HD 720p video resolution
+     */
+    hd720p = "720p",
+    /**
+     * FHD 1080p video resolution
+     */
+    fhd1080p = "1080p",
+    /**
+     * Custom video resolution
      */
     custom = "custom"
 }
