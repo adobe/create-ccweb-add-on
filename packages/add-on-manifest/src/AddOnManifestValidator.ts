@@ -99,10 +99,10 @@ export class AddOnManifestValidator {
             });
         }
         if (this._manifestVersion > ManifestVersion.V1) {
-            const documentSandboxValidation = this._isValidDocumentSandboxEntry(manifest);
-            if (!documentSandboxValidation.success) {
+            const entryPointsValidation = this._isValidEntryPoint(manifest);
+            if (!entryPointsValidation.success) {
                 isValidSchema = false;
-                validationErrors.push(...documentSandboxValidation.errorDetails!);
+                validationErrors.push(...entryPointsValidation.errorDetails!);
             }
         }
         return {
@@ -111,7 +111,7 @@ export class AddOnManifestValidator {
         };
     }
 
-    private _isValidDocumentSandboxEntry(manifest: ReturnType<typeof JSON.parse>): ManifestValidationResult {
+    private _isValidEntryPoint(manifest: ReturnType<typeof JSON.parse>): ManifestValidationResult {
         let isValidSchema = true;
         const validationErrors: ManifestError[] = [];
         manifest.entryPoints?.forEach((entrypoint: EntrypointV2) => {
@@ -120,6 +120,14 @@ export class AddOnManifestValidator {
                     `Manifest entrypoint '${entrypoint.id}' should have either 'documentSandbox' or 'script', not both`
                 );
                 validationErrors.push(OTHER_MANIFEST_ERRORS.DocumentSandboxWithScript);
+                isValidSchema = false;
+            }
+            if (
+                entrypoint.hostDomain !== undefined &&
+                !entrypoint.hostDomain.match(new RegExp("https://[a-zA-Z0-9-.]{3,}.[a-zA-Z]{2,}(.[a-zA-Z]{2,})?"))
+            ) {
+                this._logError(`Manifest entrypoint '${entrypoint.id}' should have valid host domain`);
+                validationErrors.push(OTHER_MANIFEST_ERRORS.InvalidHostDomain);
                 isValidSchema = false;
             }
         });

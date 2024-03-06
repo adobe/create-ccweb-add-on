@@ -112,6 +112,7 @@ export type EntrypointV2 = Omit<EntrypointV1, "label"> & {
     readonly script?: string;
     readonly documentSandbox?: string;
     readonly discoverable?: boolean;
+    readonly hostDomain?: string;
 };
 
 export type ManifestEntrypoint = EntrypointV1 | EntrypointV2;
@@ -199,6 +200,10 @@ export const OTHER_MANIFEST_ERRORS: ManifestErrorType = {
     DocumentSandboxWithScript: {
         instancePath: "/entryPoints/documentSandbox",
         message: "Manifest entrypoint should have either 'documentSandbox' or 'script', not both"
+    },
+    InvalidHostDomain: {
+        instancePath: "/entryPoints/hostDomain",
+        message: "Manifest entrypoint should have valid hostDomain"
     },
     RestrictedContentHubEntrypoint: {
         instancePath: "/entryPoints/type",
