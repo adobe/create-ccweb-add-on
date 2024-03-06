@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-sdk-types",
+      "comment": "Types for new Document Sandbox APIs and Iframe UI APIs",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-sdk-types"
+}
