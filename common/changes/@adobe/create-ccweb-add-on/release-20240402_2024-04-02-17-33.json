@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/create-ccweb-add-on",
+      "comment": "Remove login and add 2 new JavaScript using SWC templates",
+      "type": "major"
+    }
+  ],
+  "packageName": "@adobe/create-ccweb-add-on"
+}
