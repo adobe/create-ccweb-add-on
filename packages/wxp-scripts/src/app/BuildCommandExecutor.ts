@@ -123,10 +123,7 @@ export class BuildCommandExecutor implements CommandExecutor {
             await this._scriptManager.copyStaticFiles(options.srcDirectory, DEFAULT_OUTPUT_DIRECTORY);
         }
 
-        const addOnManifest = (await this._manifestReader.getManifest(
-            this._onValidationFailed,
-            false
-        )) as AddOnManifest;
+        const addOnManifest = this._manifestReader.getManifest(this._onValidationFailed, false) as AddOnManifest;
         const addOnDirectory = new AddOnDirectory(options.srcDirectory, addOnManifest);
 
         if (isBuildSuccessful) {

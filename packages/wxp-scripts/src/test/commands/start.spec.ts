@@ -25,8 +25,6 @@
 import type { AnalyticsConsent, AnalyticsService } from "@adobe/ccweb-add-on-analytics";
 import { ITypes as IAnalyticsTypes } from "@adobe/ccweb-add-on-analytics";
 import { DEFAULT_HOST_NAME, DEFAULT_PORT, DEFAULT_SRC_DIRECTORY } from "@adobe/ccweb-add-on-core";
-import type { AccountService } from "@adobe/ccweb-add-on-developer-terms";
-import { ITypes as IDeveloperTermsTypes } from "@adobe/ccweb-add-on-developer-terms";
 import { Config } from "@oclif/core";
 import chai, { assert, expect } from "chai";
 import chaiAsPromised from "chai-as-promised";
@@ -55,8 +53,6 @@ describe("start", () => {
     let commandExecutor: StubbedInstance<CommandExecutor>;
     let commandValidator: StubbedInstance<CommandValidator>;
 
-    let accountService: StubbedInstance<AccountService>;
-
     let analyticsConsent: StubbedInstance<AnalyticsConsent>;
     let analyticsService: StubbedInstance<AnalyticsService>;
 
@@ -76,18 +72,12 @@ describe("start", () => {
 
         expressApp = stubInterface();
 
-        accountService = stubInterface();
-        accountService.invalidateToken.resolves();
-        accountService.seekTermsOfUseConsent.resolves();
-
         analyticsConsent = stubInterface();
         analyticsService = stubInterface();
 
         container = sandbox.stub(IContainer, "get");
 
         container.withArgs(ITypes.ExpressApp).returns(expressApp);
-
-        container.withArgs(IDeveloperTermsTypes.AccountService).returns(accountService);
 
         container.withArgs(IAnalyticsTypes.AnalyticsConsent).returns(analyticsConsent);
         container.withArgs(IAnalyticsTypes.AnalyticsService).returns(analyticsService);
@@ -120,18 +110,7 @@ describe("start", () => {
 
         it("should execute succesfully when parameters are passed.", async () => {
             const start = new Start(
-                [
-                    "--src",
-                    DEFAULT_SRC_DIRECTORY,
-                    "--use",
-                    "tsc",
-                    "--port",
-                    "8000",
-                    "--login",
-                    "--analytics",
-                    "off",
-                    "--verbose"
-                ],
+                ["--src", DEFAULT_SRC_DIRECTORY, "--use", "tsc", "--port", "8000", "--analytics", "off", "--verbose"],
                 new Config({ root: "." })
             );
 

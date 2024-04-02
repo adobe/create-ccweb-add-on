@@ -137,7 +137,7 @@ export class StartCommandExecutor implements CommandExecutor {
     };
 
     private async _start(options: StartCommandOptions, expressApp: Express): Promise<void> {
-        const addOnManifest = (await this._manifestReader.getManifest(this._onValidationFailed))!;
+        const addOnManifest = this._manifestReader.getManifest(this._onValidationFailed)!;
         const addOnDirectory = new AddOnDirectory(options.srcDirectory, addOnManifest);
 
         const sslConfig = await this._sslReader.read(options.hostname);

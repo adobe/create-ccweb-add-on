@@ -25,8 +25,6 @@
 import type { AnalyticsConsent, AnalyticsService } from "@adobe/ccweb-add-on-analytics";
 import { ITypes as IAnalyticsTypes } from "@adobe/ccweb-add-on-analytics";
 import { DEFAULT_HOST_NAME, DEFAULT_PORT, DEFAULT_SRC_DIRECTORY } from "@adobe/ccweb-add-on-core";
-import type { AccountService } from "@adobe/ccweb-add-on-developer-terms";
-import { ITypes as IDeveloperTermsTypes } from "@adobe/ccweb-add-on-developer-terms";
 import { assert } from "chai";
 import type { Express } from "express";
 import "mocha";
@@ -54,8 +52,6 @@ describe("ccweb-add-on-scripts", () => {
     let commandExecutor: StubbedInstance<CommandExecutor>;
     let commandValidator: StubbedInstance<CommandValidator>;
 
-    let accountService: StubbedInstance<AccountService>;
-
     let analyticsConsent: StubbedInstance<AnalyticsConsent>;
     let analyticsService: StubbedInstance<AnalyticsService>;
 
@@ -79,18 +75,12 @@ describe("ccweb-add-on-scripts", () => {
 
         expressApp = stubInterface();
 
-        accountService = stubInterface();
-        accountService.invalidateToken.resolves();
-        accountService.seekTermsOfUseConsent.resolves();
-
         analyticsConsent = stubInterface();
         analyticsService = stubInterface();
 
         container = sandbox.stub(IContainer, "get");
 
         container.withArgs(ITypes.ExpressApp).returns(expressApp);
-
-        container.withArgs(IDeveloperTermsTypes.AccountService).returns(accountService);
 
         container.withArgs(IAnalyticsTypes.AnalyticsConsent).returns(analyticsConsent);
         container.withArgs(IAnalyticsTypes.AnalyticsService).returns(analyticsService);

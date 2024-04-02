@@ -93,7 +93,8 @@ describe("AddOnDirectoryValidator", () => {
                 assert.equal(logger.information.callCount, 1);
                 assert.equal(
                     logger.information.calledWith(`${PROGRAM_NAME} my-add-on --kind panel --template javascript`, {
-                        prefix: "  "
+                        prefix: "  ",
+                        postfix: "\n"
                     }),
                     true
                 );
@@ -146,7 +147,8 @@ describe("AddOnDirectoryValidator", () => {
                 assert.equal(logger.information.callCount, 1);
                 assert.equal(
                     logger.information.calledWith(`${PROGRAM_NAME} my-add-on --kind panel --template javascript`, {
-                        prefix: "  "
+                        prefix: "  ",
+                        postfix: "\n"
                     }),
                     true
                 );
@@ -206,7 +208,8 @@ describe("AddOnDirectoryValidator", () => {
                 assert.equal(logger.information.callCount, 1);
                 assert.equal(
                     logger.information.calledWith(`${PROGRAM_NAME} my-add-on --kind panel --template javascript`, {
-                        prefix: "  "
+                        prefix: "  ",
+                        postfix: "\n"
                     }),
                     true
                 );

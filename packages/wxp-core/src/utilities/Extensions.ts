@@ -71,11 +71,12 @@ export function traverseDirectory(directory: string, action: (absolutePath: stri
 /**
  * Get Base URL.
  * @param protocol - Protocol.
- * @param host - Host (which is equivalent to Hostname:Port).
+ * @param hostname - Server hostname.
+ * @param port - Server port number.
  * @returns Base URL as string.
  */
-export function getBaseUrl(protocol: string, host: string): string {
-    return new URL(`${protocol}://${host}`).href;
+export function getBaseUrl(protocol: string, hostname: string, port?: number): string {
+    return port !== undefined ? `${protocol}://${hostname}:${port}` : `${protocol}://${hostname}`;
 }
 
 /**

@@ -57,10 +57,7 @@ describe("AddOnResourceUtils", () => {
                     versionString: "1.0.0",
                     supportedLanguages: ["en-US"],
                     supportedApps: ["Express"],
-                    downloadUrl: `${getBaseUrl(
-                        HTTPS,
-                        `${DEFAULT_HOST_NAME}:${options.port}`
-                    )}${"test-app"}/${MANIFEST_JSON}`,
+                    downloadUrl: `${getBaseUrl(HTTPS, DEFAULT_HOST_NAME, options.port)}/test-app/${MANIFEST_JSON}`,
                     addon: {
                         localizedMetadata: {
                             name: "Test App"
@@ -78,7 +75,7 @@ describe("AddOnResourceUtils", () => {
             const addOnsJson = AddOnResourceUtils.getAddOns(
                 createManifest(),
                 addOnDirectory,
-                getBaseUrl(HTTPS, `${DEFAULT_HOST_NAME}:${options.port}`)
+                getBaseUrl(HTTPS, DEFAULT_HOST_NAME, options.port)
             );
 
             assert.deepEqual(addOnsJson, expectedAddOnsJson);
@@ -94,10 +91,7 @@ describe("AddOnResourceUtils", () => {
                     versionString: "1.0.0",
                     supportedLanguages: ["en-US"],
                     supportedApps: ["Express"],
-                    downloadUrl: `${getBaseUrl(
-                        HTTPS,
-                        `${DEFAULT_HOST_NAME}:${options.port}`
-                    )}${"test-app"}/${MANIFEST_JSON}`,
+                    downloadUrl: `${getBaseUrl(HTTPS, DEFAULT_HOST_NAME, options.port)}/test-app/${MANIFEST_JSON}`,
                     addon: {
                         localizedMetadata: {
                             name: DEFAULT_ADD_ON_NAME
@@ -110,7 +104,7 @@ describe("AddOnResourceUtils", () => {
             const addOnsJson = AddOnResourceUtils.getAddOns(
                 undefined!,
                 addOnDirectory,
-                getBaseUrl(HTTPS, `${DEFAULT_HOST_NAME}:${options.port}`)
+                getBaseUrl(HTTPS, DEFAULT_HOST_NAME, options.port)
             );
 
             assert.deepEqual(addOnsJson, expectedAddOnsJson);
@@ -122,11 +116,11 @@ describe("AddOnResourceUtils", () => {
             const addOnDirectory = new AddOnDirectory("src", createManifest());
             const options = new StartCommandOptions("src", "", "localhost", 5241, true);
 
-            const baseUrl = getBaseUrl(HTTPS, `${DEFAULT_HOST_NAME}:${options.port}`);
+            const baseUrl = getBaseUrl(HTTPS, DEFAULT_HOST_NAME, options.port);
             const expectedResources = [
-                `${baseUrl}${addOnDirectory.manifest.manifestProperties.testId}/file-1.js`,
-                `${baseUrl}${addOnDirectory.manifest.manifestProperties.testId}/file-2.css`,
-                `${baseUrl}${addOnDirectory.manifest.manifestProperties.testId}/file-3.html`
+                `${baseUrl}/${addOnDirectory.manifest.manifestProperties.testId}/file-1.js`,
+                `${baseUrl}/${addOnDirectory.manifest.manifestProperties.testId}/file-2.css`,
+                `${baseUrl}/${addOnDirectory.manifest.manifestProperties.testId}/file-3.html`
             ];
 
             const readDirStub = sandbox.stub(fs, "readdirSync");

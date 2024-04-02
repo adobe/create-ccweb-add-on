@@ -25,7 +25,6 @@
 import type { AnalyticsService } from "@adobe/ccweb-add-on-analytics";
 import type { Logger } from "@adobe/ccweb-add-on-core";
 import { DEFAULT_HOST_NAME, DEFAULT_OUTPUT_DIRECTORY, getBaseUrl, getJSONString } from "@adobe/ccweb-add-on-core";
-import type { AccountService } from "@adobe/ccweb-add-on-developer-terms";
 import type { AddOnManifestEntrypoint } from "@adobe/ccweb-add-on-manifest";
 import { assert } from "chai";
 import type { FSWatcher } from "chokidar";
@@ -63,7 +62,6 @@ describe("WxpSocketServer", () => {
 
     let entityTracker: EntityTracker;
 
-    let accountService: StubbedInstance<AccountService>;
     let manifestReader: AddOnManifestReader;
 
     let logger: StubbedInstance<Logger>;
@@ -84,13 +82,8 @@ describe("WxpSocketServer", () => {
         socketAppFactory = sandbox.stub().returns(socketApp);
 
         scriptManager = stubInterface();
-
         entityTracker = new FileChangeTracker();
-
-        accountService = stubInterface();
-        accountService.isUserPrivileged.resolves(true);
-        manifestReader = new AddOnManifestReader(accountService);
-
+        manifestReader = new AddOnManifestReader();
         logger = stubInterface<Logger>();
 
         analyticsService = stubInterface<AnalyticsService>();
@@ -176,7 +169,8 @@ describe("WxpSocketServer", () => {
                     logger.success.calledWith(
                         `Done. Your add-on '${addOnDirectory.rootDirName}' is being watched on: ${getBaseUrl(
                             WSS,
-                            `${DEFAULT_HOST_NAME}:${options.port}`
+                            DEFAULT_HOST_NAME,
+                            options.port
                         )}`
                     ),
                     true
@@ -285,7 +279,8 @@ describe("WxpSocketServer", () => {
                 logger.success.calledWith(
                     `Done. Your add-on '${addOnDirectory.rootDirName}' is being watched on: ${getBaseUrl(
                         WSS,
-                        `${DEFAULT_HOST_NAME}:${options.port}`
+                        DEFAULT_HOST_NAME,
+                        options.port
                     )}`
                 ),
                 true
@@ -389,7 +384,8 @@ describe("WxpSocketServer", () => {
                 logger.success.calledWith(
                     `Done. Your add-on '${addOnDirectory.rootDirName}' is being watched on: ${getBaseUrl(
                         WSS,
-                        `${DEFAULT_HOST_NAME}:${options.port}`
+                        DEFAULT_HOST_NAME,
+                        options.port
                     )}`
                 ),
                 true
@@ -495,7 +491,8 @@ describe("WxpSocketServer", () => {
                 logger.success.calledWith(
                     `Done. Your add-on '${addOnDirectory.rootDirName}' is being watched on: ${getBaseUrl(
                         WSS,
-                        `${DEFAULT_HOST_NAME}:${options.port}`
+                        DEFAULT_HOST_NAME,
+                        options.port
                     )}`
                 ),
                 true
@@ -609,7 +606,8 @@ describe("WxpSocketServer", () => {
                 logger.success.calledWith(
                     `Done. Your add-on '${addOnDirectory.rootDirName}' is being watched on: ${getBaseUrl(
                         WSS,
-                        `${DEFAULT_HOST_NAME}:${options.port}`
+                        DEFAULT_HOST_NAME,
+                        options.port
                     )}`
                 ),
                 true

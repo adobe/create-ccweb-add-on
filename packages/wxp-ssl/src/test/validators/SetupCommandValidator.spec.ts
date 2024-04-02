@@ -24,8 +24,6 @@
 
 import type { AnalyticsService } from "@adobe/ccweb-add-on-analytics";
 import type { Logger } from "@adobe/ccweb-add-on-core";
-import { DEFAULT_HOST_NAME } from "@adobe/ccweb-add-on-core";
-import type { AccountService } from "@adobe/ccweb-add-on-developer-terms";
 import chai, { assert, expect } from "chai";
 import chaiAsPromised from "chai-as-promised";
 import "mocha";
@@ -45,8 +43,6 @@ describe("SetupCommandValidator", () => {
 
     let processExitStub: SinonStub;
 
-    let accountService: StubbedInstance<AccountService>;
-
     let analyticsService: StubbedInstance<AnalyticsService>;
     let logger: StubbedInstance<Logger>;
 
@@ -58,12 +54,10 @@ describe("SetupCommandValidator", () => {
         processExitStub = sandbox.stub(process, "exit");
         processExitStub.throws();
 
-        accountService = stubInterface();
-
         analyticsService = stubInterface();
         logger = stubInterface();
 
-        commandValidator = new SetupCommandValidator(accountService, analyticsService, logger);
+        commandValidator = new SetupCommandValidator(analyticsService, logger);
     });
 
     afterEach(() => {
@@ -71,65 +65,10 @@ describe("SetupCommandValidator", () => {
     });
 
     describe("validate", () => {
-        it(`should log error and exit when a non-privileged user provides a hostname other than ${DEFAULT_HOST_NAME}.`, async () => {
-            accountService.isUserPrivileged.resolves(false);
-
-            const options = new SetupCommandOptions("localhost.adobe.com", true, true);
-
-            const eventData = [
-                "--hostname",
-                options.hostname,
-                "--useExisting",
-                options.useExisting,
-                "--isUserPrivileged",
-                false
-            ];
-
-            await expect(commandValidator.validate(options)).to.be.rejected;
-
-            assert.equal(processExitStub.calledOnce, true);
-            assert.equal(
-                logger.error.calledOnceWith("Invalid hostname. Only 'localhost' is allowed.", {
-                    prefix: "\n",
-                    postfix: "\n"
-                }),
-                true
-            );
-            assert.equal(
-                analyticsService.postEvent.calledOnceWith(
-                    AnalyticsErrorMarkers.ERROR_SSL_INVALID_HOSTNAME,
-                    eventData.join(" "),
-                    false
-                ),
-                true
-            );
-        });
-
-        it(`should return when a non-privileged user provides the hostname as ${DEFAULT_HOST_NAME}.`, async () => {
-            accountService.isUserPrivileged.resolves(false);
-
-            const options = new SetupCommandOptions("localhost", true, true);
-            await commandValidator.validate(options);
-
-            assert.equal(processExitStub.callCount, 0);
-            assert.equal(logger.error.callCount, 0);
-        });
-
         let hostnames = ["", "foobar", "localhost.com"];
         hostnames.forEach(hostname => {
-            it(`should log error and exit when a privileged user provides an invalid hostname: '${hostname}'.`, async () => {
-                accountService.isUserPrivileged.resolves(true);
-
+            it(`should log error and exit when a user provides an invalid hostname: '${hostname}'.`, async () => {
                 const options = new SetupCommandOptions(hostname, true, true);
-
-                const eventData = [
-                    "--hostname",
-                    options.hostname,
-                    "--useExisting",
-                    options.useExisting,
-                    "--isUserPrivileged",
-                    true
-                ];
 
                 await expect(commandValidator.validate(options)).to.be.rejected;
 
@@ -141,6 +80,8 @@ describe("SetupCommandValidator", () => {
                     }),
                     true
                 );
+
+                const eventData = ["--hostname", options.hostname, "--useExisting", options.useExisting];
                 assert.equal(
                     analyticsService.postEvent.calledOnceWith(
                         AnalyticsErrorMarkers.ERROR_SSL_INVALID_HOSTNAME,
@@ -154,9 +95,7 @@ describe("SetupCommandValidator", () => {
 
         hostnames = ["localhost", "localhost.adobe.com", "random.adobe.com"];
         hostnames.forEach(hostname => {
-            it(`should return when a privileged user provides a valid hostname: '${hostname}'.`, async () => {
-                accountService.isUserPrivileged.resolves(true);
-
+            it(`should return when a user provides a valid hostname: '${hostname}'.`, async () => {
                 const options = new SetupCommandOptions(hostname, true, true);
                 await commandValidator.validate(options);
 

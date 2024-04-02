@@ -181,7 +181,8 @@ export class AddOnDirectoryValidator implements DirectoryValidator {
         this._logger.warning(format(LOGS.executeProgram, { PROGRAM_NAME }), { prefix: LOGS.tab });
         this._logger.message(LOGS.forExample, { prefix: LOGS.newLine });
         this._logger.information(format(LOGS.executeProgramExample, { PROGRAM_NAME }), {
-            prefix: LOGS.tab
+            prefix: LOGS.tab,
+            postfix: LOGS.newLine
         });
     }
 }

@@ -169,20 +169,34 @@ describe("Extensions", () => {
         const runs = [
             {
                 protocol: "https",
-                host: "localhost:5241",
-                expectedBaseUrl: "https://localhost:5241/"
+                hostname: "localhost",
+                port: 5241,
+                expectedBaseUrl: "https://localhost:5241"
             },
             {
                 protocol: "https",
-                host: "spice.adobe.com",
-                expectedBaseUrl: "https://spice.adobe.com/"
+                hostname: "localhost.adobe.com",
+                port: 443,
+                expectedBaseUrl: "https://localhost.adobe.com:443"
             },
-            { protocol: "wss", host: "localhost:5241", expectedBaseUrl: "wss://localhost:5241/" },
-            { protocol: "wss", host: "spice.adobe.com", expectedBaseUrl: "wss://spice.adobe.com/" }
+            {
+                protocol: "https",
+                hostname: "spice.adobe.com",
+                port: undefined,
+                expectedBaseUrl: "https://spice.adobe.com"
+            },
+            { protocol: "wss", hostname: "localhost", port: 5241, expectedBaseUrl: "wss://localhost:5241" },
+            {
+                protocol: "wss",
+                hostname: "localhost.adobe.com",
+                port: 443,
+                expectedBaseUrl: "wss://localhost.adobe.com:443"
+            },
+            { protocol: "wss", hostname: "spice.adobe.com", port: undefined, expectedBaseUrl: "wss://spice.adobe.com" }
         ];
         runs.forEach(run => {
-            it("should return the Base URL from protocol and host.", () => {
-                const baseUrl = getBaseUrl(run.protocol, run.host);
+            it("should build and return the Base URL from protocol, hostname and port.", () => {
+                const baseUrl = getBaseUrl(run.protocol, run.hostname, run.port);
                 assert.equal(baseUrl, run.expectedBaseUrl);
             });
         });

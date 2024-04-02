@@ -1,6 +1,6 @@
 {
     "name": "@adobe/ccweb-add-on-scaffolder",
-    "version": "1.4.0",
+    "version": "2.0.0",
     "author": "Adobe",
     "license": "MIT",
     "description": "Scaffolding libraries for Adobe Creative Cloud Web Add-on.",
@@ -26,8 +26,7 @@
     "dependencies": {
         "@adobe/ccweb-add-on-analytics": "workspace:*",
         "@adobe/ccweb-add-on-core": "workspace:*",
-        "@adobe/ccweb-add-on-devcert": "0.1.0",
-        "@adobe/ccweb-add-on-developer-terms": "workspace:*",
+        "@adobe/ccweb-add-on-devcert": "0.1.1",
         "@adobe/ccweb-add-on-manifest": "workspace:*",
         "@adobe/ccweb-add-on-ssl": "workspace:*",
         "chalk": "4.1.1",

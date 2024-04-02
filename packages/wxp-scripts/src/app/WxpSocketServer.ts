@@ -108,7 +108,7 @@ export class WxpSocketServer implements SocketServer {
             this._logger.success(
                 format(LOGS.wssServerStarted, {
                     addOnDirectory: addOnDirectory.rootDirName,
-                    serverUrl: getBaseUrl(WSS, `${DEFAULT_HOST_NAME}:${options.port}`)
+                    serverUrl: getBaseUrl(WSS, DEFAULT_HOST_NAME, options.port)
                 })
             );
         }
@@ -146,7 +146,7 @@ export class WxpSocketServer implements SocketServer {
 
             // If the manifest has not changed, get its value from the cache,
             // else read it from file.
-            const addOnManifest = await this._manifestReader.getManifest(this._onValidationFailed, !hasManifestChanged);
+            const addOnManifest = this._manifestReader.getManifest(this._onValidationFailed, !hasManifestChanged);
 
             if (isBuildSuccessful && addOnManifest !== undefined) {
                 this._logger.success(LOGS.done, { postfix: LOGS.newLine });

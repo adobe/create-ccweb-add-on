@@ -24,8 +24,6 @@
 
 import type { AnalyticsConsent, AnalyticsService } from "@adobe/ccweb-add-on-analytics";
 import { ITypes as IAnalyticsTypes } from "@adobe/ccweb-add-on-analytics";
-import type { AccountService } from "@adobe/ccweb-add-on-developer-terms";
-import { ITypes as IDeveloperTermsTypes } from "@adobe/ccweb-add-on-developer-terms";
 import { Config } from "@oclif/core";
 import chai, { assert, expect } from "chai";
 import chaiAsPromised from "chai-as-promised";
@@ -55,8 +53,6 @@ describe("Setup", () => {
     let commandExecutor: StubbedInstance<CommandExecutor>;
     let commandValidator: StubbedInstance<CommandValidator>;
 
-    let accountService: StubbedInstance<AccountService>;
-
     let analyticsConsent: StubbedInstance<AnalyticsConsent>;
     let analyticsService: StubbedInstance<AnalyticsService>;
 
@@ -73,15 +69,10 @@ describe("Setup", () => {
         namedContainer.withArgs(ITypes.CommandValidator, "setup").returns(commandValidator);
         namedContainer.withArgs(ITypes.CommandExecutor, "setup").returns(commandExecutor);
 
-        accountService = stubInterface();
-        accountService.invalidateToken.resolves();
-        accountService.seekTermsOfUseConsent.resolves();
-
         analyticsConsent = stubInterface();
         analyticsService = stubInterface();
 
         container = sandbox.stub(IContainer, "get");
-        container.withArgs(IDeveloperTermsTypes.AccountService).returns(accountService);
         container.withArgs(IAnalyticsTypes.AnalyticsConsent).returns(analyticsConsent);
         container.withArgs(IAnalyticsTypes.AnalyticsService).returns(analyticsService);
     });
@@ -92,7 +83,7 @@ describe("Setup", () => {
 
     describe("setup", () => {
         test.stdout()
-            .command(["setup", "--hostname=localhost", "--login", "--analytics=on", "--verbose"])
+            .command(["setup", "--hostname=localhost", "--analytics=on", "--verbose"])
             .it("should execute succesfully when correct parameters are passed.", async () => {
                 analyticsConsent.set.resolves();
 
@@ -107,12 +98,9 @@ describe("Setup", () => {
             analyticsConsent.get.resolves(true);
 
             const hostname = "localhost";
-            const setup = new Setup(["--hostname", hostname, "--login", "--verbose"], new Config({ root: "." }));
+            const setup = new Setup(["--hostname", hostname, "--verbose"], new Config({ root: "." }));
 
             await setup.run();
-
-            assert.equal(accountService.invalidateToken.callCount, 1);
-            assert.equal(accountService.seekTermsOfUseConsent.callCount, 1);
 
             assert.equal(analyticsConsent.get.callCount, 1);
 
@@ -127,14 +115,11 @@ describe("Setup", () => {
 
             const hostname = "localhost";
             const setup = new Setup(
-                ["--hostname", hostname, "--login", "--analytics", "off", "--verbose"],
+                ["--hostname", hostname, "--analytics", "off", "--verbose"],
                 new Config({ root: "." })
             );
 
             await setup.run();
-
-            assert.equal(accountService.invalidateToken.callCount, 1);
-            assert.equal(accountService.seekTermsOfUseConsent.callCount, 1);
 
             assert.equal(analyticsConsent.set.calledOnceWith(false), true);
 

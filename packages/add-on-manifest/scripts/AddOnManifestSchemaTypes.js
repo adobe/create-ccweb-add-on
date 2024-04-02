@@ -110,7 +110,6 @@ export const EntrypointSchemaV2 = {
                 oauth: { type: "array", items: { type: "string" } },
                 microphone: { type: "string" },
                 camera: { type: "string" },
-                analytics: { type: "boolean" },
                 clipboard: { type: "array", items: { type: "string", pattern: clipboardPattern } }
             },
             required: [],

@@ -26,7 +26,6 @@ import type { Schema as AddOnSchema, EntryPointData } from "@adobe/ccweb-add-on-
 import { DEFAULT_OUTPUT_DIRECTORY, traverseDirectory } from "@adobe/ccweb-add-on-core";
 import type { AddOnManifest } from "@adobe/ccweb-add-on-manifest";
 import path from "path";
-import { URL } from "url";
 import { DEFAULT_ADD_ON_NAME, MANIFEST_JSON } from "../constants.js";
 import type { AddOnDirectory } from "../models/AddOnDirectory.js";
 
@@ -62,7 +61,7 @@ export class AddOnResourceUtils {
                 versionString: manifest?.version ?? addOnDirectory.manifest?.manifestProperties.version,
                 supportedLanguages: ["en-US"],
                 supportedApps: ["Express"],
-                downloadUrl: `${baseUrl}${testId}/${MANIFEST_JSON}`,
+                downloadUrl: `${baseUrl}/${testId}/${MANIFEST_JSON}`,
                 addon: {
                     localizedMetadata: {
                         name: addOnName
@@ -88,7 +87,7 @@ export class AddOnResourceUtils {
             if (!path.basename(absolutePath).startsWith(".")) {
                 const relativePath = path.relative(outputDirectory, absolutePath);
                 const resourcePath = path.join(manifest?.manifestProperties.testId as string, relativePath);
-                const resourceUrl = new URL(resourcePath, baseUrl).href;
+                const resourceUrl = `${baseUrl}/${resourcePath}`;
 
                 resources.push(resourceUrl);
             }

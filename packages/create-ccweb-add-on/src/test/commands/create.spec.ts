@@ -24,8 +24,6 @@
 
 import type { AnalyticsConsent, AnalyticsService } from "@adobe/ccweb-add-on-analytics";
 import { ITypes as IAnalyticsTypes } from "@adobe/ccweb-add-on-analytics";
-import type { AccountService } from "@adobe/ccweb-add-on-developer-terms";
-import { ITypes as IDeveloperTermsTypes } from "@adobe/ccweb-add-on-developer-terms";
 import { EntrypointType } from "@adobe/ccweb-add-on-manifest";
 import { Config } from "@oclif/core";
 import chai, { assert, expect } from "chai";
@@ -49,8 +47,6 @@ describe("CreateCCWebAddOn", () => {
 
     let addOnFactory: StubbedInstance<AddOnFactory>;
 
-    let accountService: StubbedInstance<AccountService>;
-
     let analyticsConsent: StubbedInstance<AnalyticsConsent>;
     let analyticsService: StubbedInstance<AnalyticsService>;
 
@@ -60,17 +56,11 @@ describe("CreateCCWebAddOn", () => {
         addOnFactory = stubInterface();
         addOnFactory.create.resolves();
 
-        accountService = stubInterface();
-        accountService.invalidateToken.resolves();
-        accountService.seekTermsOfUseConsent.resolves();
-
         analyticsConsent = stubInterface();
         analyticsService = stubInterface();
 
         container = sandbox.stub(IContainer, "get");
         container.withArgs(ITypes.AddOnFactory).returns(addOnFactory);
-
-        container.withArgs(IDeveloperTermsTypes.AccountService).returns(accountService);
 
         container.withArgs(IAnalyticsTypes.AnalyticsConsent).returns(analyticsConsent);
         container.withArgs(IAnalyticsTypes.AnalyticsService).returns(analyticsService);
@@ -85,14 +75,11 @@ describe("CreateCCWebAddOn", () => {
             analyticsConsent.get.resolves(true);
 
             const createCCWebAddOn = new CreateCCWebAddOn(
-                ["hello-world", "--kind=panel", "--template=react-javascript", "--login", "--verbose"],
+                ["hello-world", "--kind=panel", "--template=react-javascript", "--verbose"],
                 new Config({ root: "." })
             );
 
             await createCCWebAddOn.run();
-
-            assert.equal(accountService.invalidateToken.callCount, 1);
-            assert.equal(accountService.seekTermsOfUseConsent.callCount, 1);
 
             assert.equal(analyticsConsent.get.callCount, 1);
 
@@ -105,21 +92,11 @@ describe("CreateCCWebAddOn", () => {
             analyticsConsent.set.withArgs(false).resolves();
 
             const createCCWebAddOn = new CreateCCWebAddOn(
-                [
-                    "hello-world",
-                    "--kind=panel",
-                    "--template=react-javascript",
-                    "--login",
-                    "--analytics=off",
-                    "--verbose"
-                ],
+                ["hello-world", "--kind=panel", "--template=react-javascript", "--analytics=off", "--verbose"],
                 new Config({ root: "." })
             );
 
             await createCCWebAddOn.run();
-
-            assert.equal(accountService.invalidateToken.callCount, 1);
-            assert.equal(accountService.seekTermsOfUseConsent.callCount, 1);
 
             assert.equal(analyticsConsent.set.calledOnceWith(false), true);
 
@@ -133,7 +110,6 @@ describe("CreateCCWebAddOn", () => {
             const createCCWebAddOn = new CreateCCWebAddOn(["--incorrect-flag"], new Config({ root: "." }));
 
             const error = new Error("Nonexistent flag: --incorrect-flag\nSee more help with --help");
-
             await expect(createCCWebAddOn.catch(error)).to.be.rejectedWith();
 
             assert.equal(

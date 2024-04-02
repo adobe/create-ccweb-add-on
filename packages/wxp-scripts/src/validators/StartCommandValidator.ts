@@ -26,8 +26,6 @@ import type { AnalyticsService } from "@adobe/ccweb-add-on-analytics";
 import { ITypes as IAnalyticsTypes } from "@adobe/ccweb-add-on-analytics";
 import type { Logger } from "@adobe/ccweb-add-on-core";
 import { ALLOWED_HOSTNAMES, DEFAULT_HOST_NAME, ITypes as ICoreTypes } from "@adobe/ccweb-add-on-core";
-import type { AccountService } from "@adobe/ccweb-add-on-developer-terms";
-import { ITypes as IDeveloperTermsTypes } from "@adobe/ccweb-add-on-developer-terms";
 import { inject, injectable } from "inversify";
 import isValidDomain from "is-valid-domain";
 import process from "process";
@@ -41,8 +39,6 @@ import type { CommandValidator } from "./CommandValidator.js";
  */
 @injectable()
 export class StartCommandValidator implements CommandValidator {
-    private readonly _accountService: AccountService;
-
     private readonly _analyticsService: AnalyticsService;
     private readonly _logger: Logger;
 
@@ -54,12 +50,9 @@ export class StartCommandValidator implements CommandValidator {
      * @returns Reference to a new {@link StartCommandValidator} instance.
      */
     constructor(
-        @inject(IDeveloperTermsTypes.AccountService) accountService: AccountService,
         @inject(IAnalyticsTypes.AnalyticsService) analyticsService: AnalyticsService,
         @inject(ICoreTypes.Logger) logger: Logger
     ) {
-        this._accountService = accountService;
-
         this._analyticsService = analyticsService;
         this._logger = logger;
     }
@@ -75,36 +68,14 @@ export class StartCommandValidator implements CommandValidator {
     }
 
     private async _validateHostname(options: StartCommandOptions) {
-        const isUserPrivileged = await this._accountService.isUserPrivileged();
-
-        const eventData = [
-            "--use",
-            options.transpiler,
-            "--hostname",
-            options.hostname,
-            "--port",
-            options.port,
-            "--isUserPrivileged",
-            isUserPrivileged
-        ];
-
-        if (options.hostname !== DEFAULT_HOST_NAME && !isUserPrivileged) {
-            this._logger.error(LOGS.invalidHostname, { postfix: LOGS.newLine });
-
-            await this._analyticsService.postEvent(
-                AnalyticsErrorMarkers.SCRIPTS_START_INVALID_HOSTNAME_ERROR,
-                eventData.join(" "),
-                false
-            );
-
-            return process.exit(1);
-        }
+        const eventData = ["--use", options.transpiler, "--hostname", options.hostname, "--port", options.port];
 
         const isHostnameAllowed =
             options.hostname === DEFAULT_HOST_NAME ||
             (isValidDomain(options.hostname) && ALLOWED_HOSTNAMES.test(options.hostname));
+
         if (!isHostnameAllowed) {
-            this._logger.error(LOGS.invalidPrivilegedHostname, { postfix: LOGS.newLine });
+            this._logger.error(LOGS.invalidHostname, { postfix: LOGS.newLine });
 
             await this._analyticsService.postEvent(
                 AnalyticsErrorMarkers.SCRIPTS_START_INVALID_HOSTNAME_ERROR,
@@ -136,7 +107,6 @@ export class StartCommandValidator implements CommandValidator {
 
 const LOGS = {
     newLine: "\n",
-    invalidHostname: "Invalid hostname. Only 'localhost' is allowed.",
-    invalidPrivilegedHostname: "Invalid hostname. Only 'localhost' and '*.adobe.com' are allowed.",
+    invalidHostname: "Invalid hostname. Only 'localhost' and '*.adobe.com' are allowed.",
     invalidPort: "Invalid port. Please provide a value between 80 and 65535."
 };

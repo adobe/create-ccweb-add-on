@@ -76,7 +76,7 @@ export class PackageCommandExecutor implements CommandExecutor {
                 return;
             }
         } else {
-            await this._manifestReader.getManifest(this._onValidationFailed, options.shouldRebuild)!;
+            this._manifestReader.getManifest(this._onValidationFailed, options.shouldRebuild)!;
         }
         await this._packageContent();
     }

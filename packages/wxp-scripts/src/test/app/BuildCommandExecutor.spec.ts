@@ -25,7 +25,6 @@
 import type { AnalyticsService } from "@adobe/ccweb-add-on-analytics";
 import type { Logger } from "@adobe/ccweb-add-on-core";
 import { DEFAULT_OUTPUT_DIRECTORY } from "@adobe/ccweb-add-on-core";
-import type { AccountService } from "@adobe/ccweb-add-on-developer-terms";
 import type { AddOnManifestEntrypoint } from "@adobe/ccweb-add-on-manifest";
 import chai, { assert, expect } from "chai";
 import chaiAsPromised from "chai-as-promised";
@@ -55,7 +54,6 @@ describe("BuildCommandExecutor", () => {
 
     let cleanCommandExecutor: CleanCommandExecutor;
 
-    let accountService: StubbedInstance<AccountService>;
     let manifestReader: AddOnManifestReader;
 
     let logger: StubbedInstance<Logger>;
@@ -68,14 +66,9 @@ describe("BuildCommandExecutor", () => {
         sandbox.stub(console, "log");
 
         scriptManager = stubInterface<ScriptManager>();
-
-        cleanCommandExecutor = new CleanCommandExecutor(scriptManager, logger, analyticsService);
-
-        accountService = stubInterface();
-        accountService.isUserPrivileged.resolves(true);
-        manifestReader = new AddOnManifestReader(accountService);
-
         logger = stubInterface<Logger>();
+        cleanCommandExecutor = new CleanCommandExecutor(scriptManager, logger, analyticsService);
+        manifestReader = new AddOnManifestReader();
 
         analyticsService = stubInterface<AnalyticsService>();
         analyticsService.postEvent.resolves();
@@ -93,7 +86,7 @@ describe("BuildCommandExecutor", () => {
         sandbox.restore();
     });
 
-    describe("execute ...", () => {
+    describe("execute", () => {
         it("should transpile source directory when 'build' script is run with a transpiler.", async () => {
             const options = new BuildCommandOptions("data", "tsc", true);
 

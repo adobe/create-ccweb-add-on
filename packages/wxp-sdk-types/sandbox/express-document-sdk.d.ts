@@ -59,7 +59,9 @@ declare enum ArrowHeadType {
 export declare class ArtboardList extends RestrictedItemList<ArtboardNode> {
     /**
      * Create a new artboard and add it to the end of the list. The artboard size is the same as others on this page. The
-     * artboard background is set to default fill color {@link DEFAULT_ARTBOARD_FILL_COLOR}.
+     * artboard background is set to default fill color {@link DEFAULT_ARTBOARD_FILL_COLOR}. The new artboard becomes the
+     * default target for newly inserted content (see insertionParent) and the timeline advances to show this artboard
+     * in the current viewport.
      * @returns the newly added artboard.
      */
     addArtboard(): ArtboardNode;
@@ -70,7 +72,7 @@ export declare class ArtboardList extends RestrictedItemList<ArtboardNode> {
  *
  * When multiple artboards exist on a page, the artboards represent "scenes" in a linear timeline sequence.
  */
-export declare class ArtboardNode extends BaseNode implements IRectangularNode, ContainerNode {
+export declare class ArtboardNode extends VisualNode implements IRectangularNode, ContainerNode {
     /**
      * Returns a read-only list of all children of the node. General-purpose content containers such as ArtboardNode or
      * GroupNode also provide a mutable {@link ContainerNode.children} list. Other nodes with a more specific structure can
@@ -85,6 +87,11 @@ export declare class ArtboardNode extends BaseNode implements IRectangularNode, 
      */
     get children(): ItemList<Node>;
     /**
+     * The background fill of the artboard. Artboards must always have a fill.
+     */
+    set fill(fill: Fill);
+    get fill(): Readonly<Fill>;
+    /**
      * The node's parent. Undefined if the node is an orphan.
      */
     get parent(): PageNode | undefined;
@@ -96,11 +103,6 @@ export declare class ArtboardNode extends BaseNode implements IRectangularNode, 
      * The height of the artboard.
      */
     get height(): number;
-    /**
-     * The background fill of the artboard. Artboards must always have a fill.
-     */
-    get fill(): Readonly<Fill>;
-    set fill(fill: Fill);
 }
 
 /**
@@ -111,6 +113,11 @@ export declare class ArtboardNode extends BaseNode implements IRectangularNode, 
  */
 export declare class BaseNode {
     /**
+     * A unique identifier for this node that stays the same when the file is closed & reopened, or if the node is
+     * moved to a different part of the document.
+     */
+    get id(): string;
+    /**
      * Returns a read-only list of all children of the node. General-purpose content containers such as ArtboardNode or
      * GroupNode also provide a mutable {@link ContainerNode.children} list. Other nodes with a more specific structure can
      * hold children in various discrete "slots"; this `allChildren` list includes *all* such children and reflects their
@@ -120,12 +127,6 @@ export declare class BaseNode {
      * to guarantee all their children are full-fledged Node instances.
      */
     get allChildren(): Readonly<Iterable<BaseNode>>;
-
-    /**
-     * A unique identifier for this node that stays the same when the file is closed & reopened, or if the node is
-     * moved to a different part of the document.
-     */
-    get id(): string;
     /**
      * The node's type.
      */
@@ -297,9 +298,9 @@ export declare const constants: typeof ApiConstants;
  * also hold children in specified "slots." Use {@link Node.allChildren} for read access to children regardless of node type.
  *
  * Some ContainerNode classes may be full-fledged Node subclasses (such as Group), while others may be a subclass of the
- * more minimal BaseNode (such as Artboard).
+ * more minimal VisualNode (such as Artboard).
  */
-export declare interface ContainerNode extends BaseNode {
+export declare interface ContainerNode extends VisualNode {
     /**
      * The node's children. Use the methods on this ItemList object to get, add, and remove children.
      */
@@ -337,12 +338,52 @@ export declare class Context {
      * other UI state.
      */
     get insertionParent(): ContainerNode;
+    /**
+     * @returns The currently viewed page.
+     */
+    get currentPage(): PageNode;
 }
 
 /**
  * Entry point for APIs that read or modify the document's content.
  */
 export declare class Editor {
+    /**
+     * Enqueues a function to be run at a later time when edits to the user's document may be performed. You can always edit
+     * the document immediately when invoked in response to your add-on's UI code. However, if you delay to await an
+     * asynchronous operation such as {@link loadBitmapImage}, any edits following this pause must be scheduled using
+     * queueAsyncEdit(). This ensures the edit is properly tracked for saving and undo.
+     *
+     * The delay before your edit function is executed is typically just a few milliseconds, so it will appear instantaneous
+     * to users. However, note that queueAsyncEdit() will return *before* your function has been run.
+     * If you need to trigger any code after the edit has been performed, either include this in the lambda you are enqueuing
+     * or await the Promise returned by queueAsyncEdit().
+     *
+     * Generally, calling any setter or method is treated as an edit; but simple getters may be safely called at any time.
+     *
+     * Example of typical usage:
+     * ```javascript
+     * // Assume insertImage() is called from your UI code, and given a Blob containing image data
+     * async function insertImage(blob) {
+     *     // This function was invoked from the UI iframe, so we can make any edits we want synchronously here.
+     *     // Initially load the bitmap - an async operation
+     *     const bitmapImage = await editor.loadBitmapImage(blob);
+     *
+     *     // Execution doesn't arrive at this line until an async delay, due to the Promise 'await' above
+     *
+     *     // Further edits need to be queued to run at a safe time
+     *     editor.queueAsyncEdit(() => {
+     *          // Create scenenode to display the image, and add it to the current artboard
+     *          const mediaContainer = editor.createImageContainer(bitmapImage);
+     *          editor.context.insertionParent.children.append(mediaContainer);
+     *     });
+     * }
+     * ```
+     *
+     * @param lambda - a function which edits the document model.
+     * @returns a Promise that resolves when the lambda has finished running, or rejects if the lambda throws an error.
+     */
+    queueAsyncEdit(lambda: () => void): Promise<void>;
     /**
      * User's current selection context
      */
@@ -381,7 +422,7 @@ export declare class Editor {
      * container's mediaRectangle and maskShape children.
      *
      * Image creation involves some asynchronous steps. The image will be visible in this client almost instantly, but will
-     * render as a gray placeholder on other clients until it has been uploaded to storage and then downloaded by those clients.
+     * render as a gray placeholder on other clients until it has been uploaded to DCX and then downloaded by those clients.
      * This local client will act as having unsaved changes until the upload has finished.
      *
      * @param bitmapData - BitmapImage resource (e.g. returned from loadBitmapImage()).
@@ -410,7 +451,7 @@ export declare class Editor {
      *
      * @param bitmapData - Encoded image data in PNG or JPEG format.
      */
-    loadBitmapImage(bitmapData: Blob): Promise<BitmapImage>;
+    loadBitmapImage(rendition: Blob): Promise<BitmapImage>;
     /**
      * Convenience helper to create a complete Stroke value given just a subset of its fields. All other fields are
      * populated with default values.
@@ -427,6 +468,12 @@ export declare class Editor {
      */
     makeStroke(options?: Partial<Stroke>): Stroke;
     /**
+     * @returns a text node with default styles. The text content is initially empty, so the text node will be
+     * invisible until its `text` property is set. Creates point text, so the node's width will automatically
+     * adjust to accommodate whatever text is set.
+     */
+    createText(): TextNode;
+    /**
      * @returns a path node with a default stroke and no initial fill.
      * @param path - a string representing any [SVG path element](https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths).
      * Note that the path data will be normalized, and therefore the `path` getter may return a different SVG string from the path creation input.
@@ -434,48 +481,6 @@ export declare class Editor {
      * Throws if the input is empty or is not legal SVG path syntax.
      */
     createPath(path: string): PathNode;
-    /**
-     * @returns a text node with default styles. The text content is initially empty, so the text node will be
-     * invisible until its `text` property is set. Creates point text, so the node's width will automatically
-     * adjust to accommodate whatever text is set.
-     */
-    createText(): TextNode;
-    /**
-     * Enqueues a function to be run at a later time when edits to the user's document may be performed. You can always edit
-     * the document immediately when invoked in response to your add-on's UI code. However, if you delay to await an
-     * asynchronous operation such as {@link loadBitmapImage}, any edits following this pause must be scheduled using
-     * queueAsyncEdit(). This ensures the edit is properly tracked for saving and undo.
-     *
-     * The delay before your edit function is executed is typically just a few milliseconds, so it will appear instantaneous
-     * to users. However, note that queueAsyncEdit() will return *before* your function has been run.
-     * If you need to trigger any code after the edit has been performed, either include this in the lambda you are enqueuing
-     * or await the Promise returned by queueAsyncEdit().
-     *
-     * Generally, calling any setter or method is treated as an edit; but simple getters may be safely called at any time.
-     *
-     * Example of typical usage:
-     * ```javascript
-     * // Assume insertImage() is called from your UI code, and given a Blob containing image data
-     * async function insertImage(blob) {
-     *     // This function was invoked from the UI iframe, so we can make any edits we want synchronously here.
-     *     // Initially load the bitmap - an async operation
-     *     const bitmapImage = await editor.loadBitmapImage(blob);
-     *
-     *     // Execution doesn't arrive at this line until an async delay, due to the Promise 'await' above
-     *
-     *     // Further edits need to be queued to run at a safe time
-     *     editor.queueAsyncEdit(() => {
-     *          // Create scenenode to display the image, and add it to the current artboard
-     *          const mediaContainer = editor.createImageContainer(bitmapImage);
-     *          editor.context.insertionParent.children.append(mediaContainer);
-     *     });
-     * }
-     * ```
-     *
-     * @param lambda - a function which edits the document model.
-     * @returns a Promise that resolves when the lambda has finished running, or rejects if the lambda throws an error.
-     */
-    queueAsyncEdit(lambda: () => void): Promise<void>;
 }
 
 export declare const editor: ExpressEditor;
@@ -543,8 +548,8 @@ export declare class FillableNode extends StrokableNode implements IFillableNode
     /**
      * The fill applied to the shape, if any.
      */
-    get fill(): Readonly<Fill> | undefined;
     set fill(fill: Fill | undefined);
+    get fill(): Readonly<Fill> | undefined;
 }
 
 /**
@@ -573,10 +578,15 @@ declare enum FillType {
 }
 
 /**
- * A GridLayoutNode represents a grid layout in the scenegraph. The GridLayoutNode is used to
- * create a layout grid that other content can be placed into.
+ * A GridLayoutNode represents a grid layout in the scenegraph. The GridLayoutNode is used to create
+ * a layout grid that other content can be placed into.
  */
-export declare class GridLayoutNode extends Node implements IRectangularNode {
+export declare class GridLayoutNode extends Node implements Readonly<IRectangularNode> {
+    /**
+     * The background fill of the GridLayout.
+     */
+    set fill(fill: Fill);
+    get fill(): Readonly<Fill>;
     /**
      * The width of the node.
      */
@@ -585,11 +595,6 @@ export declare class GridLayoutNode extends Node implements IRectangularNode {
      * The height of the node.
      */
     get height(): number;
-    /**
-     * The background fill of the GridLayout.
-     */
-    get fill(): Readonly<Fill>;
-    set fill(fill: Fill);
 }
 
 /**
@@ -614,6 +619,12 @@ export declare class GroupNode extends Node implements ContainerNode {
      * @throws if the given node type cannot be used as a vector mask.
      */
     set maskShape(mask: FillableNode | undefined);
+    /**
+     * @override
+     * Note: If this group has a maskShape, group's bounds are always identical to the maskShape's, regardless of the
+     * group's other content.
+     */
+    get boundsLocal(): Readonly<Rect>;
 }
 
 /**
@@ -783,11 +794,13 @@ export declare class MediaContainerNode extends Node {
 
 /**
  * A Node represents an object in the scenegraph, the document's visual content tree. Most tangible visual content is a
- * subclass of Node, but note that some abstract top-level structural nodes (such as PageNode) only extend the more minimal
- * BaseNode. As a general rule, if you can click or drag an object with the select/move tool in the UI, then it extends
- * from Node.
+ * subclass of Node, but note that some abstract top-level structural nodes (such as PageNode) only extend the more
+ * minimal VisualNode or BaseNode. As a general rule, if you can click or drag an object with the select/move
+ * tool in the UI, then it extends from Node.
+ *
+ * A Node’s parent is always a VisualContentNode but may not be another Node (e.g. if the parent is an ArtboardNode)
  */
-declare class Node extends BaseNode {
+declare class Node extends VisualNode {
     /**
      * Returns a read-only list of all children of the node. General-purpose content containers such as ArtboardNode or
      * GroupNode also provide a mutable {@link ContainerNode.children} list. Other nodes with a more specific structure can
@@ -798,15 +811,26 @@ declare class Node extends BaseNode {
      */
     get allChildren(): Readonly<Iterable<Node>>;
     /**
+     * An axis-aligned box in the parent’s coordinate space encompassing the node’s layout bounds (its
+     * {@link boundsLocal}, as transformed by its position and rotation relative to the parent). If the node has
+     * rotation, the top-left of its boundsLocal box (aligned to its own axes) is not necessarily located at the
+     * top-left of the boundsInParent box (since it's aligned to the parent's axes). This value is well-defined
+     * even for an orphan node with no parent.
+     */
+    get boundsInParent(): Readonly<Rect>;
+    /**
+     * Convert the node's {@link boundsLocal} to an axis-aligned bounding box in the coordinate space of the target
+     * node. Both nodes must share the same {@link visualRoot}, but can lie anywhere within that subtree
+     * relative to one another (the target node need not be an ancestor of this node, nor vice versa).
+     */
+    boundsInNode(targetNode: VisualNode): Readonly<Rect>;
+    /**
      * The translation of the node along its parent's axes. This is identical to the translation component of
      * `transformMatrix`. It is often simpler to set a node's position using `setPositionInParent` than by
      * setting translation directly.
      */
-    get translation(): Readonly<{
-        x: number;
-        y: number;
-    }>;
-    set translation(value: { x: number; y: number });
+    get translation(): Readonly<Point>;
+    set translation(value: Point);
     /**
      * Move the node so the given `localRegistrationPoint` in its local coordinates is placed at the given
      * `parentPoint` in its parent's coordinates (taking into account any rotation on this node, etc.).
@@ -831,7 +855,7 @@ declare class Node extends BaseNode {
      * Set the node’s rotation angle relative to its parent to exactly the given value, keeping the given point in the
      * node’s local coordinate space at a fixed location within the parent. Disregards any rotation the node may already
      * have had. The angle set here may not be the absolute rotation angle seen on screen, if the parent or other
-     * ancestors have any rotation of their own.
+     * ancestors also have rotation of their own.
      * @param angleInDegrees - Angle in degrees.
      * @param localRotationPoint - Point to rotate around, in node's local coordinates.
      * @example
@@ -884,6 +908,7 @@ export declare class PageList extends RestrictedItemList<PageNode> {
      * with the same defaults as in {@link ArtboardList.addArtboard}. The page's artboard becomes the default target for
      * newly inserted content ({@link Context.insertionParent}) and the viewport switches to display this artboard.
      * @param geometry - The size of the new page.
+     *
      */
     addPage(geometry: RectangleGeometry): PageNode;
 }
@@ -912,6 +937,15 @@ export declare class PageNode extends BaseNode implements Readonly<IRectangularN
      */
     get name(): string | undefined;
     set name(name: string | undefined);
+    /**
+     * Clones this page, all artboards within it, and all content within those artboards. The cloned page is the same size
+     * as the original. Adds the new page immediately after this one in the pages list. The first artboard in the cloned
+     * page becomes the default target for newly inserted content ({@link Context.insertionParent}) and the viewport
+     * switches to display this artboard.
+     * @returns the cloned page.
+     *
+     */
+    cloneInPlace(): PageNode;
 }
 
 /**
@@ -930,12 +964,11 @@ export declare class PathNode extends FillableNode {
      * has multiple disjoint parts. The default value is nonZero.
      */
     get fillRule(): FillRule;
-    set fillRule(fillRule: FillRule);
+    set fillRule(rule: FillRule);
 }
 
 /**
  * Represents a 2D position.
- * @public
  */
 export declare interface Point {
     x: number;
@@ -980,6 +1013,13 @@ export declare class ReadOnlyItemList<T extends ListItem> {
      * All items in the list, as a static array. Mutations that occur later are not reflected in an array returned earlier.
      */
     toArray(): Readonly<T[]>;
+}
+
+declare interface Rect {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
 }
 
 export declare interface RectangleGeometry {
@@ -1062,6 +1102,7 @@ export declare class RectangleNode extends FillableNode implements IRectangularN
 declare class RestrictedItemList<T extends ListItem> extends ReadOnlyItemList<T> {
     /**
      * Remove the items from the list. The items need not be contiguous.
+     *
      * @throws If any of the items are not in the list, or if it is illegal to remove any of the items from this parent.
      */
     remove(...items: T[]): void;
@@ -1137,8 +1178,8 @@ export declare class StrokableNode extends Node implements IStrokableNode {
     /**
      * The stroke applied to the shape, if any.
      */
-    get stroke(): Readonly<Stroke> | undefined;
     set stroke(stroke: Stroke | undefined);
+    get stroke(): Readonly<Stroke> | undefined;
 }
 
 /**
@@ -1221,5 +1262,51 @@ export declare class TextNode extends Node {
  * An UnknownNode is a node with limited support and therefore treated as a leaf node.
  */
 export declare class UnknownNode extends Node {}
+
+/**
+ * A "node" represents an object in the scenegraph, the document's visual content tree. This class represents any node
+ * that can be visually perceived in the content. Most visual content is a subclass of the richer Node class which extends
+ * VisualNode with more properties, but the overall ArtboardNode container only supports the VisualNode APIs
+ * (and higher-level more abstract containers like PageNode extend only the minimal BaseNode class).
+ *
+ * Some VisualNodes might have a non-visual parent such as a PageNode.
+ */
+export declare class VisualNode extends BaseNode {
+    /**
+     * The highest ancestor that still has visual presence in the document. Typically an Artboard, but for orphaned
+     * content, it will be the root of the deleted content (which might be this node itself).
+     *
+     * Nodes that are both in the same visualRoot subtree lie within the same "visual space" of the document's
+     * structure. Nodes that are in different visual roots have no spatial relation to one another; there is no
+     * meaningful comparison or conversion between the bounds or coordinate spaces of such nodes.
+     */
+    get visualRoot(): VisualNode;
+    /**
+     * The bounding box of the node, expressed in the node's local coordinate space (which may be shifted or rotated
+     * relative to its parent). Generally matches the selection outline seen in the UI, encompassing the vector path
+     * "spine" of the shape as well as its stroke, but excluding effects such as shadows.
+     *
+     * The top-left corner of the bounding box corresponds to the visual top-left corner of the node, but this value is
+     * *not* necessarily (0,0) – this is especially true for Text and Path nodes.
+     */
+    get boundsLocal(): Readonly<Rect>;
+    /**
+     * Position of the node's centerpoint in its own local coordinate space, i.e. the center of the boundsLocal
+     * box.
+     */
+    get centerPointLocal(): Readonly<Point>;
+    /**
+     * Position of the node's top-left corner in its own local coordinate space, equal to (boundsLocal.x,
+     * boundsLocal.y). If the node is rotated, this is not the same as the top-left corner of
+     * boundsInParent.
+     */
+    get topLeftLocal(): Readonly<Point>;
+    /**
+     * Convert a point given in the node’s local coordinate space to a point in the coordinate space of the target node.
+     * Both nodes must share the same {@link visualRoot}, but can lie anywhere within that subtree relative to one
+     * another (the target node need not be an ancestor of this node, nor vice versa).
+     */
+    localPointInNode(localPoint: Point, targetNode: VisualNode): Readonly<Point>;
+}
 
 export {};
