@@ -24,8 +24,6 @@
 
 import type { AnalyticsService } from "@adobe/ccweb-add-on-analytics";
 import type { Logger } from "@adobe/ccweb-add-on-core";
-import { DEFAULT_HOST_NAME } from "@adobe/ccweb-add-on-core";
-import type { AccountService } from "@adobe/ccweb-add-on-developer-terms";
 import chai, { assert, expect } from "chai";
 import chaiAsPromised from "chai-as-promised";
 import "mocha";
@@ -45,8 +43,6 @@ describe("StartCommandValidator", () => {
 
     let processExitStub: SinonStub;
 
-    let accountService: StubbedInstance<AccountService>;
-
     let analyticsService: StubbedInstance<AnalyticsService>;
     let logger: StubbedInstance<Logger>;
 
@@ -58,15 +54,13 @@ describe("StartCommandValidator", () => {
         processExitStub = sandbox.stub(process, "exit");
         processExitStub.throws();
 
-        accountService = stubInterface();
-
         analyticsService = stubInterface();
         analyticsService.postEvent.resolves();
 
         logger = stubInterface();
         logger.error.returns();
 
-        commandValidator = new StartCommandValidator(accountService, analyticsService, logger);
+        commandValidator = new StartCommandValidator(analyticsService, logger);
     });
 
     afterEach(() => {
@@ -74,68 +68,10 @@ describe("StartCommandValidator", () => {
     });
 
     describe("validate", () => {
-        it(`should log error and exit when a non-privileged user provides a hostname other than ${DEFAULT_HOST_NAME}.`, async () => {
-            accountService.isUserPrivileged.resolves(false);
-
-            const options = new StartCommandOptions("src", "webpack", "localhost.adobe.com", 8080, true);
-
-            const eventData = [
-                "--use",
-                options.transpiler,
-                "--hostname",
-                options.hostname,
-                "--port",
-                options.port,
-                "--isUserPrivileged",
-                false
-            ];
-
-            await expect(commandValidator.validate(options)).to.be.rejected;
-
-            assert.equal(processExitStub.calledOnce, true);
-            assert.equal(
-                logger.error.calledOnceWith("Invalid hostname. Only 'localhost' is allowed.", {
-                    postfix: "\n"
-                }),
-                true
-            );
-            assert.equal(
-                analyticsService.postEvent.calledOnceWith(
-                    AnalyticsErrorMarkers.SCRIPTS_START_INVALID_HOSTNAME_ERROR,
-                    eventData.join(" "),
-                    false
-                ),
-                true
-            );
-        });
-
-        it(`should return when a non-privileged user provides the hostname as ${DEFAULT_HOST_NAME}.`, async () => {
-            accountService.isUserPrivileged.resolves(false);
-
-            const options = new StartCommandOptions("src", "webpack", "localhost", 8080, true);
-            await commandValidator.validate(options);
-
-            assert.equal(processExitStub.callCount, 0);
-            assert.equal(logger.error.callCount, 0);
-        });
-
         let hostnames = ["", "foobar", "localhost.com"];
         hostnames.forEach(hostname => {
-            it(`should log error and exit when a privileged user provides an invalid hostname: '${hostname}'.`, async () => {
-                accountService.isUserPrivileged.resolves(true);
-
+            it(`should log error and exit when a user provides an invalid hostname: '${hostname}'.`, async () => {
                 const options = new StartCommandOptions("src", "webpack", hostname, 8080, true);
-
-                const eventData = [
-                    "--use",
-                    options.transpiler,
-                    "--hostname",
-                    options.hostname,
-                    "--port",
-                    options.port,
-                    "--isUserPrivileged",
-                    true
-                ];
 
                 await expect(commandValidator.validate(options)).to.be.rejected;
 
@@ -146,6 +82,8 @@ describe("StartCommandValidator", () => {
                     }),
                     true
                 );
+
+                const eventData = ["--use", options.transpiler, "--hostname", options.hostname, "--port", options.port];
                 assert.equal(
                     analyticsService.postEvent.calledOnceWith(
                         AnalyticsErrorMarkers.SCRIPTS_START_INVALID_HOSTNAME_ERROR,
@@ -159,9 +97,7 @@ describe("StartCommandValidator", () => {
 
         hostnames = ["localhost", "localhost.adobe.com", "random.adobe.com"];
         hostnames.forEach(hostname => {
-            it(`should return when a privileged user provides a valid hostname: '${hostname}'.`, async () => {
-                accountService.isUserPrivileged.resolves(true);
-
+            it(`should return when a user provides a valid hostname: '${hostname}'.`, async () => {
                 const options = new StartCommandOptions("src", "webpack", hostname, 8080, true);
                 await commandValidator.validate(options);
 
@@ -173,8 +109,6 @@ describe("StartCommandValidator", () => {
         let ports = [parseInt("foobar"), -100, 79, 65536];
         ports.forEach(port => {
             it(`should log error and exit when the user provides an invalid port: ${port}.`, async () => {
-                accountService.isUserPrivileged.resolves(false);
-
                 const options = new StartCommandOptions("src", "webpack", "localhost", port, true);
 
                 const eventData = ["--use", options.transpiler, "--hostname", options.hostname, "--port", options.port];
@@ -202,8 +136,6 @@ describe("StartCommandValidator", () => {
         ports = [80, 443, 5241, 65535];
         ports.forEach(port => {
             it(`should return when the user provides a valid port: ${port}.`, async () => {
-                accountService.isUserPrivileged.resolves(true);
-
                 const options = new StartCommandOptions("src", "webpack", "localhost.adobe.com", port, true);
                 await commandValidator.validate(options);
 

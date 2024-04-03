@@ -177,7 +177,7 @@ export function getTestManifestV2(privileged?: boolean): AddOnManifestV2 {
                 type: EntrypointType.PANEL,
                 id: `#testId${count}`,
                 main: "index.html",
-                permissions: privileged ? { sandbox: ["allow-downloads"], analytics: true } : { sandbox: [] },
+                permissions: privileged ? { sandbox: ["allow-downloads"] } : { sandbox: [] },
                 defaultSize: { width: 100 + count, height: 100 + count },
                 discoverable: true,
                 hostDomain: "https://localhost.adobe.com"

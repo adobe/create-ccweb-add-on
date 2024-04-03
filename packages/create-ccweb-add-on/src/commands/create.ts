@@ -25,8 +25,6 @@
 import type { AnalyticsConsent, AnalyticsService } from "@adobe/ccweb-add-on-analytics";
 import { CLIProgram, ITypes as IAnalyticsTypes } from "@adobe/ccweb-add-on-analytics";
 import { UncaughtExceptionHandler } from "@adobe/ccweb-add-on-core";
-import type { AccountService } from "@adobe/ccweb-add-on-developer-terms";
-import { ITypes as IDeveloperTermsTypes } from "@adobe/ccweb-add-on-developer-terms";
 import { EntrypointType } from "@adobe/ccweb-add-on-manifest";
 import type { Config } from "@oclif/core";
 import { Args, Command, Flags } from "@oclif/core";
@@ -41,8 +39,6 @@ import { CLIOptions } from "../models/CLIOptions.js";
  * Implementation class of the create-ccweb-add-on command.
  */
 export class CreateCCWebAddOn extends Command {
-    private readonly _accountService: AccountService;
-
     private readonly _analyticsConsent: AnalyticsConsent;
     private readonly _analyticsService: AnalyticsService;
 
@@ -65,12 +61,6 @@ export class CreateCCWebAddOn extends Command {
             description: "Template to use for creating the Add-on project.",
             default: "",
             required: false
-        }),
-        login: Flags.boolean({
-            char: "l",
-            description: "To force login",
-            required: false,
-            default: false
         }),
         analytics: Flags.string({
             char: "a",
@@ -97,8 +87,6 @@ export class CreateCCWebAddOn extends Command {
     constructor(argv: string[], config: Config) {
         super(argv, config);
 
-        this._accountService = IContainer.get<AccountService>(IDeveloperTermsTypes.AccountService);
-
         this._analyticsConsent = IContainer.get<AnalyticsConsent>(IAnalyticsTypes.AnalyticsConsent);
 
         this._analyticsService = IContainer.get<AnalyticsService>(IAnalyticsTypes.AnalyticsService);
@@ -113,10 +101,8 @@ export class CreateCCWebAddOn extends Command {
 
         const {
             args: { addOnName },
-            flags: { kind, template, login, analytics, verbose }
+            flags: { kind, template, analytics, verbose }
         } = await this.parse(CreateCCWebAddOn);
-
-        await this._seekTermsOfUseConsent(login, verbose);
 
         await this._seekAnalyticsConsent(analytics);
 
@@ -128,20 +114,13 @@ export class CreateCCWebAddOn extends Command {
             template.toLowerCase(),
             verbose
         );
+
         await this._addOnFactory.create(options);
     }
 
     async catch(error: { message: string }) {
         await this._analyticsService.postEvent(AnalyticsErrorMarkers.ERROR_INVALID_ARGS, error.message, false);
         throw error;
-    }
-
-    private async _seekTermsOfUseConsent(login: boolean, verbose: boolean): Promise<void> {
-        if (login) {
-            await this._accountService.invalidateToken(verbose);
-        }
-
-        await this._accountService.seekTermsOfUseConsent();
     }
 
     private async _seekAnalyticsConsent(analytics: string | undefined): Promise<void> {

@@ -542,7 +542,6 @@ describe("ManifestSchema Validations - Version 2", () => {
                             "allow-popups-to-escape-sandbox"
                         ],
                         oauth: ["url1"],
-                        analytics: false,
                         clipboard: ["clipboard-write"]
                     }
                 }
@@ -568,7 +567,6 @@ describe("ManifestSchema Validations - Version 2", () => {
                             "allow-popups-to-escape-sandbox"
                         ],
                         oauth: ["url1"],
-                        analytics: false,
                         clipboard: ["clipboard-write", "clipboard-read"]
                     }
                 }

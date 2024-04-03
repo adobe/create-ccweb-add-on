@@ -23,12 +23,10 @@
  ********************************************************************************/
 
 import { ADDITIONAL_ADD_ON_INFO, DEFAULT_OUTPUT_DIRECTORY, isNullOrWhiteSpace } from "@adobe/ccweb-add-on-core";
-import type { AccountService } from "@adobe/ccweb-add-on-developer-terms";
-import { ITypes as IDeveloperTermsTypes } from "@adobe/ccweb-add-on-developer-terms";
 import type { ManifestError, ManifestValidationResult } from "@adobe/ccweb-add-on-manifest";
 import { AddOnManifest } from "@adobe/ccweb-add-on-manifest";
 import fs from "fs-extra";
-import { inject, injectable } from "inversify";
+import { injectable } from "inversify";
 import path from "path";
 import format from "string-template";
 import { MANIFEST_JSON } from "../constants.js";
@@ -38,19 +36,7 @@ import { MANIFEST_JSON } from "../constants.js";
  */
 @injectable()
 export class AddOnManifestReader {
-    private readonly _accountService: AccountService;
-
     private _addOnManifest?: AddOnManifest;
-    private _isUserPrivileged?: boolean;
-
-    /**
-     * Instantiate {@link AddOnManifestReader}.
-     * @param accountService - {@link AccountService} reference.
-     * @returns Reference to a new {@link AddOnManifestReader} instance.
-     */
-    constructor(@inject(IDeveloperTermsTypes.AccountService) accountService: AccountService) {
-        this._accountService = accountService;
-    }
 
     /**
      * Get manifest of the Add-on on which the script is being executed.
@@ -58,10 +44,10 @@ export class AddOnManifestReader {
      * @param fromCache - Whether to get the manifest from cache.
      * @returns Add-on manifest represented as {@link AddOnManifest}.
      */
-    async getManifest(
+    getManifest(
         handleValidationFailed: (_failedResult: ManifestValidationResult) => void,
         fromCache = true
-    ): Promise<AddOnManifest | undefined> {
+    ): AddOnManifest | undefined {
         if (fromCache && this._addOnManifest !== undefined) {
             return this._addOnManifest;
         }
@@ -115,10 +101,9 @@ export class AddOnManifestReader {
             return this._addOnManifest;
         }
 
-        const privileged = this._isUserPrivileged ?? (await this._accountService.isUserPrivileged());
         const { manifest, manifestValidationResult } = AddOnManifest.createManifest({
             manifest: parsedManifest,
-            additionalInfo: { ...ADDITIONAL_ADD_ON_INFO, privileged }
+            additionalInfo: ADDITIONAL_ADD_ON_INFO
         });
 
         if (!manifestValidationResult.success) {

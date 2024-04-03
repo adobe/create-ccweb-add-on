@@ -32,8 +32,6 @@ import {
     DEFAULT_SRC_DIRECTORY,
     UncaughtExceptionHandler
 } from "@adobe/ccweb-add-on-core";
-import type { AccountService } from "@adobe/ccweb-add-on-developer-terms";
-import { ITypes as IDeveloperTermsTypes } from "@adobe/ccweb-add-on-developer-terms";
 import type { Config } from "@oclif/core";
 import { Command, Flags } from "@oclif/core";
 import type { Express } from "express";
@@ -50,8 +48,6 @@ import type { CommandValidator } from "../validators/CommandValidator.js";
  * Start Command's implementation class.
  */
 export class Start extends Command {
-    private readonly _accountService: AccountService;
-
     private readonly _analyticsConsent: AnalyticsConsent;
     private readonly _analyticsService: AnalyticsService;
 
@@ -84,12 +80,6 @@ export class Start extends Command {
             required: false,
             default: DEFAULT_PORT
         }),
-        login: Flags.boolean({
-            char: "l",
-            description: "Force login.",
-            required: false,
-            default: false
-        }),
         analytics: Flags.string({
             char: "a",
             description: "Turn on/off sending analytics to Adobe.",
@@ -106,8 +96,6 @@ export class Start extends Command {
 
     constructor(argv: string[], config: Config) {
         super(argv, config);
-
-        this._accountService = IContainer.get<AccountService>(IDeveloperTermsTypes.AccountService);
 
         this._analyticsConsent = IContainer.get<AnalyticsConsent>(IAnalyticsTypes.AnalyticsConsent);
 
@@ -128,10 +116,8 @@ export class Start extends Command {
         process.chdir(rootDirectory);
 
         const {
-            flags: { src, use, hostname, port, login, analytics, verbose }
+            flags: { src, use, hostname, port, analytics, verbose }
         } = await this.parse(Start);
-
-        await this._seekTermsOfUseConsent(login, verbose);
 
         await this._seekAnalyticsConsent(analytics);
 
@@ -143,14 +129,6 @@ export class Start extends Command {
     async catch(error: { message: string }) {
         this._analyticsService.postEvent(AnalyticsErrorMarkers.SCRIPTS_START_COMMAND_ERROR, error.message, false);
         throw error;
-    }
-
-    private async _seekTermsOfUseConsent(login: boolean, verbose: boolean): Promise<void> {
-        if (login) {
-            await this._accountService.invalidateToken(verbose);
-        }
-
-        await this._accountService.seekTermsOfUseConsent();
     }
 
     private async _seekAnalyticsConsent(analytics: string | undefined): Promise<void> {

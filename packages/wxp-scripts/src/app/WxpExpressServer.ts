@@ -66,10 +66,10 @@ export class WxpExpressServer implements ExpressServer {
      * @param options - {@link StartCommandOptions} Options which the Add-on is started with.
      */
     start(addOnDirectory: AddOnDirectory, server: Server, expressApp: Express, options: StartCommandOptions): void {
-        expressApp.get(["/"], async (request, response) => {
+        expressApp.get(["/"], (request, response) => {
             /* c8 ignore start */
             /* Unreachable code since this._expressApp.get is stubbed. */
-            const manifest = await this._manifestReader.getManifest(() => {
+            const manifest = this._manifestReader.getManifest(() => {
                 return;
             }, false);
             const baseUrl = getBaseUrl(HTTPS, request.headers.host ?? `${request.hostname}:${options.port}`);
@@ -79,10 +79,10 @@ export class WxpExpressServer implements ExpressServer {
             /* c8 ignore stop */
         });
 
-        expressApp.get(`/${addOnDirectory.manifest.manifestProperties.testId as string}`, async (request, response) => {
+        expressApp.get(`/${addOnDirectory.manifest.manifestProperties.testId as string}`, (request, response) => {
             /* c8 ignore start */
             /* Unreachable code since this._expressApp.get is stubbed. */
-            const manifest = await this._manifestReader.getManifest(() => {
+            const manifest = this._manifestReader.getManifest(() => {
                 return;
             }, false);
             let resources: string[] = [];

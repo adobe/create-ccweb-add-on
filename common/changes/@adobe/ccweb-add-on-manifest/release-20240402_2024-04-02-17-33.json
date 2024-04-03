@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-manifest",
+      "comment": "Remove the analytics property from add-on manifest",
+      "type": "major"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-manifest"
+}

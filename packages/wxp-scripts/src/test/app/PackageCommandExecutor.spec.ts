@@ -24,7 +24,6 @@
 
 import type { Logger } from "@adobe/ccweb-add-on-core";
 import { DEFAULT_OUTPUT_DIRECTORY, DEFAULT_SRC_DIRECTORY } from "@adobe/ccweb-add-on-core";
-import type { AccountService } from "@adobe/ccweb-add-on-developer-terms";
 import type { AddOnManifestEntrypoint } from "@adobe/ccweb-add-on-manifest";
 import type AdmZip from "adm-zip";
 import chai, { assert, expect } from "chai";
@@ -53,11 +52,8 @@ describe("PackageCommandExecutor", () => {
     let admZipStub: StubbedInstance<AdmZip>;
 
     let buildCommandExecutor: StubbedInstance<BuildCommandExecutor>;
-
-    let accountService: StubbedInstance<AccountService>;
-    let manifestReader: AddOnManifestReader;
-
     let logger: StubbedInstance<Logger>;
+    let manifestReader: AddOnManifestReader;
 
     let packageCommandExecutor: PackageCommandExecutor;
 
@@ -68,13 +64,8 @@ describe("PackageCommandExecutor", () => {
         admZipStub = stubInterface<AdmZip>();
 
         buildCommandExecutor = stubInterface<BuildCommandExecutor>();
-
-        accountService = stubInterface();
-        accountService.isUserPrivileged.resolves(true);
-        manifestReader = new AddOnManifestReader(accountService);
-
         logger = stubInterface<Logger>();
-
+        manifestReader = new AddOnManifestReader();
         packageCommandExecutor = new PackageCommandExecutor(buildCommandExecutor, logger, manifestReader);
     });
 
@@ -82,7 +73,7 @@ describe("PackageCommandExecutor", () => {
         sandbox.restore();
     });
 
-    describe("execute ...", () => {
+    describe("execute", () => {
         it("should create zip successfully if manifest validation passes and main file is present.", async () => {
             const distPath = path.resolve(DEFAULT_OUTPUT_DIRECTORY);
             const manifestPath = path.resolve(path.join(DEFAULT_OUTPUT_DIRECTORY, MANIFEST_JSON));
@@ -124,6 +115,7 @@ describe("PackageCommandExecutor", () => {
 
             const options = new PackageCommandOptions(DEFAULT_SRC_DIRECTORY, "tsc", true, true);
             await packageCommandExecutor.execute(options);
+
             assert.equal(logger.information.callCount, 1);
             assert.equal(logger.success.callCount, 1);
             assert.equal(buildCommandExecutor.execute.callCount, 1);
@@ -171,6 +163,7 @@ describe("PackageCommandExecutor", () => {
 
             const options = new PackageCommandOptions(DEFAULT_SRC_DIRECTORY, "tsc", false, false);
             await packageCommandExecutor.execute(options);
+
             assert.equal(logger.information.callCount, 1);
             assert.equal(logger.success.callCount, 1);
             assert.equal(buildCommandExecutor.execute.callCount, 0);
@@ -478,6 +471,7 @@ describe("PackageCommandExecutor", () => {
 
             const options = new PackageCommandOptions(DEFAULT_SRC_DIRECTORY, "tsc", true, true);
             await packageCommandExecutor.execute(options);
+
             assert.equal(logger.information.callCount, 1);
             assert.equal(logger.error.callCount, 1);
         });
@@ -498,6 +492,7 @@ describe("PackageCommandExecutor", () => {
 
             const options = new PackageCommandOptions(DEFAULT_SRC_DIRECTORY, "tsc", true, true);
             await packageCommandExecutor.execute(options);
+
             assert.equal(admZipStub.writeZip.callCount, 0);
         });
     });

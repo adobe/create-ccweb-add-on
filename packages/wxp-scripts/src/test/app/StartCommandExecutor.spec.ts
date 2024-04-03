@@ -25,7 +25,6 @@
 import type { AnalyticsService } from "@adobe/ccweb-add-on-analytics";
 import type { Logger } from "@adobe/ccweb-add-on-core";
 import { DEFAULT_OUTPUT_DIRECTORY } from "@adobe/ccweb-add-on-core";
-import type { AccountService } from "@adobe/ccweb-add-on-developer-terms";
 import type { AddOnManifestEntrypoint } from "@adobe/ccweb-add-on-manifest";
 import type { SSLReader } from "@adobe/ccweb-add-on-ssl";
 import chai, { assert, expect } from "chai";
@@ -65,7 +64,6 @@ describe("StartCommandExecutor", () => {
     let sslReader: StubbedInstance<SSLReader>;
     let expressApp: StubbedInstance<Express>;
 
-    let accountService: StubbedInstance<AccountService>;
     let manifestReader: AddOnManifestReader;
 
     let analyticsService: StubbedInstance<AnalyticsService>;
@@ -86,9 +84,7 @@ describe("StartCommandExecutor", () => {
         scriptManager = stubInterface();
         logger = stubInterface();
 
-        accountService = stubInterface();
-        accountService.isUserPrivileged.resolves(true);
-        manifestReader = new AddOnManifestReader(accountService);
+        manifestReader = new AddOnManifestReader();
 
         sslReader = stubInterface<SSLReader>();
         sslReader.read.resolves();

@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-scaffolder",
+      "comment": "Manifest and devcert updates",
+      "type": "major"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-scaffolder"
+}

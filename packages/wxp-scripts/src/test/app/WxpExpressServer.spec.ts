@@ -77,7 +77,8 @@ describe("WxpExpressServer", () => {
                 logger.success.calledWith(
                     `Done. Your add-on '${addOnDirectory.rootDirName}' is hosted on: ${getBaseUrl(
                         HTTPS,
-                        `${DEFAULT_HOST_NAME}:${options.port}`
+                        DEFAULT_HOST_NAME,
+                        options.port
                     )}`
                 ),
                 true

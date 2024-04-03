@@ -24,7 +24,6 @@
 
 import type { Logger } from "@adobe/ccweb-add-on-core";
 import { DEFAULT_OUTPUT_DIRECTORY, isNullOrWhiteSpace } from "@adobe/ccweb-add-on-core";
-import type { AccountService } from "@adobe/ccweb-add-on-developer-terms";
 import type { AddOnManifestEntrypoint, ManifestError, ManifestValidationResult } from "@adobe/ccweb-add-on-manifest";
 import { assert } from "chai";
 import type { Stats } from "fs-extra";
@@ -43,11 +42,9 @@ describe("AddOnManifestReader", () => {
     let sandbox: SinonSandbox;
 
     let logger: StubbedInstance<Logger>;
-
-    let accountService: StubbedInstance<AccountService>;
     let addOnManifestReader: AddOnManifestReader;
 
-    const handleValidationFailed = async (failedResult: ManifestValidationResult) => {
+    const handleValidationFailed = (failedResult: ManifestValidationResult) => {
         logger.error("Add-on manifest validation failed.");
 
         const { errorDetails } = failedResult;
@@ -64,12 +61,9 @@ describe("AddOnManifestReader", () => {
 
     beforeEach(() => {
         sandbox = sinon.createSandbox();
+
         logger = stubInterface<Logger>();
-
-        accountService = stubInterface();
-        accountService.isUserPrivileged.resolves(true);
-
-        addOnManifestReader = new AddOnManifestReader(accountService);
+        addOnManifestReader = new AddOnManifestReader();
     });
 
     afterEach(() => {
@@ -79,7 +73,7 @@ describe("AddOnManifestReader", () => {
     describe("getAddOns", () => {
         const { manifestProperties } = createManifest();
 
-        it("should return manifest if all the validations are passed.", async () => {
+        it("should return manifest if all the validations are passed.", () => {
             const distPath = path.resolve(DEFAULT_OUTPUT_DIRECTORY);
             const manifestPath = path.resolve(path.join(DEFAULT_OUTPUT_DIRECTORY, MANIFEST_JSON));
 
@@ -111,12 +105,12 @@ describe("AddOnManifestReader", () => {
                 });
             });
 
-            const addOnManifest = await addOnManifestReader.getManifest(handleValidationFailed);
+            const addOnManifest = addOnManifestReader.getManifest(handleValidationFailed);
 
             assert.deepEqual(manifestProperties, addOnManifest?.manifestProperties);
         });
 
-        it("should return manifest from cache if the getFromCache flag is true.", async () => {
+        it("should return manifest from cache if the getFromCache flag is true.", () => {
             const distPath = path.resolve(DEFAULT_OUTPUT_DIRECTORY);
             const manifestPath = path.resolve(path.join(DEFAULT_OUTPUT_DIRECTORY, MANIFEST_JSON));
 
@@ -148,19 +142,17 @@ describe("AddOnManifestReader", () => {
                 });
             });
 
-            const addOnManifestOriginal = await addOnManifestReader.getManifest(handleValidationFailed);
+            const addOnManifestOriginal = addOnManifestReader.getManifest(handleValidationFailed);
             assert.deepEqual(manifestProperties, addOnManifestOriginal?.manifestProperties);
 
-            const addOnManifestCached = await addOnManifestReader.getManifest(
-                async (error: ManifestValidationResult) => {
-                    logger.error(error?.errorDetails?.[0].message);
-                }
-            );
+            const addOnManifestCached = addOnManifestReader.getManifest((error: ManifestValidationResult) => {
+                logger.error(error?.errorDetails?.[0].message);
+            });
 
             assert.deepEqual(addOnManifestCached?.manifestProperties, addOnManifestOriginal?.manifestProperties);
         });
 
-        it(`should return error if ${DEFAULT_OUTPUT_DIRECTORY} doesn't exist.`, async () => {
+        it(`should return error if ${DEFAULT_OUTPUT_DIRECTORY} doesn't exist.`, () => {
             const distPath = path.resolve(DEFAULT_OUTPUT_DIRECTORY);
             const manifestPath = path.resolve(path.join(DEFAULT_OUTPUT_DIRECTORY, MANIFEST_JSON));
 
@@ -168,7 +160,7 @@ describe("AddOnManifestReader", () => {
             fsExistsSyncStub.withArgs(distPath).returns(false);
             fsExistsSyncStub.withArgs(manifestPath).returns(false);
 
-            await addOnManifestReader.getManifest(handleValidationFailed);
+            addOnManifestReader.getManifest(handleValidationFailed);
 
             assert.equal(logger.error.callCount, 3);
             assert.equal(logger.error.getCall(0).calledWith("Add-on manifest validation failed."), true);
@@ -179,7 +171,7 @@ describe("AddOnManifestReader", () => {
             assert.equal(logger.error.getCall(2).calledWith(`Please build your add-on.`), true);
         });
 
-        it(`should return error if ${DEFAULT_OUTPUT_DIRECTORY} is not a directory.`, async () => {
+        it(`should return error if ${DEFAULT_OUTPUT_DIRECTORY} is not a directory.`, () => {
             const distPath = path.resolve(DEFAULT_OUTPUT_DIRECTORY);
             const manifestPath = path.resolve(path.join(DEFAULT_OUTPUT_DIRECTORY, MANIFEST_JSON));
 
@@ -195,7 +187,7 @@ describe("AddOnManifestReader", () => {
             };
             lstatSyncStub.withArgs(distPath).returns(stats);
 
-            await addOnManifestReader.getManifest(handleValidationFailed);
+            addOnManifestReader.getManifest(handleValidationFailed);
 
             assert.equal(logger.error.callCount, 3);
             assert.equal(logger.error.getCall(0).calledWith("Add-on manifest validation failed."), true);
@@ -206,7 +198,7 @@ describe("AddOnManifestReader", () => {
             assert.equal(logger.error.getCall(2).calledWith(`Please build your add-on.`), true);
         });
 
-        it("should return error if manifest doesnt exist.", async () => {
+        it("should return error if manifest doesnt exist.", () => {
             const distPath = path.resolve(DEFAULT_OUTPUT_DIRECTORY);
             const manifestPath = path.resolve(path.join(DEFAULT_OUTPUT_DIRECTORY, MANIFEST_JSON));
 
@@ -222,7 +214,7 @@ describe("AddOnManifestReader", () => {
             };
             lstatSyncStub.withArgs(distPath).returns(stats);
 
-            await addOnManifestReader.getManifest(handleValidationFailed);
+            addOnManifestReader.getManifest(handleValidationFailed);
 
             assert.equal(logger.error.callCount, 2);
             assert.equal(logger.error.getCall(0).calledWith("Add-on manifest validation failed."), true);
@@ -232,7 +224,7 @@ describe("AddOnManifestReader", () => {
             );
         });
 
-        it("should return error if manifest is not a file.", async () => {
+        it("should return error if manifest is not a file.", () => {
             const distPath = path.resolve(DEFAULT_OUTPUT_DIRECTORY);
             const manifestPath = path.resolve(path.join(DEFAULT_OUTPUT_DIRECTORY, MANIFEST_JSON));
 
@@ -253,7 +245,7 @@ describe("AddOnManifestReader", () => {
                 }
             });
 
-            await addOnManifestReader.getManifest(handleValidationFailed);
+            addOnManifestReader.getManifest(handleValidationFailed);
 
             assert.equal(logger.error.callCount, 2);
             assert.equal(logger.error.getCall(0).calledWith("Add-on manifest validation failed."), true);
@@ -263,7 +255,7 @@ describe("AddOnManifestReader", () => {
             );
         });
 
-        it("should return error if manifest is empty.", async () => {
+        it("should return error if manifest is empty.", () => {
             const distPath = path.resolve(DEFAULT_OUTPUT_DIRECTORY);
             const manifestPath = path.resolve(path.join(DEFAULT_OUTPUT_DIRECTORY, MANIFEST_JSON));
 
@@ -286,14 +278,14 @@ describe("AddOnManifestReader", () => {
                 }
             });
 
-            await addOnManifestReader.getManifest(handleValidationFailed);
+            addOnManifestReader.getManifest(handleValidationFailed);
 
             assert.equal(logger.error.callCount, 2);
             assert.equal(logger.error.getCall(0).calledWith("Add-on manifest validation failed."), true);
             assert.equal(logger.error.getCall(1).calledWith(`${MANIFEST_JSON} is empty.`), true);
         });
 
-        it("should return error if manifest is incorrect.", async () => {
+        it("should return error if manifest is incorrect.", () => {
             const distPath = path.resolve(DEFAULT_OUTPUT_DIRECTORY);
             const manifestPath = path.resolve(path.join(DEFAULT_OUTPUT_DIRECTORY, MANIFEST_JSON));
 
@@ -317,7 +309,7 @@ describe("AddOnManifestReader", () => {
                 }
             });
 
-            await addOnManifestReader.getManifest(handleValidationFailed);
+            addOnManifestReader.getManifest(handleValidationFailed);
 
             assert.equal(logger.error.callCount, 2);
             assert.equal(logger.error.getCall(0).calledWith("Add-on manifest validation failed."), true);
@@ -327,7 +319,7 @@ describe("AddOnManifestReader", () => {
             );
         });
 
-        it("should return error if manifest has a syntax error.", async () => {
+        it("should return error if manifest has a syntax error.", () => {
             const distPath = path.resolve(DEFAULT_OUTPUT_DIRECTORY);
             const manifestPath = path.resolve(path.join(DEFAULT_OUTPUT_DIRECTORY, MANIFEST_JSON));
 
@@ -350,7 +342,7 @@ describe("AddOnManifestReader", () => {
                 }
             });
 
-            await addOnManifestReader.getManifest(handleValidationFailed);
+            addOnManifestReader.getManifest(handleValidationFailed);
 
             assert.equal(logger.error.callCount, 2);
             assert.equal(logger.error.getCall(0).calledWith("Add-on manifest validation failed."), true);

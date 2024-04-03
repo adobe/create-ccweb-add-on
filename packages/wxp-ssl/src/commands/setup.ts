@@ -27,8 +27,6 @@
 import type { AnalyticsConsent, AnalyticsService } from "@adobe/ccweb-add-on-analytics";
 import { CLIProgram, ITypes as IAnalyticsTypes } from "@adobe/ccweb-add-on-analytics";
 import { UncaughtExceptionHandler } from "@adobe/ccweb-add-on-core";
-import type { AccountService } from "@adobe/ccweb-add-on-developer-terms";
-import { ITypes as IDeveloperTermsTypes } from "@adobe/ccweb-add-on-developer-terms";
 import type { Config } from "@oclif/core";
 import { Command, Flags } from "@oclif/core";
 import process from "process";
@@ -44,8 +42,6 @@ import type { CommandValidator } from "../validators/CommandValidator.js";
  * SSL Setup command.
  */
 export class Setup extends Command {
-    private readonly _accountService: AccountService;
-
     private readonly _analyticsConsent: AnalyticsConsent;
     private readonly _analyticsService: AnalyticsService;
 
@@ -69,12 +65,6 @@ export class Setup extends Command {
             default: false,
             hidden: true
         }),
-        login: Flags.boolean({
-            char: "l",
-            description: "Force login.",
-            required: false,
-            default: false
-        }),
         analytics: Flags.string({
             char: "a",
             description: "Turn on/off sending analytics to Adobe.",
@@ -91,8 +81,6 @@ export class Setup extends Command {
 
     constructor(argv: string[], config: Config) {
         super(argv, config);
-
-        this._accountService = IContainer.get<AccountService>(IDeveloperTermsTypes.AccountService);
 
         this._analyticsConsent = IContainer.get<AnalyticsConsent>(IAnalyticsTypes.AnalyticsConsent);
 
@@ -111,10 +99,8 @@ export class Setup extends Command {
         process.chdir(rootDirectory);
 
         const {
-            flags: { hostname, useExisting, login, analytics, verbose }
+            flags: { hostname, useExisting, analytics, verbose }
         } = await this.parse(Setup);
-
-        await this._seekTermsOfUseConsent(login, verbose);
 
         await this._seekAnalyticsConsent(analytics);
 
@@ -126,14 +112,6 @@ export class Setup extends Command {
     async catch(error: { message: string }) {
         this._analyticsService.postEvent(AnalyticsErrorMarkers.ERROR_SSL_SETUP, error.message, false);
         throw error;
-    }
-
-    private async _seekTermsOfUseConsent(login: boolean, verbose: boolean): Promise<void> {
-        if (login) {
-            await this._accountService.invalidateToken(verbose);
-        }
-
-        await this._accountService.seekTermsOfUseConsent();
     }
 
     private async _seekAnalyticsConsent(analytics: string | undefined): Promise<void> {

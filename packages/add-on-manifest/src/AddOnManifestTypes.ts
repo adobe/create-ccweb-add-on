@@ -92,7 +92,6 @@ export type Permissions = {
     readonly oauth?: string[];
     readonly camera?: string;
     readonly microphone?: string;
-    readonly analytics?: boolean;
     readonly clipboard?: string[];
 };
 

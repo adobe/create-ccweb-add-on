@@ -34,7 +34,7 @@ export const CCWEB_ADDON_DIRECTORY = path.join("Adobe", "CCWebAddOn");
 export const ADD_ON_PREFERENCES_FILE = "add-on-preferences.json";
 export const ADDITIONAL_ADD_ON_INFO = {
     sourceId: "developerSource",
-    privileged: false,
+    privileged: true,
     isDeveloperAddOn: true
 };
 
