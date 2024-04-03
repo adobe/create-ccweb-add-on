@@ -18,8 +18,7 @@
              */
 
             "pathMapping": {
-                "index.html": "${workspaceFolder}/src/index.html",
-                "index.js": "${workspaceFolder}/src/index.js"
+                "index.html": "${workspaceFolder}/src/index.html"
             },
 
             /**
@@ -40,8 +39,7 @@
              */
 
             "pathMapping": {
-                "index.html": "${workspaceFolder}/src/index.html",
-                "index.js": "${workspaceFolder}/src/index.js"
+                "index.html": "${workspaceFolder}/src/index.html"
             },
 
             /**
