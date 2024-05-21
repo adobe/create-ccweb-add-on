@@ -169,7 +169,9 @@ export function getTestManifestV2(privileged?: boolean): AddOnManifestV2 {
             _blessedPartnerAccess: "blessedPartnerAccess",
             trustedPartnerApis: {
                 messaging: false,
-                expressPrint: true
+                expressPrint: true,
+                addOnLifecycle: false,
+                toastNotifications: false
             }
         },
         entryPoints: [

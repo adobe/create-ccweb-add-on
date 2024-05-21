@@ -170,7 +170,7 @@ export declare interface BitmapImage {
  * <InlineAlert slots="text" variant="warning"/>
  * *Do not depend on the literal numeric values of these constants*, as they may change. Always reference the enum identifiers in your code.
  *
- * Determines how a scenende is composited on top of the content rendered below it.
+ * Determines how a scenenode is composited on top of the content rendered below it.
  *
  * If a node is inside a container whose blend mode anything other than {@link passThrough}, then the node's blend mode only
  * interacts with other siblings within the same container. See documentation below for details.
@@ -235,7 +235,7 @@ export declare interface Color {
 /**
  * Represents a solid-color fill.
  *
- * The most convenient way to create a stroke is via `Editor.makeColorFill()`.
+ * The most convenient way to create a fill is via `Editor.makeColorFill()`.
  */
 export declare interface ColorFill extends Fill {
     /**

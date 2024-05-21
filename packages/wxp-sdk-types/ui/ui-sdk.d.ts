@@ -215,7 +215,13 @@ declare interface ApplicationBase {
      * @returns DisableDragToDocument - Callback to undo the changes made by enableDragToDocument
      */
     enableDragToDocument(element: HTMLElement, dragCallbacks: DragCallbacks): DisableDragToDocument;
-
+    /**
+     * @experimental - Experimental API
+     * Register iframe with the add-on SDK.
+     * @param element - HTMLIframeElement to be registered.
+     * @returns UnregisterIframe - Callback to unregister iframe from the add-on SDK.
+     */
+    registerIframe(element: HTMLIFrameElement): UnregisterIframe;
     /**
      * Show a modal dialog
      * @param dialogOptions - dialog options such as title, description, etc.
@@ -467,6 +473,8 @@ declare namespace Constants {
         RuntimeType,
         BleedUnit,
         VideoResolution,
+        EditorPanel,
+        PanelActionType,
         AuthorizationStatus
     };
 }
@@ -670,6 +678,45 @@ export declare interface DragCompletionData {
 }
 
 export declare type DragPreviewCallback = (element: HTMLElement) => URL;
+
+export declare enum EditorPanel {
+    /**
+     * Editor search panel
+     */
+    search = "search",
+    /**
+     * Editor your stuff panel
+     */
+    yourStuff = "yourStuff",
+    /**
+     * Editor templates panel
+     */
+    templates = "templates",
+    /**
+     * Editor media panel
+     */
+    media = "media",
+    /**
+     * Editor text panel
+     */
+    text = "text",
+    /**
+     * Editor elements panel
+     */
+    elements = "elements",
+    /**
+     * Editor grids panel
+     */
+    grids = "grids",
+    /**
+     * Editor brands panel
+     */
+    brands = "brands",
+    /**
+     * Editor addOns panel
+     */
+    addOns = "addOns"
+}
 
 export declare interface Field {
     /**
@@ -923,6 +970,23 @@ export declare interface PageRendition extends Rendition {
      * Page metadata
      */
     metadata: PageMetadata;
+}
+
+/**
+ * Represents the action to be performed on opening an Editor panel.
+ */
+export declare interface PanelAction {
+    /**
+     * Type of action to be performed on the Editor panel {@link PanelActionType}.
+     */
+    type: PanelActionType;
+}
+
+export declare enum PanelActionType {
+    /**
+     * Action type to perform search action on Editor panel.
+     */
+    search = "search"
 }
 
 /**
@@ -1237,6 +1301,20 @@ export declare enum RuntimeType {
     documentSandbox = "documentSandbox"
 }
 
+/**
+ * Search Action that can be performed on Editor Panel.
+ */
+export declare interface SearchAction extends PanelAction {
+    /**
+     * Search action type.
+     */
+    type: PanelActionType.search;
+    /**
+     * Query used to perform search action.
+     */
+    searchString: string;
+}
+
 export declare type SimpleDialogOptions = AlertDialogOptions | InputDialogOptions;
 
 /**
@@ -1255,6 +1333,13 @@ export declare interface UI {
      * Supported locales of the application
      */
     readonly locales: string[];
+    /**
+     * @experimental - Experimental API
+     * Opens an Editor Panel
+     * @param panel - one of {@link EditorPanel}
+     * @param action - optional action to be performed on the panel {@link PanelAction}
+     */
+    openEditorPanel(panel: EditorPanel, action?: PanelAction): void;
 }
 
 declare type UiTheme = "light" | "dark" | "lightest" | "darkest";
@@ -1271,6 +1356,12 @@ declare type Unpromisify<P> = P extends Promise<infer T> ? T : P;
  * Inverse of `ProxyOrClone<T>`.
  */
 declare type UnproxyOrClone<T> = T extends RemoteObject<ProxyMarked> ? Local<T> : T;
+
+/**
+ * @experimental - Experimental API
+ * Callback to unregister iframe from the add-on SDK.
+ */
+declare type UnregisterIframe = () => void;
 
 /**
  * Types of dialog variants supported.

@@ -164,7 +164,9 @@ export const RequirementSchemaV2 = {
             type: "object",
             properties: {
                 messaging: { type: "boolean" },
-                expressPrint: { type: "boolean" }
+                expressPrint: { type: "boolean" },
+                toastNotifications: { type: "boolean" },
+                addOnLifecycle: { type: "boolean" }
             },
             required: [],
             additionalProperties: false
