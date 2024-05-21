@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-sdk-types",
+      "comment": "Typings updated for Experimental Tiktok API",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-sdk-types"
+}
