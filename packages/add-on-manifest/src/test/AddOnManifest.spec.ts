@@ -191,5 +191,13 @@ function verifyCommonManifestFields(
             manifest.requirements.trustedPartnerApis.expressPrint,
             testManifest.requirements.trustedPartnerApis.expressPrint
         );
+        assert.equal(
+            manifest.requirements.trustedPartnerApis.toastNotifications,
+            testManifest.requirements.trustedPartnerApis.toastNotifications
+        );
+        assert.equal(
+            manifest.requirements.trustedPartnerApis.addOnLifecycle,
+            testManifest.requirements.trustedPartnerApis.addOnLifecycle
+        );
     }
 }

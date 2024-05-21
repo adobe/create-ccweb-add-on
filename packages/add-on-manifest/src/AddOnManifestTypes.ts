@@ -41,6 +41,8 @@ export type App = {
 export type TrustedPartnerApis = {
     readonly messaging?: boolean;
     readonly expressPrint?: boolean;
+    readonly addOnLifecycle?: boolean;
+    readonly toastNotifications?: boolean;
 };
 
 export type RequirementsV2 = {
