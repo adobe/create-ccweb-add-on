@@ -255,7 +255,7 @@ export declare interface AppThemeChangeEventData {
 /**
  * Asset collection Id type.
  */
-export declare type AssetCollcetionId = `urn:aaid:sc:VA6C2:${string}`;
+export declare type AssetCollectionId = `urn:aaid:sc:VA6C2:${string}`;
 
 /**
  * Request parameters to authorize a user using OAuth 2.0 PKCE based authorization.
@@ -956,7 +956,7 @@ export declare interface NavigateAction extends PanelAction {
     /**
      * collectionId of the asset collection to navigate to.
      */
-    collectionId?: AssetCollcetionId;
+    collectionId?: AssetCollectionId;
 }
 
 /**
@@ -1499,3 +1499,4 @@ export declare enum VideoResolution {
 }
 
 export {};
+
