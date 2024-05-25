@@ -2,7 +2,7 @@
   "changes": [
     {
       "packageName": "@adobe/ccweb-add-on-sdk-types",
-      "comment": "Updates for tiktop API",
+      "comment": "Add TikTok CML as a trusted partner in manifest.json.",
       "type": "minor"
     }
   ],
