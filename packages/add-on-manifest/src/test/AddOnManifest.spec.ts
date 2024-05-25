@@ -199,5 +199,9 @@ function verifyCommonManifestFields(
             manifest.requirements.trustedPartnerApis.addOnLifecycle,
             testManifest.requirements.trustedPartnerApis.addOnLifecycle
         );
+        assert.equal(
+            manifest.requirements.trustedPartnerApis.tiktokcml,
+            testManifest.requirements.trustedPartnerApis.tiktokcml
+        );
     }
 }

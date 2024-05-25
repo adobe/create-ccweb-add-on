@@ -518,10 +518,12 @@ describe("ManifestSchema Validations - Version 2", () => {
         assert.equal(typeof testManifest.requirements.trustedPartnerApis?.expressPrint === "boolean", true);
         assert.equal(typeof testManifest.requirements.trustedPartnerApis?.toastNotifications === "boolean", true);
         assert.equal(typeof testManifest.requirements.trustedPartnerApis?.addOnLifecycle === "boolean", true);
+        assert.equal(typeof testManifest.requirements.trustedPartnerApis?.tiktokcml === "boolean", true);
         assert.equal(testManifest.requirements.trustedPartnerApis?.messaging, false);
         assert.equal(testManifest.requirements.trustedPartnerApis?.expressPrint, true);
         assert.equal(testManifest.requirements.trustedPartnerApis?.addOnLifecycle, false);
         assert.equal(testManifest.requirements.trustedPartnerApis?.toastNotifications, false);
+        assert.equal(testManifest.requirements.trustedPartnerApis?.tiktokcml, true);
     });
 
     it("should have at least one entrypoint", () => {

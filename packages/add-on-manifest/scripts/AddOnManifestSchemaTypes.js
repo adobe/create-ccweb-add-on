@@ -166,7 +166,8 @@ export const RequirementSchemaV2 = {
                 messaging: { type: "boolean" },
                 expressPrint: { type: "boolean" },
                 toastNotifications: { type: "boolean" },
-                addOnLifecycle: { type: "boolean" }
+                addOnLifecycle: { type: "boolean" },
+                tiktokcml: { type: "boolean" }
             },
             required: [],
             additionalProperties: false

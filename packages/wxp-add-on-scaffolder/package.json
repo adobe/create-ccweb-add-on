@@ -1,6 +1,6 @@
 {
     "name": "@adobe/ccweb-add-on-scaffolder",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "author": "Adobe",
     "license": "MIT",
     "description": "Scaffolding libraries for Adobe Creative Cloud Web Add-on.",
