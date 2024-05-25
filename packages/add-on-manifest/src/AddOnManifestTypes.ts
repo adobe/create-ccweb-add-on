@@ -43,6 +43,7 @@ export type TrustedPartnerApis = {
     readonly expressPrint?: boolean;
     readonly addOnLifecycle?: boolean;
     readonly toastNotifications?: boolean;
+    readonly tiktokcml?: boolean;
 };
 
 export type RequirementsV2 = {

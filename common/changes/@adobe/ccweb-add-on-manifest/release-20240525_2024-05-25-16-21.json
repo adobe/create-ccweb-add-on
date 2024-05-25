@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-manifest",
+      "comment": "Add TikTok CML as a trusted partner in manifest.json.",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-manifest"
+}

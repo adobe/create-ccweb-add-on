@@ -253,6 +253,11 @@ export declare interface AppThemeChangeEventData {
 }
 
 /**
+ * Asset collection Id type.
+ */
+export declare type AssetCollectionId = `urn:aaid:sc:VA6C2:${string}`;
+
+/**
  * Request parameters to authorize a user using OAuth 2.0 PKCE based authorization.
  */
 export declare type AuthorizationRequest = {
@@ -474,6 +479,8 @@ declare namespace Constants {
         BleedUnit,
         VideoResolution,
         EditorPanel,
+        MediaTabs,
+        ElementsTabs,
         PanelActionType,
         AuthorizationStatus
     };
@@ -679,6 +686,9 @@ export declare interface DragCompletionData {
 
 export declare type DragPreviewCallback = (element: HTMLElement) => URL;
 
+/**
+ * Express editor panels.
+ */
 export declare enum EditorPanel {
     /**
      * Editor search panel
@@ -716,6 +726,32 @@ export declare enum EditorPanel {
      * Editor addOns panel
      */
     addOns = "addOns"
+}
+
+/**
+ * Tabs in editor Elements panel.
+ */
+export declare enum ElementsTabs {
+    /**
+     * Design assets tab.
+     */
+    designAssets = "designAssets",
+    /**
+     * Backgrounds tab.
+     */
+    backgrounds = "backgrounds",
+    /**
+     * Shapes assets tab.
+     */
+    shapes = "shapes",
+    /**
+     * Icons tab.
+     */
+    stockIcons = "stockIcons",
+    /**
+     * Charts tab.
+     */
+    charts = "charts"
 }
 
 export declare interface Field {
@@ -872,6 +908,24 @@ export declare interface MediaAttributes {
     title: string;
 }
 
+/**
+ * Tabs in editor media panel.
+ */
+export declare enum MediaTabs {
+    /**
+     * Video tab.
+     */
+    video = "video",
+    /**
+     * Audio tab.
+     */
+    audio = "audio",
+    /**
+     * Photos tab.
+     */
+    photos = "photos"
+}
+
 export declare interface Mp4RenditionOptions extends RenditionOptions {
     /**
      * mp4 rendition format
@@ -885,6 +939,24 @@ export declare interface Mp4RenditionOptions extends RenditionOptions {
      * Custom Resolution (in pixel)
      */
     customResolution?: number;
+}
+
+/**
+ * Navigation action that can be performed on Editor panels.
+ */
+export declare interface NavigateAction extends PanelAction {
+    /**
+     * Navigate to collection action type.
+     */
+    type: PanelActionType.navigate;
+    /**
+     *
+     */
+    tab?: ElementsTabs | MediaTabs;
+    /**
+     * collectionId of the asset collection to navigate to.
+     */
+    collectionId?: AssetCollectionId;
 }
 
 /**
@@ -982,11 +1054,18 @@ export declare interface PanelAction {
     type: PanelActionType;
 }
 
+/**
+ * Types of actions that can be performed on Editor panels.
+ */
 export declare enum PanelActionType {
     /**
      * Action type to perform search action on Editor panel.
      */
-    search = "search"
+    search = "search",
+    /**
+     * Action type to perform navigation within Editor panel.
+     */
+    navigate = "navigate"
 }
 
 /**
@@ -1420,3 +1499,4 @@ export declare enum VideoResolution {
 }
 
 export {};
+
