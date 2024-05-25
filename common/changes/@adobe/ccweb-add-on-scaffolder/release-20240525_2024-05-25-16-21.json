@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-scaffolder",
+      "comment": "Updates for tiktop API",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-scaffolder"
+}
