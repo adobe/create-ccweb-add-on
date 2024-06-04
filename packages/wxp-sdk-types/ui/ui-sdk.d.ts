@@ -621,6 +621,7 @@ declare interface Document_2 {
      * Add audio to the current page
      */
     addAudio(blob: Blob, attributes: MediaAttributes): Promise<void>;
+
     /**
      * Create renditions
      */
@@ -906,6 +907,10 @@ export declare interface MediaAttributes {
      * Media title
      */
     title: string;
+    /**
+     * Media author
+     */
+    author?: string;
 }
 
 /**
@@ -1499,4 +1504,3 @@ export declare enum VideoResolution {
 }
 
 export {};
-

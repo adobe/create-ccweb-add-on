@@ -11,7 +11,6 @@ rm -rf wxp-add-on-scaffolder/config
 rm -rf wxp-scripts/config
 rm -rf create-ccweb-add-on/config
 rm -rf wxp-analytics/config
-rm -rf wxp-developer-terms/config
 rm -rf wxp-sdk-types/config
 echo $'Done!\n'
 
@@ -38,9 +37,6 @@ find ./create-ccweb-add-on -name '*.bak' -type f -delete
 
 find -E ./wxp-analytics -type f -regex '.*package\.json' -exec sed -i '.bak' 's/branches 100",/branches 100"/g' {} \;
 find ./wxp-analytics -name '*.bak' -type f -delete
-
-find -E ./wxp-developer-terms -type f -regex '.*package\.json' -exec sed -i '.bak' 's/branches 100",/branches 100"/g' {} \;
-find ./wxp-developer-terms -name '*.bak' -type f -delete
 
 find -E ./wxp-add-on-scaffolder -type f -regex '.*package\.json' -exec sed -i '.bak' 's/branches 100",/branches 100"/g' {} \;
 find ./wxp-add-on-scaffolder -name '*.bak' -type f -delete

@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-sdk-types",
+      "comment": "Add optional author field in MediaAttributes.",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-sdk-types"
+}

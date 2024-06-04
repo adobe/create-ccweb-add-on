@@ -22,6 +22,8 @@
  * SOFTWARE.
  ********************************************************************************/
 
+/// <reference types="gl-matrix/index.js" />
+
 import { mat2d } from "gl-matrix";
 
 declare namespace ApiConstants {
