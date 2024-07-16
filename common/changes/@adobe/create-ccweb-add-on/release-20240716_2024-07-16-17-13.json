@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/create-ccweb-add-on",
+      "comment": "Add support for mobile schema in add-on manifest",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@adobe/create-ccweb-add-on"
+}
