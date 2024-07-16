@@ -1,6 +1,6 @@
 {
     "name": "@adobe/ccweb-add-on-core",
-    "version": "2.2.0",
+    "version": "1.0.0",
     "author": "Adobe",
     "license": "MIT",
     "description": "Core libraries for Adobe Creative Cloud Web Add-on.",
@@ -33,7 +33,7 @@
         "inversify": "6.0.1",
         "reflect-metadata": "0.1.13",
         "string-template": "1.0.0",
-        "tslib": "2.4.0"
+        "tslib": "2.6.2"
     },
     "devDependencies": {
         "@types/chai": "4.2.14",
@@ -41,7 +41,7 @@
         "@types/fs-extra": "9.0.13",
         "@types/hjson": "2.4.3",
         "@types/mocha": "9.1.1",
-        "@types/node": "16.11.62",
+        "@types/node": "16.18.36",
         "@types/sinon": "9.0.8",
         "@types/string-template": "1.0.2",
         "c8": "7.7.2",
@@ -51,8 +51,8 @@
         "regenerator-runtime": "0.13.9",
         "rimraf": "3.0.2",
         "sinon": "9.2.1",
-        "ts-node": "10.9.1",
+        "ts-node": "10.9.2",
         "ts-sinon": "2.0.1",
-        "typescript": "4.8.4"
+        "typescript": "5.4.5"
     }
 }

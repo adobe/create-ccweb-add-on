@@ -1,6 +1,6 @@
 {
     "name": "@adobe/create-ccweb-add-on",
-    "version": "2.2.0",
+    "version": "1.0.0",
     "author": "Adobe",
     "license": "MIT",
     "description": "Create an Adobe Creative Cloud Web Add-on.",
@@ -49,7 +49,7 @@
         "reflect-metadata": "0.1.13",
         "semver": "7.3.4",
         "string-template": "1.0.0",
-        "tslib": "2.4.0",
+        "tslib": "2.6.2",
         "validate-npm-package-name": "3.0.0"
     },
     "devDependencies": {
@@ -57,7 +57,7 @@
         "@types/chai": "4.2.14",
         "@types/fs-extra": "9.0.13",
         "@types/mocha": "9.1.1",
-        "@types/node": "16.11.62",
+        "@types/node": "16.18.36",
         "@types/prompts": "2.0.14",
         "@types/semver": "7.3.4",
         "@types/sinon": "9.0.8",
@@ -72,8 +72,8 @@
         "regenerator-runtime": "0.13.9",
         "rimraf": "3.0.2",
         "sinon": "9.2.1",
-        "ts-node": "10.9.1",
+        "ts-node": "10.9.2",
         "ts-sinon": "2.0.1",
-        "typescript": "4.8.4"
+        "typescript": "5.4.5"
     }
 }

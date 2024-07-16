@@ -134,7 +134,9 @@ export enum EntrypointType {
     COMMAND = "command",
     PANEL = "panel",
     SHARE = "share",
-    CONTENT_HUB = "content-hub"
+    CONTENT_HUB = "content-hub",
+    MOBILE_MEDIA_AUDIO = "mobile.media.audio",
+    MOBILE_YOUR_STUFF_FILES = "mobile.your-stuff.files"
 }
 
 export type AuthorInfo = {
@@ -248,10 +250,5 @@ export enum AddOnLogLevel {
 export type AddOnLogAction = (...args: unknown[]) => unknown;
 
 export function isIframeEntryPointType(entryPointType: EntrypointType): boolean {
-    return (
-        entryPointType === EntrypointType.PANEL ||
-        entryPointType === EntrypointType.WIDGET ||
-        entryPointType === EntrypointType.SHARE ||
-        entryPointType === EntrypointType.CONTENT_HUB
-    );
+    return entryPointType !== EntrypointType.COMMAND;
 }
