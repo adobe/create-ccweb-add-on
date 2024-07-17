@@ -92,6 +92,16 @@ export function getTestManifest(): AddOnManifestV1 {
 
 export function getTestManifestV1(privileged?: boolean): AddOnManifestV1 {
     count++;
+    const entryPointDetails = {
+        main: "index.html",
+        label: {
+            default: `#testId${count}`,
+            "en-US": `#testId${count}`,
+            "fr-FR": `#testId${count}`
+        },
+        permissions: privileged ? { sandbox: ["allow-downloads"] } : { sandbox: [] },
+        defaultSize: { width: 100 + count, height: 100 + count }
+    };
     const manifest = {
         name: `#testId${count}`,
         id: `#testId${count}`,
@@ -104,15 +114,18 @@ export function getTestManifestV1(privileged?: boolean): AddOnManifestV1 {
         entryPoints: [
             {
                 type: EntrypointType.PANEL,
-                id: `#testId${count}`,
-                main: "index.html",
-                label: {
-                    default: `#testId${count}`,
-                    "en-US": `#testId${count}`,
-                    "fr-FR": `#testId${count}`
-                },
-                permissions: privileged ? { sandbox: ["allow-downloads"] } : { sandbox: [] },
-                defaultSize: { width: 100 + count, height: 100 + count }
+                id: `panel-${count}`,
+                ...entryPointDetails
+            },
+            {
+                type: EntrypointType.MOBILE_MEDIA_AUDIO,
+                id: `mobile-media-audio-${count}`,
+                ...entryPointDetails
+            },
+            {
+                type: EntrypointType.MOBILE_YOUR_STUFF_FILES,
+                id: `mobile-your-stuff-files-${count}`,
+                ...entryPointDetails
             }
         ],
         icon: [
@@ -155,7 +168,7 @@ export function getTestManifestV2(privileged?: boolean): AddOnManifestV2 {
                 {
                     name: "Express",
                     apiVersion: 1,
-                    supportedDeviceClass: ["mobile"]
+                    supportedDeviceClass: ["desktop", "mobile-ios", "mobile-android"]
                 },
                 {
                     name: "Express",
@@ -178,12 +191,22 @@ export function getTestManifestV2(privileged?: boolean): AddOnManifestV2 {
         entryPoints: [
             {
                 type: EntrypointType.PANEL,
-                id: `#testId${count}`,
+                id: `panel-${count}`,
                 main: "index.html",
                 permissions: privileged ? { sandbox: ["allow-downloads"] } : { sandbox: [] },
                 defaultSize: { width: 100 + count, height: 100 + count },
                 discoverable: true,
                 hostDomain: "https://localhost.adobe.com"
+            },
+            {
+                type: EntrypointType.MOBILE_MEDIA_AUDIO,
+                id: `mobile-media-audio-${count}`,
+                main: "index.html"
+            },
+            {
+                type: EntrypointType.MOBILE_YOUR_STUFF_FILES,
+                id: `mobile-your-stuff-files-${count}`,
+                main: "index.html"
             }
         ]
     };

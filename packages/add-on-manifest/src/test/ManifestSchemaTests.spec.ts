@@ -86,6 +86,30 @@ function testValidInvalidPatterns(
     });
 }
 
+function testValidInvalidPatternsV2(
+    applyTest: (manifest: AddOnManifestType<ManifestVersion.V2>, key: string) => void,
+    validPatterns: string[],
+    invalidPatterns: string[]
+) {
+    validPatterns.forEach(validPattern => {
+        const testManifest = getTestManifestV2();
+        applyTest(testManifest, validPattern);
+        assert.equal(
+            validator.validateManifestSchema(testManifest, { ...additionInfo, privileged: true }).success,
+            true
+        );
+    });
+
+    invalidPatterns.forEach(invalidPattern => {
+        const testManifest = getTestManifestV2();
+        applyTest(testManifest, invalidPattern);
+        assert.equal(
+            validator.validateManifestSchema(testManifest, { ...additionInfo, privileged: true }).success,
+            false
+        );
+    });
+}
+
 type MutableObject<T> = {
     -readonly [K in keyof T]: T[K];
 };
@@ -188,9 +212,9 @@ describe("ManifestSchema Validations - Version 1", () => {
         });
     });
 
-    it("should have a valid widget type", () => {
-        const validTypePatterns = ["panel"];
-        const invalidTypePatterns = ["widgets", "panels", "command"];
+    it("should have a valid entry point type", () => {
+        const validTypePatterns = ["panel", "mobile.media.audio", "mobile.your-stuff.files"];
+        const invalidTypePatterns = ["widgets", "panels", "mobile.media", "mobile.your-stuff"];
 
         const testFn = (manifest: ReturnType<typeof JSON.parse>, value: string) => {
             (manifest.entryPoints[0] as MutableObject<ManifestEntrypoint>).type = value;
@@ -598,6 +622,26 @@ describe("ManifestSchema Validations - Version 2", () => {
         assert.equal(validationResult.success, false);
         assert.notEqual(validationResult.errorDetails, undefined);
         assert.equal(validationResult.errorDetails?.[0], OTHER_MANIFEST_ERRORS.RestrictedContentHubEntrypoint);
+    });
+
+    it("should have a valid entry point type", () => {
+        const validTypePatterns = ["panel", "mobile.media.audio", "mobile.your-stuff.files"];
+        const invalidTypePatterns = ["widgets", "panels", "mobile.media", "mobile.your-stuff"];
+
+        const testFn = (manifest: ReturnType<typeof JSON.parse>, value: string) => {
+            (manifest.entryPoints[0] as MutableObject<ManifestEntrypoint>).type = value;
+        };
+
+        testValidInvalidPatternsV2(testFn, validTypePatterns, invalidTypePatterns);
+    });
+
+    it("should have a valid deviceClassPattern", () => {
+        const validTypePatterns = ["desktop", "mobile", "app", "mobile-ios", "mobile-android"];
+        const invalidTypePatterns = ["mobile-app", "web"];
+        const testFn = (manifest: ReturnType<typeof JSON.parse>, value: string) => {
+            (manifest.requirements.apps[0] as MutableObject<App>).supportedDeviceClass = [value];
+        };
+        testValidInvalidPatternsV2(testFn, validTypePatterns, invalidTypePatterns);
     });
 
     describe("ManifestSchema Validation with 'script' field", () => {

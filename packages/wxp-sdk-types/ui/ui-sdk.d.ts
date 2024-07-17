@@ -131,6 +131,10 @@ export declare enum AppEvent {
      */
     localechange = "localechange",
     /**
+     * triggered when the regional format is changed in the application.
+     */
+    formatchange = "formatchange",
+    /**
      * triggered when drag is started on the currently dragged element.
      */
     dragstart = "dragstart",
@@ -157,6 +161,7 @@ export declare type AppEventHandlerType<Event extends AppEventType> = (data: App
 declare interface AppEventsTypeMap {
     [AppEvent.themechange]: AppThemeChangeEventData;
     [AppEvent.localechange]: AppLocaleChangeEventData;
+    [AppEvent.formatchange]: AppFormatChangeEventData;
     [AppEvent.dragstart]: AppDragStartEventData;
     [AppEvent.dragend]: AppDragEndEventData;
 
@@ -165,6 +170,13 @@ declare interface AppEventsTypeMap {
 }
 
 export declare type AppEventType = keyof AppEventsTypeMap & string;
+
+/**
+ * The payload data sent to the App FormatChange event handler.
+ */
+export declare interface AppFormatChangeEventData {
+    format: string;
+}
 
 /**
  * Interface that represents the underlying Application.
@@ -212,9 +224,14 @@ declare interface ApplicationBase {
      * Enable drag to document on the given element
      * @param element - Element to enable drag on.
      * @param dragCallbacks - Interface to pass all drag realated callbacks (previewCallback & completionCallback).
+     * @param dragOptions - Interface to pass all drag related options.
      * @returns DisableDragToDocument - Callback to undo the changes made by enableDragToDocument
      */
-    enableDragToDocument(element: HTMLElement, dragCallbacks: DragCallbacks): DisableDragToDocument;
+    enableDragToDocument(
+        element: HTMLElement,
+        dragCallbacks: DragCallbacks,
+        dragOptions?: DragOptions
+    ): DisableDragToDocument;
     /**
      * @experimental - Experimental API
      * Register iframe with the add-on SDK.
@@ -683,6 +700,16 @@ export declare interface DragCompletionData {
      * Media info
      */
     attributes?: MediaAttributes;
+}
+
+/**
+ * Interface to provide drag options which can be passed to enableDragToDocument to change the drag behavior.
+ */
+declare interface DragOptions {
+    /**
+     * Use preview size for the drag image instead of the element size
+     */
+    usePreviewSizeForDragImage?: boolean;
 }
 
 export declare type DragPreviewCallback = (element: HTMLElement) => URL;
@@ -1413,6 +1440,10 @@ export declare interface UI {
      * Current locale of the application
      */
     readonly locale: string;
+    /**
+     * Current regional format of the application
+     */
+    readonly format: string;
     /**
      * Supported locales of the application
      */

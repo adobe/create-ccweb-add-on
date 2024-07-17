@@ -22,12 +22,12 @@
  * SOFTWARE.
  ********************************************************************************/
 
-const typePattern = "^(panel|share|content-hub)$";
+const typePattern = "^(panel|share|content-hub|mobile.your-stuff.files|mobile.media.audio)$";
 const sandboxPattern = "^(allow-popups|allow-presentation|allow-downloads|allow-popups-to-escape-sandbox)$";
 const clipboardPattern = "^(clipboard-write|clipboard-read)$";
 const iconPattern = "^(lightest|light|medium|dark|darkest|all)$";
 const appPattern = "^(Express)$";
-const deviceClassPattern = "^(desktop|mobile|app)$";
+const deviceClassPattern = "^(desktop|mobile|app|mobile-ios|mobile-android)$";
 
 export const IconSchema = {
     type: "object",
