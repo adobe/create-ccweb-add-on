@@ -48,12 +48,18 @@ const container = IContainer;
 
 container.bind<Express>(ITypes.ExpressApp).toConstantValue(
     express()
+        // The order of the following configurations matter.
+        // Do not re-order.
+        .use((_, response, next) => {
+            response.set("Access-Control-Allow-Private-Network", "true");
+            next();
+        })
         .use(cors())
         .use(express.json())
         .use(express.urlencoded({ extended: true }))
-        .use((_, res, next) => {
-            res.set("Cross-Origin-Resource-Policy", "cross-origin");
-            res.set("Cross-Origin-Embedder-Policy", "credentialless");
+        .use((_, response, next) => {
+            response.set("Cross-Origin-Resource-Policy", "cross-origin");
+            response.set("Cross-Origin-Embedder-Policy", "credentialless");
             next();
         })
 );
