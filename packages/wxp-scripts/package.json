@@ -1,6 +1,6 @@
 {
     "name": "@adobe/ccweb-add-on-scripts",
-    "version": "2.3.0",
+    "version": "2.3.1",
     "author": "Adobe",
     "license": "MIT",
     "description": "Scripts for Adobe Creative Cloud Web Add-on.",

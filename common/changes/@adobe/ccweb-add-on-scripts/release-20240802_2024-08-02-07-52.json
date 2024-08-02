@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-scripts",
+      "comment": "Set Access-Control-Allow-Private-Network response header to true",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-scripts"
+}
