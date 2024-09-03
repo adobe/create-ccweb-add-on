@@ -228,9 +228,10 @@ describe("ManifestSchema Validations - Version 1", () => {
             "allow-popups",
             "allow-presentation",
             "allow-downloads",
-            "allow-popups-to-escape-sandbox"
+            "allow-popups-to-escape-sandbox",
+            "allow-forms"
         ];
-        const invalidSandboxPatterns = ["allow-modals", "allow-top-navigation-by-user-activation", "allow-forms"];
+        const invalidSandboxPatterns = ["allow-modals", "allow-top-navigation-by-user-activation"];
 
         const testFn = (manifest: ReturnType<typeof JSON.parse>, value: string) => {
             const sandboxPermissions = manifest.entryPoints[0].permissions!.sandbox || [];
@@ -542,12 +543,14 @@ describe("ManifestSchema Validations - Version 2", () => {
         assert.equal(typeof testManifest.requirements.trustedPartnerApis?.expressPrint === "boolean", true);
         assert.equal(typeof testManifest.requirements.trustedPartnerApis?.toastNotifications === "boolean", true);
         assert.equal(typeof testManifest.requirements.trustedPartnerApis?.addOnLifecycle === "boolean", true);
+        assert.equal(typeof testManifest.requirements.trustedPartnerApis?.formSubmission === "boolean", true);
         assert.equal(typeof testManifest.requirements.trustedPartnerApis?.tiktokcml === "boolean", true);
         assert.equal(testManifest.requirements.trustedPartnerApis?.messaging, false);
         assert.equal(testManifest.requirements.trustedPartnerApis?.expressPrint, true);
         assert.equal(testManifest.requirements.trustedPartnerApis?.addOnLifecycle, false);
         assert.equal(testManifest.requirements.trustedPartnerApis?.toastNotifications, false);
         assert.equal(testManifest.requirements.trustedPartnerApis?.tiktokcml, true);
+        assert.equal(testManifest.requirements.trustedPartnerApis?.formSubmission, true);
     });
 
     it("should have at least one entrypoint", () => {
@@ -622,6 +625,82 @@ describe("ManifestSchema Validations - Version 2", () => {
         assert.equal(validationResult.success, false);
         assert.notEqual(validationResult.errorDetails, undefined);
         assert.equal(validationResult.errorDetails?.[0], OTHER_MANIFEST_ERRORS.RestrictedContentHubEntrypoint);
+    });
+
+    it("should succeed for 'allow-forms' sanbox property with trusted flag or privileged", () => {
+        const manifest = getTestManifestV2();
+        const testManifest = {
+            ...manifest,
+            requirements: {
+                ...manifest.requirements,
+                trustedPartnerApis: {
+                    formSubmission: true
+                }
+            },
+            entryPoints: [
+                {
+                    ...manifest.entryPoints[0],
+                    permissions: {
+                        sandbox: ["allow-forms"]
+                    }
+                }
+            ]
+        };
+        let additionalAddOnInfo = { ...additionInfo, privileged: false };
+        let validationResult = validator.validateManifestSchema(testManifest, additionalAddOnInfo);
+        assert.equal(validationResult.success, true);
+        assert.equal(validationResult.errorDetails, undefined);
+
+        const manifestWithoutTrustedApi = {
+            ...testManifest,
+            requirements: {
+                ...testManifest.requirements,
+                trustedPartnerApis: {}
+            }
+        };
+
+        additionalAddOnInfo = { ...additionInfo, privileged: true };
+        validationResult = validator.validateManifestSchema(manifestWithoutTrustedApi, additionalAddOnInfo);
+        assert.equal(validationResult.success, true);
+        assert.equal(validationResult.errorDetails, undefined);
+    });
+
+    it("should fail and return error response if 'allow-forms' is used for entrypoint without the trusted flag", () => {
+        const manifest = getTestManifestV2();
+        const testManifest = {
+            ...manifest,
+            requirements: {
+                ...manifest.requirements,
+                trustedPartnerApis: {
+                    formSubmission: false
+                }
+            },
+            entryPoints: [
+                {
+                    ...manifest.entryPoints[0],
+                    permissions: {
+                        sandbox: ["allow-forms"]
+                    }
+                }
+            ]
+        };
+        const additionalAddOnInfo = { ...additionInfo, privileged: false };
+        let validationResult = validator.validateManifestSchema(testManifest, additionalAddOnInfo);
+        assert.equal(validationResult.success, false);
+        assert.notEqual(validationResult.errorDetails, undefined);
+        assert.equal(validationResult.errorDetails?.[0], OTHER_MANIFEST_ERRORS.RestrictedFormsSandboxProperty);
+
+        const manifestWithoutTrustedApi = {
+            ...testManifest,
+            requirements: {
+                ...testManifest.requirements,
+                trustedPartnerApis: {}
+            }
+        };
+        validationResult = validator.validateManifestSchema(manifestWithoutTrustedApi, additionalAddOnInfo);
+        assert.equal(validationResult.success, false);
+        assert.notEqual(validationResult.errorDetails, undefined);
+        assert.equal(validationResult.errorDetails?.[0], OTHER_MANIFEST_ERRORS.RestrictedFormsSandboxProperty);
     });
 
     it("should have a valid entry point type", () => {

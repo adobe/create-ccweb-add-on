@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-core",
+      "comment": "Support mobile add-ons",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-core"
+}

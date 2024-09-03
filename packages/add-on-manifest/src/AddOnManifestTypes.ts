@@ -44,6 +44,7 @@ export type TrustedPartnerApis = {
     readonly addOnLifecycle?: boolean;
     readonly toastNotifications?: boolean;
     readonly tiktokcml?: boolean;
+    readonly formSubmission?: boolean;
 };
 
 export type RequirementsV2 = {
@@ -136,7 +137,8 @@ export enum EntrypointType {
     SHARE = "share",
     CONTENT_HUB = "content-hub",
     MOBILE_MEDIA_AUDIO = "mobile.media.audio",
-    MOBILE_YOUR_STUFF_FILES = "mobile.your-stuff.files"
+    MOBILE_YOUR_STUFF_FILES = "mobile.your-stuff.files",
+    MOBILE_MORE = "mobile.more"
 }
 
 export type AuthorInfo = {
@@ -212,6 +214,10 @@ export const OTHER_MANIFEST_ERRORS: ManifestErrorType = {
     RestrictedContentHubEntrypoint: {
         instancePath: "/entryPoints/type",
         message: "Entrypoint type 'content-hub' is allowed only for privileged add-ons"
+    },
+    RestrictedFormsSandboxProperty: {
+        instancePath: "/entryPoints/permissions/sandbox",
+        message: `Sandbox property "allow-forms" is not allowed for this AddOn`
     }
 };
 

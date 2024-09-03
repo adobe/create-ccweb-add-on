@@ -1,6 +1,6 @@
 {
     "name": "@adobe/ccweb-add-on-analytics",
-    "version": "2.3.0",
+    "version": "2.4.0",
     "author": "Adobe",
     "license": "MIT",
     "description": "Analytics libraries for Adobe Creative Cloud Web Add-on.",
@@ -31,7 +31,8 @@
         "os-name": "4.0.1",
         "prompts": "2.4.2",
         "reflect-metadata": "0.1.13",
-        "tslib": "2.6.2"
+        "tslib": "2.6.2",
+        "@swc/helpers": "0.5.12"
     },
     "devDependencies": {
         "@types/chai": "4.2.14",

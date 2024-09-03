@@ -4,6 +4,7 @@ echo 'Removing @hz dependencies ...'
 find -E ./ -type f -regex '.*package\.json' -exec sed -i '.bak' '/"@hz\//d' {} \;
 find . -name '*.bak' -type f -delete
 find . -name 'owners.yml' -type f -delete
+find . -name 'BUILD.bazel' -type f -delete
 rm -rf add-on-manifest/config
 rm -rf wxp-core/config
 rm -rf wxp-ssl/config

@@ -184,6 +184,7 @@ export function getTestManifestV2(privileged?: boolean): AddOnManifestV2 {
                 messaging: false,
                 expressPrint: true,
                 addOnLifecycle: false,
+                formSubmission: true,
                 toastNotifications: false,
                 tiktokcml: true
             }

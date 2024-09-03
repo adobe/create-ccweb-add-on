@@ -96,6 +96,17 @@ export class AddOnManifestValidator {
                     validationErrors.push(OTHER_MANIFEST_ERRORS.InvalidClipboardPermission);
                     isValidSchema = false;
                 }
+                if (!manifest.requirements?.trustedPartnerApis?.formSubmission) {
+                    const allowsForms = entrypoint.permissions?.sandbox?.find(s => s === "allow-forms") !== undefined;
+                    if (allowsForms) {
+                        this._logError(
+                            "allow-forms permission is not allowed for the Add-on entrypoint: ",
+                            entrypoint.id
+                        );
+                        validationErrors.push(OTHER_MANIFEST_ERRORS.RestrictedFormsSandboxProperty);
+                        isValidSchema = false;
+                    }
+                }
             });
         }
         if (this._manifestVersion > ManifestVersion.V1) {

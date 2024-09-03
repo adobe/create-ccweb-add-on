@@ -253,6 +253,12 @@ declare interface ApplicationBase {
      * @returns if the user is premium user or not
      */
     startPremiumUpgradeIfFreeUser(): Promise<boolean>;
+    /**
+     * @experimental - Experimental API
+     * Get information regarding current platform.
+     * @returns the details regarding the current platform.
+     */
+    getCurrentPlatform(): Promise<CurrentPlatformPayload>;
 }
 
 /**
@@ -499,10 +505,36 @@ declare namespace Constants {
         MediaTabs,
         ElementsTabs,
         PanelActionType,
+        PlatformEnvironment,
+        DeviceClass,
+        PlatformType,
         AuthorizationStatus
     };
 }
 export { Constants };
+
+/**
+ * @experimental - Experimental API
+ * Interface for the current platform
+ */
+export declare interface CurrentPlatformPayload {
+    /**
+     * Purchases are NOT allowed in the {@link PlatformEnvironment.app} as of now
+     */
+    inAppPurchaseAllowed: boolean;
+    /**
+     * Denotes the platform type
+     */
+    platform: PlatformType;
+    /**
+     * Denotes the current environment
+     */
+    environment: PlatformEnvironment;
+    /**
+     * Denotes the device class
+     */
+    deviceClass: DeviceClass;
+}
 
 /**
  * Represents the current logged-in user accessing the host application
@@ -559,6 +591,25 @@ export declare interface DevFlags {
      * Simulate APIs as a free user.
      */
     simulateFreeUser: boolean;
+}
+
+/**
+ * @experimental - Experimental API
+ * Denotes the device class
+ */
+export declare enum DeviceClass {
+    /**
+     * Mobile Device
+     */
+    mobile = "mobile",
+    /**
+     * Tablet Device
+     */
+    tablet = "tablet",
+    /**
+     * Desktop
+     */
+    desktop = "desktop"
 }
 
 /**
@@ -1172,6 +1223,68 @@ export declare interface PdfRenditionOptions extends RenditionOptions {
      * If pageBoxes are defined, then PdfRenditionOptions.bleed is ignored.
      */
     pageBoxes?: PdfPageBoxes;
+}
+
+/**
+ * @experimental - Experimental API
+ * Denotes the enum for current environment
+ */
+export declare enum PlatformEnvironment {
+    /**
+     * App Environment
+     */
+    app = "app",
+    /**
+     * Web Environment
+     */
+    web = "web"
+}
+
+/**
+ * @experimental - Experimental API
+ * Denotes the type of platform
+ */
+export declare enum PlatformType {
+    /**
+     * iOS
+     */
+    iOS = "ios",
+    /**
+     * iPad
+     */
+    iPadOS = "ipad",
+    /**
+     * Chrome OS
+     */
+    chromeOS = "chromeOS",
+    /**
+     * Android
+     */
+    android = "android",
+    /**
+     * Chrome Browser
+     */
+    chromeBrowser = "chromeBrowser",
+    /**
+     * Firefox Browser
+     */
+    fireforxBrowser = "firefoxBrowser",
+    /**
+     * Edge Browser
+     */
+    edgeBrowser = "edgeBrowser",
+    /**
+     * Samsung Browser
+     */
+    samsungBrowser = "samsumgBrowser",
+    /**
+     * Safari Browser
+     */
+    safariBrowser = "safariBrowser",
+    /**
+     * Unknown Platform
+     */
+    unknown = "unknown"
 }
 
 export declare interface PngRenditionOptions extends RenditionOptions {
