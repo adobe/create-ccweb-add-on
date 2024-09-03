@@ -203,5 +203,9 @@ function verifyCommonManifestFields(
             manifest.requirements.trustedPartnerApis.tiktokcml,
             testManifest.requirements.trustedPartnerApis.tiktokcml
         );
+        assert.equal(
+            manifest.requirements.trustedPartnerApis.formSubmission,
+            testManifest.requirements.trustedPartnerApis.formSubmission
+        );
     }
 }

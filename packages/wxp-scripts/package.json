@@ -1,6 +1,6 @@
 {
     "name": "@adobe/ccweb-add-on-scripts",
-    "version": "2.3.1",
+    "version": "2.4.0",
     "author": "Adobe",
     "license": "MIT",
     "description": "Scripts for Adobe Creative Cloud Web Add-on.",
@@ -52,6 +52,7 @@
         "reflect-metadata": "0.1.13",
         "string-template": "1.0.0",
         "tslib": "2.6.2",
+        "@swc/helpers": "0.5.12",
         "ws": "8.9.0"
     },
     "devDependencies": {

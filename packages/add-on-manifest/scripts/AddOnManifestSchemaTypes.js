@@ -22,8 +22,8 @@
  * SOFTWARE.
  ********************************************************************************/
 
-const typePattern = "^(panel|share|content-hub|mobile.your-stuff.files|mobile.media.audio)$";
-const sandboxPattern = "^(allow-popups|allow-presentation|allow-downloads|allow-popups-to-escape-sandbox)$";
+const typePattern = "^(panel|share|content-hub|mobile.your-stuff.files|mobile.media.audio|mobile.more)$";
+const sandboxPattern = "^(allow-popups|allow-presentation|allow-downloads|allow-popups-to-escape-sandbox|allow-forms)$";
 const clipboardPattern = "^(clipboard-write|clipboard-read)$";
 const iconPattern = "^(lightest|light|medium|dark|darkest|all)$";
 const appPattern = "^(Express)$";
@@ -167,7 +167,8 @@ export const RequirementSchemaV2 = {
                 expressPrint: { type: "boolean" },
                 toastNotifications: { type: "boolean" },
                 addOnLifecycle: { type: "boolean" },
-                tiktokcml: { type: "boolean" }
+                tiktokcml: { type: "boolean" },
+                formSubmission: { type: "boolean" }
             },
             required: [],
             additionalProperties: false
