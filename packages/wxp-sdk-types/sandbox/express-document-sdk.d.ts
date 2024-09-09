@@ -453,22 +453,24 @@ export declare class Editor {
      *
      * @param bitmapData - Encoded image data in PNG or JPEG format.
      */
-    loadBitmapImage(rendition: Blob): Promise<BitmapImage>;
+    loadBitmapImage(bitmapData: Blob): Promise<BitmapImage>;
     /**
-     * Convenience helper to create a complete Stroke value given just a subset of its fields. All other fields are
-     * populated with default values.
+     * Convenience helper to create a complete SolidColorStroke value given just a
+     * subset of its fields. All other fields are populated with default values.
      *
-     * See {@link Stroke} for more details on the `options` fields. Defaults:
+     * See {@link SolidColorStroke} for more details on the `options` fields. Defaults:
      * - `color` has default value {@link DEFAULT_STROKE_COLOR} if none is provided.
      * - `width` has default value {@link DEFAULT_STROKE_WIDTH} if none is provided.
      * - `position` has default value `center` if none is provided.
      * - `dashPattern` has default value [] if none is provided.
      * - `dashOffset` has default value 0 if none is provided. This field is ignored
      *   if no `dashPattern` was provided.
+     * - `type` has default value SolidColorStroke.type if none is provided. This field
+     *    shouldn't be set to any other value.
      *
      * @returns a stroke configured with the given options.
      */
-    makeStroke(options?: Partial<Stroke>): Stroke;
+    makeStroke(options?: Partial<SolidColorStroke>): SolidColorStroke;
     /**
      * @returns a text node with default styles. The text content is initially empty, so the text node will be
      * invisible until its `text` property is set. Creates point text, so the node's width will automatically
@@ -534,7 +536,8 @@ export declare class ExpressRootNode extends BaseNode {
 
 /**
  * Base interface representing any fill in the scenegraph. See {@link FillableNode}.
- * The only fill type currently supported is {@link ColorFill}.
+ * Currently, you can only create {@link ColorFill}s, but you might encounter
+ * other fill types when reading scenegraph content.
  */
 export declare interface Fill {
     /**
@@ -622,7 +625,6 @@ export declare class GroupNode extends Node implements ContainerNode {
      */
     set maskShape(mask: FillableNode | undefined);
     /**
-     * @override
      * Note: If this group has a maskShape, group's bounds are always identical to the maskShape's, regardless of the
      * group's other content.
      */
@@ -754,6 +756,9 @@ export declare class LineNode extends StrokableNode {
     get startArrowHeadType(): ArrowHeadType;
     /**
      * The setter sets a default stroke on the line if it did not have one.
+     *
+     * @throws if the line's stroke is not a SolidColorStroke type.
+     * More complex stroke types do not support arrowheads.
      */
     set startArrowHeadType(type: ArrowHeadType);
     /**
@@ -764,6 +769,9 @@ export declare class LineNode extends StrokableNode {
     get endArrowHeadType(): ArrowHeadType;
     /**
      * The setter sets a default stroke on the line if it did not have one.
+     *
+     * @throws if the line's stroke is not a SolidColorStroke type.
+     * More complex stroke types do not support arrowheads.
      */
     set endArrowHeadType(type: ArrowHeadType);
 }
@@ -781,7 +789,7 @@ export declare interface ListItem {}
  */
 export declare class MediaContainerNode extends Node {
     /**
-     * The rectangular node representing the entire, uncropped bounds of the media (e.g. image or video). The media's position and
+     * The rectangular node representing the entire, uncropped bounds of the media (e.g. image, GIFs, or video). The media's position and
      * rotation can be changed, but it cannot be resized yet via this API. Media types other than images will yield a plain Node object
      * for now.
      */
@@ -792,6 +800,14 @@ export declare class MediaContainerNode extends Node {
      * different shape via this API.
      */
     get maskShape(): FillableNode;
+    /**
+     * Replace existing media inline. The new media is sized to completely fill the bounds of the existing maskShape; if the
+     * media's aspect ratio differs from the maskShape's, the media will be cropped by the maskShape on either the left/right
+     * or top/bottom edges. Currently only supports images as the new media, but previous media can be of any type.
+     *
+     * @param media - New content to display. Currently must be a {@link BitmapImage}.
+     */
+    replaceMedia(media: BitmapImage): void;
 }
 
 /**
@@ -912,7 +928,7 @@ export declare class PageList extends RestrictedItemList<PageNode> {
      * @param geometry - The size of the new page.
      *
      */
-    addPage(geometry: RectangleGeometry): PageNode;
+    addPage(inputGeometry: RectangleGeometry): PageNode;
 }
 
 /**
@@ -1174,23 +1190,16 @@ export declare class SolidColorShapeNode extends Node {
 }
 
 /**
- * Base class for a Node that can have its own stroke.
- */
-export declare class StrokableNode extends Node implements IStrokableNode {
-    /**
-     * The stroke applied to the shape, if any.
-     */
-    set stroke(stroke: Stroke | undefined);
-    get stroke(): Readonly<Stroke> | undefined;
-}
-
-/**
- * Represents a stroke in the scenegraph. See {@link StrokableNode}.
+ * Represents a solid-color stroke, with optional dashes.
  *
- * The most convenient way to create a stroke is via `Editor.makeStroke()`. This also futureproofs your code in case any
- * other required fields are added to the Stroke descriptor in the future.
+ * The most convenient way to create a solid-color stroke is via `Editor.makeStroke()`. This also futureproofs
+ * your code in case any other required fields are added to the Stroke descriptor in the future.
  */
-export declare interface Stroke {
+export declare interface SolidColorStroke extends Stroke {
+    /**
+     * The stroke type.
+     */
+    readonly type: StrokeType.color;
     /**
      * The color of a stroke.
      */
@@ -1217,6 +1226,34 @@ export declare interface Stroke {
 }
 
 /**
+ * SolidColorStroke with 'type' property as optional.
+ */
+export declare type SolidColorStrokeWithOptionalType = Omit<SolidColorStroke, "type"> &
+    Partial<Pick<SolidColorStroke, "type">>;
+
+/**
+ * Base class for a Node that can have its own stroke.
+ */
+export declare class StrokableNode extends Node implements IStrokableNode {
+    /**
+     * The stroke applied to the shape, if any.
+     * Only {@link SolidColorStroke} values are supported by the setter, but the "type" field is optional
+     * for backward compatibility. Throws if another type is provided.
+     */
+    set stroke(stroke: SolidColorStrokeWithOptionalType | undefined);
+    get stroke(): Readonly<Stroke> | undefined;
+}
+
+/**
+ * Base interface representing any stroke in the scenegraph. See {@link StrokableNode}.
+ * Currently, you can only create {@link SolidColorStroke}s, but you might encounter
+ * other stroke types when reading from scenegraph content.
+ */
+export declare interface Stroke {
+    readonly type: StrokeType;
+}
+
+/**
  * <InlineAlert slots="text" variant="warning"/>
  * *Do not depend on the literal numeric values of these constants*, as they may change. Always reference the enum identifiers in your code.
  *
@@ -1236,6 +1273,21 @@ export declare class StrokeShapeNode extends StrokableNode {}
 
 /**
  * <InlineAlert slots="text" variant="warning"/>
+ * *Do not depend on the literal string values of these constants*, as they may change. Always reference the enum identifiers in your code.
+ *
+ * <InlineAlert slots="text" variant="warning"/>
+ * *Additional stroke types may be added in the future.* If your code has different branches or cases depending on stroke type,
+ * always have a default/fallback case to handle any unknown values you may encounter.
+ */
+declare enum StrokeType {
+    /**
+     * A solid-color stroke, with optional dashes.
+     */
+    color = "Color"
+}
+
+/**
+ * <InlineAlert slots="text" variant="warning"/>
  * *Do not depend on the literal numeric values of these constants*, as they may change. Always reference the enum identifiers in your code.
  */
 declare enum TextAlignment {
@@ -1249,9 +1301,12 @@ declare enum TextAlignment {
  */
 export declare class TextNode extends Node {
     /**
-     * The text string of the node
+     * The text string of the node.
      */
     get text(): string;
+    /**
+     * Sets the text content of the text node.
+     */
     set text(textContent: string);
     /**
      * The horizontal text alignment of the text node. Alignment is always the same across this node's entire text content.
