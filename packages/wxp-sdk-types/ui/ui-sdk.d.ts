@@ -135,6 +135,10 @@ export declare enum AppEvent {
      */
     formatchange = "formatchange",
     /**
+     * triggered when the sdk is reset.
+     */
+    reset = "reset",
+    /**
      * triggered when drag is started on the currently dragged element.
      */
     dragstart = "dragstart",
@@ -162,6 +166,7 @@ declare interface AppEventsTypeMap {
     [AppEvent.themechange]: AppThemeChangeEventData;
     [AppEvent.localechange]: AppLocaleChangeEventData;
     [AppEvent.formatchange]: AppFormatChangeEventData;
+    [AppEvent.reset]: undefined;
     [AppEvent.dragstart]: AppDragStartEventData;
     [AppEvent.dragend]: AppDragEndEventData;
 
