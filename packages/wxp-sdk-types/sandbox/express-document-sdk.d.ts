@@ -27,7 +27,7 @@
 import { mat2d } from "gl-matrix";
 
 declare namespace ApiConstants {
-    export { SceneNodeType, BlendMode, FillType, ArrowHeadType, TextAlignment, FillRule, StrokePosition };
+    export { ArrowHeadType, BlendMode, FillRule, FillType, SceneNodeType, StrokePosition, StrokeType, TextAlignment };
 }
 
 declare interface ApiModuleExport {
