@@ -1273,7 +1273,7 @@ export declare enum PlatformType {
     /**
      * Firefox Browser
      */
-    fireforxBrowser = "firefoxBrowser",
+    firefoxBrowser = "firefoxBrowser",
     /**
      * Edge Browser
      */
