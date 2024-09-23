@@ -70,9 +70,6 @@ importers:
       '@oclif/core':
         specifier: 2.8.0
         version: 2.8.0(@types/node@16.18.36)(typescript@5.4.5)
-      '@swc/helpers':
-        specifier: 0.5.12
-        version: 0.5.12
       axios:
         specifier: 1.6.0
         version: 1.6.0
@@ -191,9 +188,6 @@ importers:
       '@adobe/ccweb-add-on-ssl':
         specifier: workspace:*
         version: link:../wxp-ssl
-      '@swc/helpers':
-        specifier: 0.5.12
-        version: 0.5.12
       chalk:
         specifier: 4.1.1
         version: 4.1.1
@@ -464,9 +458,6 @@ importers:
       '@oclif/core':
         specifier: 2.8.0
         version: 2.8.0(@types/node@16.18.36)(typescript@5.4.5)
-      '@swc/helpers':
-        specifier: 0.5.12
-        version: 0.5.12
       adm-zip:
         specifier: 0.5.9
         version: 0.5.9
@@ -576,9 +567,6 @@ importers:
 
   ../../packages/wxp-sdk-types:
     dependencies:
-      '@swc/helpers':
-        specifier: 0.5.12
-        version: 0.5.12
       gl-matrix:
         specifier: 3.3.0
         version: 3.3.0

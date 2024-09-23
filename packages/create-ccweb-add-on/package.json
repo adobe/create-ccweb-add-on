@@ -1,6 +1,6 @@
 {
     "name": "@adobe/create-ccweb-add-on",
-    "version": "2.4.0",
+    "version": "2.4.1",
     "author": "Adobe",
     "license": "MIT",
     "description": "Create an Adobe Creative Cloud Web Add-on.",
@@ -50,7 +50,6 @@
         "semver": "7.3.4",
         "string-template": "1.0.0",
         "tslib": "2.6.2",
-        "@swc/helpers": "0.5.12",
         "validate-npm-package-name": "3.0.0"
     },
     "devDependencies": {
