@@ -15,8 +15,6 @@
         "noImplicitOverride": false,
         "noUnusedLocals": true,
         "outDir": "dist",
-        "rootDir": "src",
-        "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
         "preserveConstEnums": true,
         "resolveJsonModule": true,
         "sourceMap": true,

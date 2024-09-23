@@ -46,7 +46,6 @@
     },
     "dependencies": {
         "tslib": "2.6.2",
-        "@swc/helpers": "0.5.12",
         "gl-matrix": "3.3.0"
     },
     "devDependencies": {
