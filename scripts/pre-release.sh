@@ -55,6 +55,15 @@ find -E ./wxp-sdk-types -type f -regex '.*package\.json' -exec sed -i '.bak' 's/
 find ./wxp-sdk-types -name '*.bak' -type f -delete
 echo $'Done!\n'
 
+echo 'Fixing tsconfig.json ...'
+find -E ./ -type f -regex '.*tsconfig\.json' -exec sed -i '.bak' '/"inlineSources/d;' {} \;
+find . -name '*.bak' -type f -delete
+find -E ./ -type f -regex '.*tsconfig\.json' -exec sed -i '.bak' '/"rootDir/d;' {} \;
+find . -name '*.bak' -type f -delete
+find -E ./ -type f -regex '.*tsconfig\.json' -exec sed -i '.bak' '/"tsBuildInfoFile/d;' {} \;
+find . -name '*.bak' -type f -delete
+echo $'Done!\n'
+
 echo 'Removing eslint configurations ...'
 find . -name '.eslintignore' -type f -delete
 find . -name '.eslintrc' -type f -delete
