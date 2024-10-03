@@ -259,7 +259,6 @@ declare interface ApplicationBase {
      */
     startPremiumUpgradeIfFreeUser(): Promise<boolean>;
     /**
-     * @experimental - Experimental API
      * Get information regarding current platform.
      * @returns the details regarding the current platform.
      */
@@ -519,7 +518,6 @@ declare namespace Constants {
 export { Constants };
 
 /**
- * @experimental - Experimental API
  * Interface for the current platform
  */
 export declare interface CurrentPlatformPayload {
@@ -599,7 +597,6 @@ export declare interface DevFlags {
 }
 
 /**
- * @experimental - Experimental API
  * Denotes the device class
  */
 export declare enum DeviceClass {
@@ -683,9 +680,13 @@ export declare type DisableDragToDocument = () => void;
  */
 declare interface Document_2 {
     /**
-     * Add image/gif/Ps/Ai files to the current page
+     * Add image/Ps/Ai files to the current page
      */
     addImage(blob: Blob, attributes?: MediaAttributes): Promise<void>;
+    /**
+     * Add GIF files to the current page
+     */
+    addAnimatedImage(blob: Blob, attributes?: MediaAttributes): Promise<void>;
     /**
      * Add video to the current page
      */
@@ -1231,7 +1232,6 @@ export declare interface PdfRenditionOptions extends RenditionOptions {
 }
 
 /**
- * @experimental - Experimental API
  * Denotes the enum for current environment
  */
 export declare enum PlatformEnvironment {
@@ -1246,7 +1246,6 @@ export declare enum PlatformEnvironment {
 }
 
 /**
- * @experimental - Experimental API
  * Denotes the type of platform
  */
 export declare enum PlatformType {

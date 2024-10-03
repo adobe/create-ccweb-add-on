@@ -26,18 +26,122 @@
 
 import { mat2d } from "gl-matrix";
 
+/**
+ * AddOnData class provides APIs to read, write, remove private metadata to a Node.
+ * This metadata is accessible only to the add-on that has set it.
+ */
+export declare class AddOnData {
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Sets a private metadata entry on the node.
+     * @param key - The key for the private metadata entry.
+     * @param value - The value for the private metadata entry.
+     */
+    setItem(key: string, value: string): void;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Retrieves the private metadata value for the specified key on the node.
+     * @param key - The key of the private metadata entry to retrieve.
+     * @returns The value of the private metadata entry.
+     */
+    getItem(key: string): string | undefined;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Removes a single private metadata entry on the node.
+     * @param key - The key of the private metadata entry to remove.
+     */
+    removeItem(key: string): void;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Clears all private metadata entries on the node.
+     */
+    clear(): void;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * @returns an array of all keys for the private metadata entries on the node.
+     */
+    keys(): string[];
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * @returns an object with the remaining quota for private metadata on the node for this add-on.
+     * The object contains the following properties:
+     * - sizeInBytes: The remaining quota size in bytes (maximum 3KB).
+     * - numKeys: The remaining quota for the number of keys (maximum 20 keys).
+     */
+    get remainingQuota(): Readonly<{
+        sizeInBytes: number;
+        numKeys: number;
+    }>;
+    /**
+     * @returns an iterator for all the private metadata entries on the node.
+     * The iterator yields the metadata key-value pairs.
+     */
+    [Symbol.iterator](): Iterator<[string, string]>;
+}
+
 declare namespace ApiConstants {
-    export { ArrowHeadType, BlendMode, FillRule, FillType, SceneNodeType, StrokePosition, StrokeType, TextAlignment };
+    export {
+        ArrowHeadType,
+        BlendMode,
+        FillRule,
+        FillType,
+        SceneNodeType,
+        StrokePosition,
+        StrokeType,
+        TextAlignment,
+        TextType,
+        EditorEvent,
+        VisualEffectType
+    };
 }
 
 declare interface ApiModuleExport {
     editor: ExpressEditor;
     constants: unknown;
     colorUtils: ExpressColorUtils;
+    fonts: ExpressFonts;
 }
 
 /**
  * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ */
+export declare interface AreaTextLayout {
+    type: TextType.area;
+    width: number;
+    height: number;
+}
+
+/**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
  * *Do not depend on the literal numeric values of these constants*, as they may change. Always reference the enum identifiers in your code.
  */
 declare enum ArrowHeadType {
@@ -73,6 +177,7 @@ export declare class ArtboardList extends RestrictedItemList<ArtboardNode> {
  * An ArtboardNode represents an artboard object in the scenegraph. All user visual content must be contained on an artboard.
  *
  * When multiple artboards exist on a page, the artboards represent "scenes" in a linear timeline sequence.
+ * Please note that creating and deleting an artboard in a single frame will crash the editor.
  */
 export declare class ArtboardNode extends VisualNode implements IRectangularNode, ContainerNode {
     /**
@@ -108,12 +213,103 @@ export declare class ArtboardNode extends VisualNode implements IRectangularNode
 }
 
 /**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ */
+export declare interface AutoHeightTextLayout {
+    type: TextType.autoHeight;
+    width: number;
+}
+
+/**
+ * Font the current user has access or licensing permissions to create / edit content with.
+ */
+export declare class AvailableFont extends BaseFont {
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Whether the font is a premium Adobe font.
+     */
+    get isPremium(): boolean;
+    get availableForEditing(): true;
+}
+
+/**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * Base character styles that can be applied to a range of characters.
+ */
+declare interface BaseCharacterStyles {
+    fontSize: number;
+    color: Color;
+    tracking: number;
+    underline: boolean;
+}
+
+/**
+ * Represents a font that is able to be rendered within this document. However, the user may not have edit permissions for
+ * all such fonts.
+ */
+declare abstract class BaseFont {
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * The PostScript name of the font.
+     */
+    get postscriptName(): string;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * The font family containing the font.
+     */
+    get family(): string;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * The style of the font within the family.
+     */
+    get style(): string;
+    /**
+     * Whether the current user has permission to create / edit content using this font.
+     */
+    abstract get availableForEditing(): boolean;
+}
+
+/**
  * A "node" represents an object in the scenegraph, the document's visual content tree. This base class includes only the
  * most fundamental nonvisual properties that even nodes near the top of the document structure share (such as PageNode).
  * The more tangible visual content typically extends the richer Node class which extends BaseNode with additional
  * properties.
  */
 export declare class BaseNode {
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Get {@link AddOnData} reference for managing the private metadata on this node for this add-on.
+     */
+    get addOnData(): AddOnData;
+
     /**
      * A unique identifier for this node that stays the same when the file is closed & reopened, or if the node is
      * moved to a different part of the document.
@@ -170,6 +366,7 @@ export declare interface BitmapImage {
 
 /**
  * <InlineAlert slots="text" variant="warning"/>
+ *
  * *Do not depend on the literal numeric values of these constants*, as they may change. Always reference the enum identifiers in your code.
  *
  * Determines how a scenenode is composited on top of the content rendered below it.
@@ -211,6 +408,50 @@ declare enum BlendMode {
     color = 16,
     luminosity = 17
 }
+
+/**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * Text styles of a range of characters, even a short span like a single word.
+ */
+export declare interface CharacterStyles extends BaseCharacterStyles {
+    font: Font;
+}
+
+/**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * Input shape of the applyCharacterStyle API.
+ */
+export declare interface CharacterStylesInput extends Partial<BaseCharacterStyles> {
+    font?: AvailableFont;
+}
+
+/**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * Output shape of the characterStyleRange getter.
+ */
+export declare interface CharacterStylesRange extends CharacterStyles, StyleRange {}
+
+/**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * Input shape of the characterStyleRange setter.
+ */
+export declare interface CharacterStylesRangeInput extends CharacterStylesInput, StyleRange {}
 
 /**
  * Represents an RGBA color value.
@@ -344,6 +585,32 @@ export declare class Context {
      * @returns The currently viewed page.
      */
     get currentPage(): PageNode;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Registers a handler for editor events such as selection change.
+     * The registered callback will be invoked when the specified event occurs.
+     * Note: Do not attempt to make changes to the document in response to a selection change callback because it may destabilize the application.
+     * @param eventName - an editor event name.
+     * @param callback - a callback to be registered for an editor event.
+     * @returns a unique ID for the registered event handler.
+     */
+    on(eventName: EditorEvent, callback: EditorEventHandler): EventHandlerId;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Unregisters handlers for editor events like selection change.
+     * @param eventName - an editor event name.
+     * @param handlerId - a unique ID returned by `editor.context.on` API.
+     * Callback that was previously registered will be removed and will no more be invoked when the event occurs.
+     */
+    off(eventName: EditorEvent, handlerId: EventHandlerId): void;
 }
 
 /**
@@ -364,7 +631,7 @@ export declare class Editor {
      * Generally, calling any setter or method is treated as an edit; but simple getters may be safely called at any time.
      *
      * Example of typical usage:
-     * ```javascript
+     * ```js
      * // Assume insertImage() is called from your UI code, and given a Blob containing image data
      * async function insertImage(blob) {
      *     // This function was invoked from the UI iframe, so we can make any edits we want synchronously here.
@@ -473,8 +740,11 @@ export declare class Editor {
     makeStroke(options?: Partial<SolidColorStroke>): SolidColorStroke;
     /**
      * @returns a text node with default styles. The text content is initially empty, so the text node will be
-     * invisible until its `text` property is set. Creates point text, so the node's width will automatically
+     * invisible until its `fullContent` property's `text` is set. Creates point text, so the node's width will automatically
      * adjust to accommodate whatever text is set.
+     *
+     * Note: the registration point of this text node is not guaranteed to be at the top-left of the bounding box of its
+     * insertion parent. Recommend using `setPositionInParent` over `translation` to set the position.
      */
     createText(): TextNode;
     /**
@@ -488,6 +758,28 @@ export declare class Editor {
 }
 
 export declare const editor: ExpressEditor;
+
+/**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * This enum represents the supported editor events.
+ */
+export declare enum EditorEvent {
+    selectionChange = "selectionChange"
+}
+
+/**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * This type represents function signature for the editor event handler callback.
+ */
+export declare type EditorEventHandler = () => void;
 
 /**
  * An EllipseNode represents an ellipse object in the scenegraph.
@@ -513,12 +805,24 @@ export declare class EllipseNode extends FillableNode {
     set ry(value: number);
 }
 
+/**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * This type represents unique id of each event handler callback that is registered.
+ */
+export declare type EventHandlerId = string;
+
 declare const expressApiModule: ApiModuleExport;
 export default expressApiModule;
 
 declare class ExpressColorUtils extends ColorUtils {}
 
 declare class ExpressEditor extends Editor {}
+
+declare class ExpressFonts extends Fonts {}
 
 /**
  * An ExpressRootNode represents the root node of the document's "scenegraph" artwork tree. The root contains a collection
@@ -559,6 +863,7 @@ export declare class FillableNode extends StrokableNode implements IFillableNode
 
 /**
  * <InlineAlert slots="text" variant="warning"/>
+ *
  * *Do not depend on the literal numeric values of these constants*, as they may change. Always reference the enum identifiers in your code.
  *
  * The fill rule, aka "winding rule," specifies how the interior area of a path is determined in cases where the path is
@@ -571,9 +876,11 @@ declare enum FillRule {
 
 /**
  * <InlineAlert slots="text" variant="warning"/>
+ *
  * *Do not depend on the literal string values of these constants*, as they may change. Always reference the enum identifiers in your code.
  *
  * <InlineAlert slots="text" variant="warning"/>
+ *
  * *Additional fill types may be added in the future.* If your code has different branches or cases depending on fill type,
  * always have a default/fallback case to handle any unknown values you may encounter.
  */
@@ -583,10 +890,57 @@ declare enum FillType {
 }
 
 /**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * Represents a font in the document.
+ *
+ * Note: not every font encountered in the existing content is available for editing.
+ * Check the `availableForEditing` property to be sure.
+ */
+export declare type Font = AvailableFont | UnavailableFont;
+
+/**
+ * The Fonts class provides methods to work with fonts.
+ */
+export declare class Fonts {
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Get an {@link AvailableFont} that exactly matches the given PostScript name, if any. Only fonts that the user has permission to use
+     * for editing content are returned, so the result of this call is always safe to apply to a {@link TextContentModel}'s styles.
+     *
+     * @param postscriptName - The PostScript name of the font.
+     * @returns The Font object if found and available for editing, otherwise undefined.
+     */
+    fromPostscriptName(postscriptName: string): Promise<AvailableFont | undefined>;
+}
+
+export declare const fonts: ExpressFonts;
+
+/**
+ * A GridCellNode represents the MediaContainerNode aspect of a grid cell. Unlike other MediaContainerNodes,
+ * GridCellNodes cannot be translated or rotated directly. This implementation translates and rotates the
+ * MediaRectangle child of the GridCellNode when those actions are applied.
+ */
+export declare class GridCellNode extends MediaContainerNode {}
+
+/**
  * A GridLayoutNode represents a grid layout in the scenegraph. The GridLayoutNode is used to create
  * a layout grid that other content can be placed into.
  */
 export declare class GridLayoutNode extends Node implements Readonly<IRectangularNode> {
+    /**
+     * The Grid's regular children. Does not include rectangles and skips over media constainer nodes to return fill grandchildren.
+     * Grid Cells are ordered by the y and then x position of their top left corner, i.e. left to right and top to bottom.
+     * The children cannot be added or removed.
+     */
+    get allChildren(): Readonly<Iterable<Node>>;
     /**
      * The background fill of the GridLayout.
      */
@@ -688,6 +1042,8 @@ export declare class ItemList<T extends ListItem> extends RestrictedItemList<T> 
     /**
      * Add one or more items to the end of the list. The last argument will become the last item in this list. Items are
      * removed from their previous parent, if any – or if an item is already in *this* list, its index is simply changed.
+     *
+     * @throws - if item has a different parent and item is a {@link TextNode} that's a part of a Text Flow, or if item's children subtree contains a TextNode who is a part of a Text Flow.
      */
     append(...items: T[]): void;
     /**
@@ -698,18 +1054,24 @@ export declare class ItemList<T extends ListItem> extends RestrictedItemList<T> 
      * Replace `oldItem` with `newItem` in this list. Throws if `oldItem` is not a member of this list.
      * `newItem` is removed from its previous parent, if any – or if it's already in *this* list, its index is simply
      * changed. No-op if both arguments are the same item.
+     *
+     * @throws - if newItem has a different parent and newItem is a {@link TextNode} that's a part of a Text Flow, or if newItem's children subtree contains a TextNode who is a part of a Text Flow.
      */
     replace(oldItem: T, newItem: T): void;
     /**
      * Insert `newItem` so it is immediately before `before` in this list: places `newItem` at the index that `before` used
      * to occupy, shifting `before` and all later items to higher indices. `newItem` is removed from its previous parent,
      * if any – or if it's already in *this* list, its index is simply changed. No-op if both arguments are the same item.
+     *
+     * @throws - if newItem has a different parent and it is a {@link TextNode} that's a part of a Text Flow, or if newItem's children subtree contains a TextNode who is a part of a Text Flow.
      */
     insertBefore(newItem: T, before: T): void;
     /**
      * Insert `newItem` so it is immediately after `after` in this list: places `newItem` at the index one higher than `after`,
      * shifting all later items to higher indices (the index of `after` remains unchanged). `newItem` is removed from its previous parent,
      * if any – or if it's already in *this* list, its index is simply changed. No-op if both arguments are the same item.
+     *
+     * @throws - if newItem has a different parent and it is a {@link TextNode} that's a part of a Text Flow, or if newItem's children subtree contains a TextNode who is a part of a Text Flow.
      */
     insertAfter(newItem: T, after: T): void;
 }
@@ -994,6 +1356,17 @@ export declare interface Point {
 }
 
 /**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ */
+export declare interface PointTextLayout {
+    type: TextType.autoWidth;
+}
+
+/**
  * ReadOnlyItemList represents an ordered list of API objects, representing items that are all children of the
  * same parent node. (The reverse is not necessarily true, however: this list might not include all
  * children that exist in the parent node. See {@link Node.allChildren} for details).
@@ -1144,9 +1517,11 @@ declare class RestrictedItemList<T extends ListItem> extends ReadOnlyItemList<T>
 
 /**
  * <InlineAlert slots="text" variant="warning"/>
+ *
  * *Do not depend on the literal string values of these constants*, as they may change. Always reference the enum identifiers in your code.
  *
  * <InlineAlert slots="text" variant="warning"/>
+ *
  * *Additional node types may be added in the future.* If your code has different branches or cases depending on node type,
  * always have a default/fallback case to handle any unknown values you may encounter.
  */
@@ -1155,7 +1530,6 @@ declare enum SceneNodeType {
     rectangle = "Rectangle",
     ellipse = "Ellipse",
     path = "Path",
-    text = "Text",
     linkedAsset = "LinkedAsset",
     group = "Group",
     artboard = "ab:Artboard",
@@ -1173,8 +1547,12 @@ declare enum SceneNodeType {
     solidColorShape = "SolidColorShape",
     /** Type of StrokeShapeNode, representing a stroke-only prepackaged shape that appears as a leaf node in the UI */
     strokeShape = "StrokeShape",
+    /** Type of MediaContainerNode which is a child of a GridLayout, representing one of the Grid's cells*/
+    gridCell = "GridCell",
     /** Type of GridLayoutNode represents a grid layout in the scenegraph used to create a layout grid that other content can be placed into */
-    gridLayout = "GridLayout"
+    gridLayout = "GridLayout",
+    /** Type of TextNode, representing a non-threaded text or a threaded text frame */
+    text = "Text"
 }
 
 /**
@@ -1255,6 +1633,7 @@ export declare interface Stroke {
 
 /**
  * <InlineAlert slots="text" variant="warning"/>
+ *
  * *Do not depend on the literal numeric values of these constants*, as they may change. Always reference the enum identifiers in your code.
  *
  * A stroke's {@link Stroke.position} determines how the thickness of the stroke is aligned along a shape's path outline.
@@ -1273,9 +1652,11 @@ export declare class StrokeShapeNode extends StrokableNode {}
 
 /**
  * <InlineAlert slots="text" variant="warning"/>
+ *
  * *Do not depend on the literal string values of these constants*, as they may change. Always reference the enum identifiers in your code.
  *
  * <InlineAlert slots="text" variant="warning"/>
+ *
  * *Additional stroke types may be added in the future.* If your code has different branches or cases depending on stroke type,
  * always have a default/fallback case to handle any unknown values you may encounter.
  */
@@ -1287,7 +1668,20 @@ declare enum StrokeType {
 }
 
 /**
+ * Represents a range of characters defined by a length (and implicitly started at the end of the previous range).
+ */
+declare interface StyleRange {
+    /**
+     * The length or number of characters in which character styles will be applied.
+     * Note: since characters are represented as UTF-16 code units, some symbols
+     * such as emojis are considered to have a length of 2.
+     */
+    length: number;
+}
+
+/**
  * <InlineAlert slots="text" variant="warning"/>
+ *
  * *Do not depend on the literal numeric values of these constants*, as they may change. Always reference the enum identifiers in your code.
  */
 declare enum TextAlignment {
@@ -1297,28 +1691,212 @@ declare enum TextAlignment {
 }
 
 /**
- * A TextNode represents a text object in the scenegraph.
+ * Represents a complete piece of text content flow, which may be split across multiple {@link TextNode} frames for display.
+ * Use this model to get or modify the text string and the style ranges applied to it.
+ */
+export declare class TextContentModel {
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * A unique identifier for this node that stays the same when the file is closed & reopened, or if the node is
+     * moved to a different part of the document.
+     *
+     * To determine if two TextNodes are connected to the same TextContentModel,
+     * check if both models have the same id.
+     * Comparing two models using `===` will always fail.
+     */
+    get id(): string;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Get ordered list of all {@link TextNode}s that display this text content in the scenegraph. The text content
+     * starts in the first  {@link TextNode} "frame", and then flows into the second node once it has filled the first one. The ending of the
+     * text content may not be visible at all, if the last {@link TextNode} "frame" is not large enough to accommodate it.
+     *
+     * If there are multiple {@link TextNode}s, all of them must be configured to use {@link AreaTextLayout}.
+     */
+    get allTextNodes(): Readonly<Iterable<TextNode>>;
+    /**
+     * The complete text string, which may span multiple {@link TextNode} "frames" in the scenegraph.
+     */
+    get text(): string;
+    set text(textContent: string);
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * The character style ranges of this text content.
+     */
+    get characterStyleRanges(): readonly CharacterStylesRange[];
+    set characterStyleRanges(styles: readonly CharacterStylesRangeInput[]);
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Apply one or more styles to the characters in the given range, leaving other styles in this range unchanged. Does
+     * not modify any styles in the text outside this range.
+     * @param styles - The styles to apply.
+     * @param range - The start and length of character sequence to which the styles should be applied.
+     * If not specified the styles will be applied to the entire piece of text content flow.
+     */
+    applyCharacterStyles(
+        styles: CharacterStylesInput,
+        range?: {
+            start: number;
+            length: number;
+        }
+    ): void;
+}
+
+/**
+ * A TextNode represents a text display frame in the scenegraph. It may display an entire piece of text, or sometimes just
+ * a subset of longer text that flows across multiple TextNode "frames". Because of this, the TextNode does not directly hold
+ * the text content and styles – instead it refers to a {@link TextContentModel}, which may be shared across multiple TextNodes.
  */
 export declare class TextNode extends Node {
     /**
-     * The text string of the node.
+     * The model containing the complete text string and its styles, only part of which may be visible within the bounds of
+     * this specific TextNode "frame." The full text content flow may be split across multiple frames, and/or it may be clipped if a
+     * fixed-size frame using {@link AreaTextLayout} does not fit all the (remaining) text.
+     *
+     * Note: When traversing the scenegraph in search of text content, bear in mind that multiple TextNodes may refer to the
+     * same single {@link TextContentModel}; this can give the impression that the same text is duplicated multiple times when it is
+     * not. Use {@link TextContentModel}.id to determine whether a given piece of text content is unique or if it's already been
+     * encountered before.
+     */
+    get fullContent(): TextContentModel;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * The next TextNode that text overflowing this node will spill into, if any. If undefined and this TextNode is fixed size
+     * ({@link AreaTextLayout}), any text content that does not fit within this node's area will be clipped.
+     *
+     * To get *all* TextNodes that the text content may be split across, use `TextNode.fullContent.allTextNodes`.
+     */
+    get nextTextNode(): TextNode | undefined;
+    /**
+     * The text string content which is partially *or* fully displayed in this TextNode "frame."
+     * WARNING: If a piece of text content flows across several TextNodes, *each* TextNode's `text` getter will return
+     * the *entire* text content string.
+     * @deprecated - Use the text getter on {@link TextContentModel} instead. Access it via `TextNode.fullContent.text`.
      */
     get text(): string;
     /**
-     * Sets the text content of the text node.
+     * Sets the text content of the TextNode.
+     * WARNING: If a piece of text content flows across several TextNodes,
+     * *each* TextNode's `text` setter will sets the *entire* text content string.
+     * @deprecated - Use the text setter on {@link TextContentModel} instead. Access it via `TextNode.fullContent.text`.
      */
     set text(textContent: string);
     /**
-     * The horizontal text alignment of the text node. Alignment is always the same across this node's entire text content.
+     * The horizontal text alignment of the TextNode. Alignment is always the same across this node's entire text content.
      */
     get textAlignment(): TextAlignment;
     set textAlignment(alignment: TextAlignment);
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * @returns The list of visual effects applied to the TextNode.
+     */
+    get visualEffects(): readonly VisualEffectType[];
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * @returns The layout mode of the TextNode "frame."
+     */
+    get layout(): Readonly<PointTextLayout | AutoHeightTextLayout | AreaTextLayout | UnsupportedTextLayout>;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Sets the layout mode of the TextNode "frame."
+     *
+     * If this TextNode is part of a multi-frame text content flow, it must be configured to use {@link AreaTextLayout}. Other
+     * layout modes are only available for single-frame text.
+     *
+     * @throws if changing text layout to/from {@link TextType.magicFit} or {@link TextType.circular} layout when the text contains font(s) unavailable to the current user.
+     * @throws if TextNode is part of a multi-frame text content flow and the layout is not {@link AreaTextLayout}.
+     */
+    set layout(layout: PointTextLayout | AutoHeightTextLayout | AreaTextLayout);
+}
+
+/**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * *Do not depend on the literal numeric values of these constants*, as they may change. Always reference the enum identifiers in your code.
+ */
+declare enum TextType {
+    /**
+     * Point text
+     */
+    autoWidth = 0,
+    /**
+     * Soft bottom
+     */
+    autoHeight = 1,
+    area = 2,
+    magicFit = 3,
+    circular = 4
+}
+
+/**
+ * Font the current user does not have access or licensing permissions to create / edit content with.
+ */
+export declare class UnavailableFont extends BaseFont {
+    get availableForEditing(): false;
 }
 
 /**
  * An UnknownNode is a node with limited support and therefore treated as a leaf node.
  */
 export declare class UnknownNode extends Node {}
+
+/**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ */
+export declare interface UnsupportedTextLayout {
+    type: TextType.magicFit | TextType.circular;
+}
+
+/**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * Visual effects that can be applied to a text node.
+ */
+declare enum VisualEffectType {
+    generativeTextEffects = "GenerativeTextEffects",
+    outline = "Outline",
+    shadow = "Shadow",
+    shapeDecoration = "ShapeDecoration"
+}
 
 /**
  * A "node" represents an object in the scenegraph, the document's visual content tree. This class represents any node
