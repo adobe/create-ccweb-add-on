@@ -22,8 +22,6 @@
  * SOFTWARE.
  ********************************************************************************/
 
-/// <reference types="gl-matrix/index.js" />
-
 import { mat2d } from "gl-matrix";
 
 /**
@@ -124,6 +122,7 @@ declare interface ApiModuleExport {
     constants: unknown;
     colorUtils: ExpressColorUtils;
     fonts: ExpressFonts;
+    viewport: ExpressViewport;
 }
 
 /**
@@ -157,7 +156,7 @@ declare enum ArrowHeadType {
 
 /**
  * ArtboardList represents an ordered list of ArtboardNodes arranged in a timeline sequence, where they are called "scenes."
- * All items in the list are children of a single PageNode.
+ * All items in the list are children of a single {@link PageNode}.
  *
  * ArtboardList also provides APIs for adding/removing artboards from the page. ArtboardList is never empty: it is illegal to
  * remove the last remaining artboard from the list.
@@ -175,8 +174,11 @@ export declare class ArtboardList extends RestrictedItemList<ArtboardNode> {
 
 /**
  * An ArtboardNode represents an artboard object in the scenegraph. All user visual content must be contained on an artboard.
+ * Artboards are always contained on a {@link PageNode}; when a page contains multiple artboards, the artboards represent
+ * "scenes" in a linear timeline sequence.
  *
- * When multiple artboards exist on a page, the artboards represent "scenes" in a linear timeline sequence.
+ * To create new artboards, see {@link ArtboardList.addArtboard}.
+ *
  * Please note that creating and deleting an artboard in a single frame will crash the editor.
  */
 export declare class ArtboardNode extends VisualNode implements IRectangularNode, ContainerNode {
@@ -246,12 +248,28 @@ export declare class AvailableFont extends BaseFont {
  * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
  *
  * @experimental
- * Base character styles that can be applied to a range of characters.
+ * Base character styles that can be applied to any range of characters.
+ * Excludes font style, which differs between the getter-oriented {@link CharacterStyles} interface and the
+ * setter-oriented {@link CharacterStylesInput}.
  */
 declare interface BaseCharacterStyles {
+    /**
+     * Size of the text in points.
+     */
     fontSize: number;
+    /**
+     * Text color.
+     */
     color: Color;
-    tracking: number;
+    /**
+     * Uniformly adjusts the letter spacing, aka character spacing. Specified as a delta relative to the font's default
+     * spacing, in units of 1/1000 em: positive values increase the spacing, negative values tighten the spacing, and 0
+     * leaves spacing at its default.
+     */
+    letterSpacing: number;
+    /**
+     * Adds an underline to text.
+     */
     underline: boolean;
 }
 
@@ -415,7 +433,8 @@ declare enum BlendMode {
  * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
  *
  * @experimental
- * Text styles of a range of characters, even a short span like a single word.
+ * Text styles that can be applied to any range of characters, even a short span like a single word. (Contrast with
+ * ParagraphStyles, which must be applied to an entire paragraph atomically).
  */
 export declare interface CharacterStyles extends BaseCharacterStyles {
     font: Font;
@@ -427,7 +446,11 @@ export declare interface CharacterStyles extends BaseCharacterStyles {
  * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
  *
  * @experimental
- * Input shape of the applyCharacterStyle API.
+ * Variant of {@link CharacterStyles} with all style fields optional, used for applyCharacterStyles(). When using that API,
+ * any fields not specified are left unchanged, preserving the text's existing styles.
+ *
+ * If specified, the font must be of the {@link AvailableFont} type – one that is guaranteed to be available for the current
+ * user to edit with.
  */
 export declare interface CharacterStylesInput extends Partial<BaseCharacterStyles> {
     font?: AvailableFont;
@@ -439,7 +462,11 @@ export declare interface CharacterStylesInput extends Partial<BaseCharacterStyle
  * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
  *
  * @experimental
- * Output shape of the characterStyleRange getter.
+ * A set of {@link CharacterStyles} along with the range of characters they apply to. Seen in the characterStyleRanges
+ * getter.
+ *
+ * Note that fonts returned by the getter are *not* guaranteed to be ones the user has rights to edit with, even though they
+ * are visible in the document.
  */
 export declare interface CharacterStylesRange extends CharacterStyles, StyleRange {}
 
@@ -449,7 +476,11 @@ export declare interface CharacterStylesRange extends CharacterStyles, StyleRang
  * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
  *
  * @experimental
- * Input shape of the characterStyleRange setter.
+ * Variant of {@link CharacterStylesRange} with all style fields optional, along with the range of characters they apply to.
+ * Used for the characterStyleRanges setter. When invoking the setter, any fields not specified are reset to their defaults.
+ *
+ * If specified, the font must be of the {@link AvailableFont} type – one that is guaranteed to be available for the current
+ * user to edit with.
  */
 export declare interface CharacterStylesRangeInput extends CharacterStylesInput, StyleRange {}
 
@@ -559,9 +590,13 @@ export declare class Context {
      */
     get selection(): readonly Node[];
     /**
-     * Sets the current selection, automatically ensuring these rules are met:
-     * - Nodes must be within the current artboard (others are filtered out).
-     * - A node cannot be selected at the same time as its ancestor (descendants are filtered out).
+     * Sets the current selection to an array of {@link Node}.
+     * Accepts a single node as a shortcut for a length-1 array `[node]` or
+     * `undefined` as a shortcut for `[]`, which clears the selection.
+     *
+     * Only node(s) that meet the following criteria can be selected:
+     * - Nodes must be within the current artboard (nodes outside the active artboard are filtered out).
+     * - A node cannot be selected if its ancestor is also selected (descendants are filtered out).
      * - Locked nodes are filtered out (but will still be included in selectionIncludingNonEditable).
      */
     set selection(nodes: Node | readonly Node[] | undefined);
@@ -694,7 +729,7 @@ export declare class Editor {
      * render as a gray placeholder on other clients until it has been uploaded to DCX and then downloaded by those clients.
      * This local client will act as having unsaved changes until the upload has finished.
      *
-     * @param bitmapData - BitmapImage resource (e.g. returned from loadBitmapImage()).
+     * @param bitmapData - BitmapImage resource (e.g. returned from {@link loadBitmapImage}).
      * @param options - Additional configuration:
      *      - initialSize - Size the image is displayed at. Must have the same aspect ratio as bitmapData. Defaults to the
      *        size the image would be created at by a UI drag-drop gesture (typically the image's full size, but scaled down
@@ -782,7 +817,9 @@ export declare enum EditorEvent {
 export declare type EditorEventHandler = () => void;
 
 /**
- * An EllipseNode represents an ellipse object in the scenegraph.
+ * An EllipseNode represents an ellipse or circle shape in the scenegraph.
+ *
+ * To create new ellipse, see {@link Editor.createEllipse}.
  */
 export declare class EllipseNode extends FillableNode {
     /**
@@ -834,9 +871,12 @@ declare class ExpressFonts extends Fonts {}
 export declare class ExpressRootNode extends BaseNode {
     /**
      * The pages of the document. All visual content is contained on artboards within the pages.
+     * To create new pages, see {@link PageList.addPage}.
      */
     get pages(): PageList;
 }
+
+declare class ExpressViewport extends Viewport {}
 
 /**
  * Base interface representing any fill in the scenegraph. See {@link FillableNode}.
@@ -933,6 +973,8 @@ export declare class GridCellNode extends MediaContainerNode {}
 /**
  * A GridLayoutNode represents a grid layout in the scenegraph. The GridLayoutNode is used to create
  * a layout grid that other content can be placed into.
+ *
+ * APIs to create a new grid layout are not yet available.
  */
 export declare class GridLayoutNode extends Node implements Readonly<IRectangularNode> {
     /**
@@ -959,6 +1001,8 @@ export declare class GridLayoutNode extends Node implements Readonly<IRectangula
 /**
  * A GroupNode represents a Group object in the scenegraph, which has a collection of generic children as well as a separate,
  * optional vector mask child.
+ *
+ * To create new group, see {@link Editor.createGroup}.
  */
 export declare class GroupNode extends Node implements ContainerNode {
     /**
@@ -997,6 +1041,9 @@ declare interface IFillableNode {
  * ImageRectangleNode is a rectangular node that displays the image media part of a MediaContainerNode. It can only exist
  * within that container parent. Cropping can be adjusted by changing this media's position/rotation (as well as its mask
  * shape sibling node).
+ *
+ * ImageRectangleNodes cannot be created directly; use {@link Editor.createImageContainer} to create the entire
+ * container structure together.
  */
 export declare class ImageRectangleNode extends Node implements Readonly<IRectangularNode> {
     /**
@@ -1077,7 +1124,9 @@ export declare class ItemList<T extends ListItem> extends RestrictedItemList<T> 
 }
 
 /**
- * A LineNode represents a simple line object in the scenegraph – a single straight-line segment.
+ * A LineNode represents a simple vector line in the scenegraph – a single straight-line segment.
+ *
+ * To create new lines, see {@link Editor.createLine}.
  */
 export declare class LineNode extends StrokableNode {
     static readonly DEFAULT_START_X = 0;
@@ -1148,6 +1197,9 @@ export declare interface ListItem {}
  * A MediaContainerNode is a multi-node construct that displays media (such as images or video) with optional cropping and
  * clipping to a shape mask. The underlying media asset is always rectangular, but the final appearance of this node is
  * determined by the maskShape which is not necessarily a rectangle.
+ *
+ * To create new media container for a bitmap image, see {@link Editor.createImageContainer}. APIs for creating a
+ * container with other content, such as videos, are not yet available.
  */
 export declare class MediaContainerNode extends Node {
     /**
@@ -1276,8 +1328,8 @@ export { Node as Node };
 
 /**
  * PageList represents an ordered list of PageNodes, all of which are children of the root node of the document's "scenegraph"
- * artwork tree. A page contains one or more artboards, representing "scenes" in a linear timeline sequence. Those artboards
- * in turn contain all the visual content of the document.
+ * artwork tree (see {@link ExpressRootNode}). A page contains one or more artboards, representing "scenes" in a linear timeline
+ * sequence. Those artboards in turn contain all the visual content of the document.
  *
  * PageList also provides APIs for adding/removing pages from the document. PageList is never empty: it is illegal to
  * remove the last remaining page from the list.
@@ -1294,12 +1346,16 @@ export declare class PageList extends RestrictedItemList<PageNode> {
 }
 
 /**
- * A PageNode represents a page in the document. A page contains one or more artboards, representing "scenes" in a linear
- * timeline sequence. Those artboards in turn contain all the visual content of the document.
+ * A PageNode represents a page in the document, a child of the root node of the document's "scenegraph" artwork tree
+ * (see {@link ExpressRootNode}). A page contains one or more artboards, representing "scenes" in a linear timeline
+ * sequence. Those artboards in turn contain all the visual content of the document.
+ *
+ * To create new pages, see {@link PageList.addPage}.
  */
 export declare class PageNode extends BaseNode implements Readonly<IRectangularNode> {
     /**
      * The artboards or "scenes" of a page, ordered by timeline sequence.
+     * To create new artboards, see {@link ArtboardList.addArtboard}.
      */
     get artboards(): ArtboardList;
     /**
@@ -1329,8 +1385,10 @@ export declare class PageNode extends BaseNode implements Readonly<IRectangularN
 }
 
 /**
- * A PathNode represents a generic vector path shape in the scenegraph. Paths cannot be created or edited through this API
+ * A PathNode represents a generic vector path shape in the scenegraph. Paths cannot be edited through this API
  * yet, only read.
+ *
+ * To create new paths, see {@link Editor.createPath}.
  */
 export declare class PathNode extends FillableNode {
     /**
@@ -1419,7 +1477,9 @@ export declare interface RectangleGeometry {
 }
 
 /**
- * A RectangleNode represents a rectangle object in the scenegraph.
+ * A RectangleNode represents a rectangle shape in the scenegraph.
+ *
+ * To create new rectangles, see {@link Editor.createRectangle}.
  */
 export declare class RectangleNode extends FillableNode implements IRectangularNode {
     /**
@@ -1733,7 +1793,13 @@ export declare class TextContentModel {
      * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
      *
      * @experimental
-     * The character style ranges of this text content.
+     * The character styles applied to different ranges of this text content. When setting character styles, any style
+     * properties that are not provided are reset to their defaults (contrast to {@link applyCharacterStyles} which
+     * preserves the text's existing styles for any fields not specified). When *getting* styles, all fields are always
+     * provided.
+     *
+     * Note: existing fonts used in the document, returned by this getter, are not guaranteed to be ones the current user
+     * has rights to edit with. The *setter* only accepts the AvailableFont type which has been verified to be usable.
      */
     get characterStyleRanges(): readonly CharacterStylesRange[];
     set characterStyleRanges(styles: readonly CharacterStylesRangeInput[]);
@@ -1743,8 +1809,11 @@ export declare class TextContentModel {
      * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
      *
      * @experimental
-     * Apply one or more styles to the characters in the given range, leaving other styles in this range unchanged. Does
-     * not modify any styles in the text outside this range.
+     * Apply one or more styles to the characters in the given range, leaving any style properties that were not specified
+     * unchanged. Does not modify any styles in the text outside this range. Contrast to the {@link characterStyleRanges}
+     * setter, which specifies new style range(s) for the entire text at once, and resets any unspecified properties back to
+     * default styles.
+
      * @param styles - The styles to apply.
      * @param range - The start and length of character sequence to which the styles should be applied.
      * If not specified the styles will be applied to the entire piece of text content flow.
@@ -1761,7 +1830,10 @@ export declare class TextContentModel {
 /**
  * A TextNode represents a text display frame in the scenegraph. It may display an entire piece of text, or sometimes just
  * a subset of longer text that flows across multiple TextNode "frames". Because of this, the TextNode does not directly hold
- * the text content and styles – instead it refers to a {@link TextContentModel}, which may be shared across multiple TextNodes.
+ * the text content and styles – instead it refers to a {@link TextContentModel}, which may be shared across multiple TextNode frames.
+ *
+ * To create new a single-frame piece of text, see {@link Editor.createText}. APIs are not yet available to create
+ * multi-frame text flows.
  */
 export declare class TextNode extends Node {
     /**
@@ -1773,6 +1845,7 @@ export declare class TextNode extends Node {
      * same single {@link TextContentModel}; this can give the impression that the same text is duplicated multiple times when it is
      * not. Use {@link TextContentModel}.id to determine whether a given piece of text content is unique or if it's already been
      * encountered before.
+     *
      */
     get fullContent(): TextContentModel;
     /**
@@ -1882,6 +1955,28 @@ export declare class UnknownNode extends Node {}
 export declare interface UnsupportedTextLayout {
     type: TextType.magicFit | TextType.circular;
 }
+
+/**
+ * Represents the area of the canvas that is currently visible on-screen.
+ */
+export declare class Viewport {
+    /**
+     * Adjusts the viewport to make the node's bounds visible on-screen, assuming all bounds are within the artboard bounds.
+     * Makes the node's {@link ArtboardNode} or {@link PageNode} visible if they were not already
+     * (which may result in {@link Context.selection} being cleared). It is strongly recomended
+     * to further draw user's attention to the node by setting it as the {@link Context.selection} following this call.
+     *
+     * After this call, the value of {@link Context.insertionParent} will always be the node's containing {@link ArtboardNode}.
+     *
+     * Note that the node might still not appear visible if:
+     *   - Its animation settings make it invisible at the beginning of the {@link ArtboardNode} "scene".
+     *   - It is obscured underneath other artwork in the z-order.
+     *   - It is hidden by a {@link GroupNode}'s mask or similar cropping.
+     */
+    bringIntoView(node: VisualNode): void;
+}
+
+export declare const viewport: ExpressViewport;
 
 /**
  * <InlineAlert slots="text" variant="warning"/>

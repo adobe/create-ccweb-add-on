@@ -371,8 +371,33 @@ export declare enum AuthorizationStatus {
     POPUP_BLOCKED = "POPUP_BLOCKED",
     POPUP_CLOSED = "POPUP_CLOSED",
     POPUP_TIMEOUT = "POPUP_TIMEOUT",
-    FAILED = "FAILED"
+    FAILED = "FAILED",
+    IFRAME_LOAD_FAILED = "IFRAME_LOAD_FAILED"
 }
+
+/**
+ * Request parameters to authorize a user using OAuth 2.0 PKCE based authorization in an iframe.
+ */
+export declare type AuthorizeInsideIframeRequest = AuthorizationRequest & {
+    /**
+     * Relative position of the oauth iframe panel
+     */
+    position?: {
+        top: number;
+        left: number;
+    };
+    /**
+     * Offset from the right and bottom of the Iframe container when the size (windowSize) is not specified.
+     */
+    offset?: {
+        right: number;
+        bottom: number;
+    };
+    /**
+     * Flag to determine if the iframe panel needs to show a header.
+     */
+    showHeader?: boolean;
+};
 
 /**
  * Request parameters to initiate an OAuth 2.0 PKCE based authorization workflow,
@@ -712,6 +737,14 @@ declare interface Document_2 {
      * Get document name/title
      */
     title(): Promise<string>;
+    /**
+     * Import a Pdf to the document.
+     */
+    importPdf(blob: Blob, attributes: MediaAttributes): void;
+    /**
+     * Import a presentation to the document.
+     */
+    importPresentation(blob: Blob, attributes: MediaAttributes): void;
 }
 export { Document_2 as Document };
 
@@ -1065,6 +1098,12 @@ export declare interface OAuth {
      * @returns - {@link AuthorizationResult} Authorization result.
      */
     authorizeWithOwnRedirect(request: AuthorizeWithOwnRedirectRequest): Promise<AuthorizationResult>;
+    /**
+     * Authorize a user using OAuth 2.0 PKCE workflow in an iframe.
+     * @param request - {@link AuthorizeInsideIframeRequest} Payload with parameters to be used in the authorization workflow.
+     * @returns - {@link AuthorizationResponse} Response containing a ONE-TIME Authorization Code which can be used to obtain an access token.
+     */
+    authorizeInsideIframe(request: AuthorizeInsideIframeRequest): Promise<AuthorizationResponse>;
 }
 
 /**
