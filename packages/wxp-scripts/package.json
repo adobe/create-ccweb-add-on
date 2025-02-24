@@ -1,6 +1,6 @@
 {
     "name": "@adobe/ccweb-add-on-scripts",
-    "version": "2.4.2",
+    "version": "2.5.0",
     "author": "Adobe",
     "license": "MIT",
     "description": "Scripts for Adobe Creative Cloud Web Add-on.",
@@ -41,7 +41,7 @@
         "@adobe/ccweb-add-on-devcert": "0.1.1",
         "@adobe/ccweb-add-on-manifest": "workspace:*",
         "@adobe/ccweb-add-on-ssl": "workspace:*",
-        "@oclif/core": "2.8.0",
+        "@oclif/core": "4.2.8",
         "adm-zip": "0.5.9",
         "chokidar": "3.5.3",
         "cors": "2.8.5",
@@ -55,7 +55,7 @@
         "ws": "8.18.1"
     },
     "devDependencies": {
-        "@oclif/test": "2.3.4",
+        "@oclif/test": "4.1.11",
         "@types/adm-zip": "0.4.34",
         "@types/chai-as-promised": "7.1.3",
         "@types/chai": "4.2.14",
