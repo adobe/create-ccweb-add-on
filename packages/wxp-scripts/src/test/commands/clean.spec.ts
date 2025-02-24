@@ -35,6 +35,7 @@ import { AnalyticsErrorMarkers } from "../../AnalyticsMarkers.js";
 import type { CommandExecutor } from "../../app/CommandExecutor.js";
 import { Clean } from "../../commands/clean.js";
 import { IContainer, ITypes } from "../../config/index.js";
+import { PROGRAM_NAME } from "../../constants.js";
 
 chai.use(chaiAsPromised);
 
@@ -74,7 +75,7 @@ describe("clean", () => {
         it("should execute succesfully when no parameters are passed.", async () => {
             analyticsConsent.get.resolves(true);
 
-            const clean = new Clean([], new Config({ root: "." }));
+            const clean = new Clean([], new Config({ name: PROGRAM_NAME, root: "." }));
 
             await clean.run();
 

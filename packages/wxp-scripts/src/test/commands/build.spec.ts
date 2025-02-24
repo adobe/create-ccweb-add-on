@@ -36,6 +36,7 @@ import { AnalyticsErrorMarkers } from "../../AnalyticsMarkers.js";
 import type { CommandExecutor } from "../../app/CommandExecutor.js";
 import { Build } from "../../commands/build.js";
 import { IContainer, ITypes } from "../../config/index.js";
+import { PROGRAM_NAME } from "../../constants.js";
 import { BuildCommandOptions } from "../../models/BuildCommandOptions.js";
 
 chai.use(chaiAsPromised);
@@ -76,7 +77,7 @@ describe("build", () => {
         it("should execute succesfully when no parameters are passed.", async () => {
             analyticsConsent.get.resolves(true);
 
-            const build = new Build([], new Config({ root: "." }));
+            const build = new Build([], new Config({ name: PROGRAM_NAME, root: "." }));
 
             await build.run();
 
