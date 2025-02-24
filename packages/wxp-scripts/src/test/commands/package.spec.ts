@@ -37,6 +37,7 @@ import type { CommandExecutor } from "../../app/CommandExecutor.js";
 import { Package } from "../../commands/package.js";
 import { IContainer, ITypes } from "../../config/index.js";
 import { PackageCommandOptions } from "../../models/PackageCommandOptions.js";
+import { PROGRAM_NAME } from "../../constants.js";
 
 chai.use(chaiAsPromised);
 
@@ -76,7 +77,7 @@ describe("package", () => {
         it("should execute succesfully when no parameters are passed.", async () => {
             analyticsConsent.get.resolves(true);
 
-            const packageCommand = new Package([], new Config({ root: "." }));
+            const packageCommand = new Package([], new Config({ name: PROGRAM_NAME, root: "." }));
 
             await packageCommand.run();
 
@@ -92,7 +93,7 @@ describe("package", () => {
 
             const packageCommand = new Package(
                 ["--src", DEFAULT_SRC_DIRECTORY, "--use", "tsc", "--no-rebuild", "--analytics", "off", "--verbose"],
-                new Config({ root: "." })
+                new Config({ name: PROGRAM_NAME, root: "." })
             );
 
             await packageCommand.run();
@@ -106,7 +107,7 @@ describe("package", () => {
 
     describe("catch", () => {
         it("should fail when incorrect params are passed", async () => {
-            const setup = new Package(["--incorrect-flag"], new Config({ root: "." }));
+            const setup = new Package(["--incorrect-flag"], new Config({ name: PROGRAM_NAME, root: "." }));
 
             const error = new Error("Nonexistent flag: --incorrect-flag\nSee more help with --help");
 

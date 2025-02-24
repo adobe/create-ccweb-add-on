@@ -37,6 +37,7 @@ import { AnalyticsErrorMarkers } from "../../AnalyticsMarkers.js";
 import type { CommandExecutor } from "../../app/CommandExecutor.js";
 import { Start } from "../../commands/start.js";
 import { IContainer, ITypes } from "../../config/index.js";
+import { PROGRAM_NAME } from "../../constants.js";
 import { StartCommandOptions } from "../../models/StartCommandOptions.js";
 import type { CommandValidator } from "../../validators/CommandValidator.js";
 
@@ -91,7 +92,7 @@ describe("start", () => {
         it("should execute succesfully when no parameters are passed.", async () => {
             analyticsConsent.get.resolves(true);
 
-            const start = new Start([], new Config({ root: "." }));
+            const start = new Start([], new Config({ name: PROGRAM_NAME, root: "." }));
 
             await start.run();
 
@@ -111,7 +112,7 @@ describe("start", () => {
         it("should execute succesfully when parameters are passed.", async () => {
             const start = new Start(
                 ["--src", DEFAULT_SRC_DIRECTORY, "--use", "tsc", "--port", "8000", "--analytics", "off", "--verbose"],
-                new Config({ root: "." })
+                new Config({ name: PROGRAM_NAME, root: "." })
             );
 
             await start.run();
@@ -125,7 +126,7 @@ describe("start", () => {
 
     describe("catch", () => {
         it("should fail when incorrect params are passed", async () => {
-            const setup = new Start(["--incorrect-flag"], new Config({ root: "." }));
+            const setup = new Start(["--incorrect-flag"], new Config({ name: PROGRAM_NAME, root: "." }));
 
             const error = new Error("Nonexistent flag: --incorrect-flag\nSee more help with --help");
 

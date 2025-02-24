@@ -92,7 +92,7 @@ describe("ccweb-add-on-scripts", () => {
 
     describe("clean", () => {
         test.stdout()
-            .command(["clean"])
+            .command(["clean", "--analytics", "off"])
             .it("should execute succesfully when no parameters are passed.", async () => {
                 assert.equal(commandExecutor.execute.callCount, 1);
             });
