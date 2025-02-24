@@ -86,7 +86,7 @@ export class Package extends Command {
         this._analyticsConsent = IContainer.get<AnalyticsConsent>(IAnalyticsTypes.AnalyticsConsent);
 
         this._analyticsService = IContainer.get<AnalyticsService>(IAnalyticsTypes.AnalyticsService);
-        this._analyticsService.program = new CLIProgram(PROGRAM_NAME, this.config.version);
+        this._analyticsService.program = new CLIProgram(PROGRAM_NAME, this.config.name + "@" + this.config.version);
         this._analyticsService.startTime = Date.now();
 
         this._commandExecutor = IContainer.getNamed<CommandExecutor>(ITypes.CommandExecutor, "package");
