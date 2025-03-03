@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-sdk-types",
+      "comment": "Exposed paragraph style APIs and stabalized APIs",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-sdk-types"
+}
