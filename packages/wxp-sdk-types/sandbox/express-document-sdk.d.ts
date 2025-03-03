@@ -30,61 +30,31 @@ import { mat2d } from "gl-matrix";
  */
 export declare class AddOnData {
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * Sets a private metadata entry on the node.
      * @param key - The key for the private metadata entry.
      * @param value - The value for the private metadata entry.
      */
     setItem(key: string, value: string): void;
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * Retrieves the private metadata value for the specified key on the node.
      * @param key - The key of the private metadata entry to retrieve.
      * @returns The value of the private metadata entry.
      */
     getItem(key: string): string | undefined;
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * Removes a single private metadata entry on the node.
      * @param key - The key of the private metadata entry to remove.
      */
     removeItem(key: string): void;
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * Clears all private metadata entries on the node.
      */
     clear(): void;
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * @returns an array of all keys for the private metadata entries on the node.
      */
     keys(): string[];
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * @returns an object with the remaining quota for private metadata on the node for this add-on.
      * The object contains the following properties:
      * - sizeInBytes: The remaining quota size in bytes (maximum 3KB).
@@ -177,7 +147,7 @@ export declare class ArtboardList extends RestrictedItemList<ArtboardNode> {
  * Artboards are always contained on a {@link PageNode}; when a page contains multiple artboards, the artboards represent
  * "scenes" in a linear timeline sequence.
  *
- * To create new artboards, see {@link ArtboardList.addArtboard}.
+ * To create a new artboard, see {@link ArtboardList.addArtboard}.
  *
  * Please note that creating and deleting an artboard in a single frame will crash the editor.
  */
@@ -319,11 +289,6 @@ declare abstract class BaseFont {
  */
 export declare class BaseNode {
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * Get {@link AddOnData} reference for managing the private metadata on this node for this add-on.
      */
     get addOnData(): AddOnData;
@@ -365,6 +330,47 @@ export declare class BaseNode {
      * removal. No-op if node is already an orphan.
      */
     removeFromParent(): void;
+}
+
+/**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * BaseParagraphListStyle interface represents common properties shared between ordered and unordered list types.
+ */
+declare interface BaseParagraphListStyle {
+    /** A value from 0-8 that specifies indent/nesting level. Default is 0 if not provided. */
+    indentLevel?: number;
+}
+
+/**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * Base paragraph styles that can be applied to an entire paragraph atomically.
+ * Excludes list style settings, which differ between the getter-oriented {@link ParagraphStyles} interface and the
+ * setter-oriented {@link ParagraphStylesRangeInput}.
+ */
+declare interface BaseParagraphStyles {
+    /**
+     * Space before paragraph (in points). It does not affect the first paragraph. It is additive to previous paragraph's spaceAfter
+     * (adjacent spacing does not merge/collapse together).
+     */
+    spaceBefore: number;
+    /**
+     * Space after paragraph (in points). It does not affect the last paragraph. It is additive to the next paragraph's spaceBefore
+     * (adjacent spacing does not merge/collapse together).
+     */
+    spaceAfter: number;
+    /**
+     * Spacing between lines, aka leading, expressed as a multiple of the font size's default spacing - ex. 1.5 = 150% of normal.
+     * It only affects the space *between* lines, not the space above the first line or below the last line.
+     */
+    lineSpacing: number;
 }
 
 /**
@@ -462,8 +468,7 @@ export declare interface CharacterStylesInput extends Partial<BaseCharacterStyle
  * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
  *
  * @experimental
- * A set of {@link CharacterStyles} along with the range of characters they apply to. Seen in the characterStyleRanges
- * getter.
+ * A set of {@link CharacterStyles} along with the range of characters they apply to. Seen in the characterStyleRanges getter.
  *
  * Note that fonts returned by the getter are *not* guaranteed to be ones the user has rights to edit with, even though they
  * are visible in the document.
@@ -586,6 +591,22 @@ export declare interface ContainerNode extends VisualNode {
  */
 export declare class Context {
     /**
+     * Registers a handler for editor events such as selection change.
+     * The registered callback will be invoked when the specified event occurs.
+     * Note: Do not attempt to make changes to the document in response to a selection change callback because it may destabilize the application.
+     * @param eventName - an editor event name.
+     * @param callback - a callback to be registered for an editor event.
+     * @returns a unique ID for the registered event handler.
+     */
+    on(eventName: EditorEvent, callback: EditorEventHandler): EventHandlerId;
+    /**
+     * Unregisters handlers for editor events like selection change.
+     * @param eventName - an editor event name.
+     * @param handlerId - a unique ID returned by `editor.context.on` API.
+     * Callback that was previously registered will be removed and will no more be invoked when the event occurs.
+     */
+    off(eventName: EditorEvent, handlerId: EventHandlerId): void;
+    /**
      * @returns the current selection. Nodes that are locked or otherwise non-editable are never included in the selection.
      */
     get selection(): readonly Node[];
@@ -620,32 +641,6 @@ export declare class Context {
      * @returns The currently viewed page.
      */
     get currentPage(): PageNode;
-    /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
-     * Registers a handler for editor events such as selection change.
-     * The registered callback will be invoked when the specified event occurs.
-     * Note: Do not attempt to make changes to the document in response to a selection change callback because it may destabilize the application.
-     * @param eventName - an editor event name.
-     * @param callback - a callback to be registered for an editor event.
-     * @returns a unique ID for the registered event handler.
-     */
-    on(eventName: EditorEvent, callback: EditorEventHandler): EventHandlerId;
-    /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
-     * Unregisters handlers for editor events like selection change.
-     * @param eventName - an editor event name.
-     * @param handlerId - a unique ID returned by `editor.context.on` API.
-     * Callback that was previously registered will be removed and will no more be invoked when the event occurs.
-     */
-    off(eventName: EditorEvent, handlerId: EventHandlerId): void;
 }
 
 /**
@@ -795,11 +790,6 @@ export declare class Editor {
 export declare const editor: ExpressEditor;
 
 /**
- * <InlineAlert slots="text" variant="warning"/>
- *
- * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
- *
- * @experimental
  * This enum represents the supported editor events.
  */
 export declare enum EditorEvent {
@@ -807,11 +797,6 @@ export declare enum EditorEvent {
 }
 
 /**
- * <InlineAlert slots="text" variant="warning"/>
- *
- * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
- *
- * @experimental
  * This type represents function signature for the editor event handler callback.
  */
 export declare type EditorEventHandler = () => void;
@@ -843,11 +828,6 @@ export declare class EllipseNode extends FillableNode {
 }
 
 /**
- * <InlineAlert slots="text" variant="warning"/>
- *
- * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
- *
- * @experimental
  * This type represents unique id of each event handler callback that is registered.
  */
 export declare type EventHandlerId = string;
@@ -871,7 +851,7 @@ declare class ExpressFonts extends Fonts {}
 export declare class ExpressRootNode extends BaseNode {
     /**
      * The pages of the document. All visual content is contained on artboards within the pages.
-     * To create new pages, see {@link PageList.addPage}.
+     * To create a new page, see {@link PageList.addPage}.
      */
     get pages(): PageList;
 }
@@ -1126,7 +1106,7 @@ export declare class ItemList<T extends ListItem> extends RestrictedItemList<T> 
 /**
  * A LineNode represents a simple vector line in the scenegraph – a single straight-line segment.
  *
- * To create new lines, see {@link Editor.createLine}.
+ * To create a new line, see {@link Editor.createLine}.
  */
 export declare class LineNode extends StrokableNode {
     static readonly DEFAULT_START_X = 0;
@@ -1313,7 +1293,9 @@ declare class Node extends VisualNode {
     get transformMatrix(): mat2d;
     /**
      * The node's lock/unlock state. Locked nodes are excluded from the selection (see {@link Context.selection}), and
-     * cannot be edited by the user unless they are unlocked first.
+     * cannot be edited by the user in the UI unless they are unlocked first. Operations on locked nodes using the API
+     * are permitted. However, please consider if modifying a locked node would align with user expectations
+     * before using the API to make changes to locked nodes.
      */
     get locked(): boolean;
     set locked(locked: boolean);
@@ -1327,9 +1309,60 @@ declare class Node extends VisualNode {
 export { Node as Node };
 
 /**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * Numbering types used to display ordered lists: 1, A, a, I, i 01, 001.
+ */
+export declare enum OrderedListNumbering {
+    numeric = 1,
+    uppercaseAlpha = 2,
+    lowercaseAlpha = 3,
+    uppercaseRomanNum = 4,
+    lowercaseRomanNum = 5,
+    singleZeroPrefixNumeric = 7,
+    doubleZeroPrefixNumeric = 8
+}
+
+/**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * OrderedListStyle represents the style of an ordered list.
+ */
+export declare type OrderedListStyle = Required<OrderedListStyleInput>;
+
+/**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * Interface for specifying an ordered list style, such as a numbered list.
+ */
+export declare interface OrderedListStyleInput extends BaseParagraphListStyle {
+    type: ParagraphListType.ordered;
+    /**
+     * The numbering style to use. If undefined, it defaults to a different type depending on the paragraph's indent level.
+     * The defaults for increasing indent are 1, a, i, I, and then they repeat.
+     * These markers and the prefix/postfix strings (if any) are displayed using the same font as the start of the
+     * paragraph's text content.
+     */
+    numbering?: OrderedListNumbering;
+    /** Additional string to display before each sequence number/letter, e.g. "(" */
+    prefix?: string;
+    /** Additional string to display after each sequence number/letter, e.g. ")" or "." */
+    postfix?: string;
+}
+
+/**
  * PageList represents an ordered list of PageNodes, all of which are children of the root node of the document's "scenegraph"
  * artwork tree (see {@link ExpressRootNode}). A page contains one or more artboards, representing "scenes" in a linear timeline
- * sequence. Those artboards in turn contain all the visual content of the document.
+ * sequence. Those artboards, in turn, contain all the visual content of the document.
  *
  * PageList also provides APIs for adding/removing pages from the document. PageList is never empty: it is illegal to
  * remove the last remaining page from the list.
@@ -1348,7 +1381,7 @@ export declare class PageList extends RestrictedItemList<PageNode> {
 /**
  * A PageNode represents a page in the document, a child of the root node of the document's "scenegraph" artwork tree
  * (see {@link ExpressRootNode}). A page contains one or more artboards, representing "scenes" in a linear timeline
- * sequence. Those artboards in turn contain all the visual content of the document.
+ * sequence. Those artboards, in turn, contain all the visual content of the document.
  *
  * To create new pages, see {@link PageList.addPage}.
  */
@@ -1383,6 +1416,69 @@ export declare class PageNode extends BaseNode implements Readonly<IRectangularN
      */
     cloneInPlace(): PageNode;
 }
+
+/**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * Indicates list type: see {@link UnorderedListStyleInput} and {@link OrderedListStyleInput}.
+ */
+export declare enum ParagraphListType {
+    unordered = 0,
+    ordered = 1
+}
+
+/**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * Text styles that must be applied to an entire paragraph atomically. (Contrast with CharacterStyles which can be applied to
+ * any range of characters, even a short span like one single word).
+ */
+export declare interface ParagraphStyles extends BaseParagraphStyles {
+    list?: OrderedListStyle | UnorderedListStyle;
+}
+
+/**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * The variant of {@link ParagraphStyles} with all optional style fields is used to apply ParagraphStyles(). When using that API,
+ * any fields not specified are left unchanged, preserving the text's existing styles.
+ */
+export declare interface ParagraphStylesInput extends Partial<BaseParagraphStyles> {
+    list?: OrderedListStyleInput | UnorderedListStyleInput;
+}
+
+/**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * A set of {@link ParagraphStyles} and the text range they apply to. It is seen in the paragraphStyleRanges getter.
+ */
+export declare interface ParagraphStylesRange extends ParagraphStyles, StyleRange {}
+
+/**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * A variant of {@link ParagraphStylesRange} with all style fields optional and the text range they apply to. Used for the
+ * paragraphStyleRanges setter. When invoking the setter, any fields not specified are reset to their defaults.
+ *
+ * Paragraphs are separated by newline characters (`\n`). The ranges specified here should align with
+ * those boundaries.
+ */
+export declare interface ParagraphStylesRangeInput extends ParagraphStylesInput, StyleRange {}
 
 /**
  * A PathNode represents a generic vector path shape in the scenegraph. Paths cannot be edited through this API
@@ -1461,7 +1557,7 @@ export declare class ReadOnlyItemList<T extends ListItem> {
     /**
      * All items in the list, as a static array. Mutations that occur later are not reflected in an array returned earlier.
      */
-    toArray(): Readonly<T[]>;
+    toArray(): readonly T[];
 }
 
 declare interface Rect {
@@ -1479,7 +1575,7 @@ export declare interface RectangleGeometry {
 /**
  * A RectangleNode represents a rectangle shape in the scenegraph.
  *
- * To create new rectangles, see {@link Editor.createRectangle}.
+ * To create a new rectangle, see {@link Editor.createRectangle}.
  */
 export declare class RectangleNode extends FillableNode implements IRectangularNode {
     /**
@@ -1793,7 +1889,7 @@ export declare class TextContentModel {
      * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
      *
      * @experimental
-     * The character styles applied to different ranges of this text content. When setting character styles, any style
+     * The character styles are applied to different ranges of this text content. When setting character styles, any style
      * properties that are not provided are reset to their defaults (contrast to {@link applyCharacterStyles} which
      * preserves the text's existing styles for any fields not specified). When *getting* styles, all fields are always
      * provided.
@@ -1809,8 +1905,57 @@ export declare class TextContentModel {
      * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
      *
      * @experimental
+     * The styles applied to different paragraphs of this text content.
+     */
+    get paragraphStyleRanges(): readonly ParagraphStylesRange[];
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Apply styles to different paragraphs of this text content. Any style properties that are not provided are reset to their defaults.
+     * When **getting** styles, all properties are always provided.
+     *
+     * Paragraphs are separated by newline characters (`\n`). The ranges specified here should align with
+     * those boundaries. If multiple ranges provided overlap a single paragraph, the first one to overlap is applied to the
+     * entire paragraph.
+     *
+     * @throws if the text content contains fonts unavailable to the current user and an ordered-list style is being applied.
+     */
+    set paragraphStyleRanges(styles: readonly ParagraphStylesRangeInput[]);
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
      * Apply one or more styles to the characters in the given range, leaving any style properties that were not specified
      * unchanged. Does not modify any styles in the text outside this range. Contrast to the {@link characterStyleRanges}
+     * setter, which specifies new style range(s) for the entire text at once, and resets any unspecified properties back to
+     * default styles.
+
+     * @param styles - The styles to apply.
+     * @param range -The start and length of the character sequence to which the styles should be applied.
+     * The styles will be applied to the entire text content flow if not specified.
+     * If the specified range doesn't align well with the paragraph boundaries, the range will be expanded to cover the
+     * entire paragraphs, it overlaps.
+     */
+    applyCharacterStyles(
+        styles: CharacterStylesInput,
+        range?: {
+            start: number;
+            length: number;
+        }
+    ): void;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Apply one or more styles to the paragraphs in the given range, leaving any style properties that were not specified
+     * unchanged. Does not modify any styles in the text outside this range. Contrast to the {@link paragraphStyleRanges}
      * setter, which specifies new style range(s) for the entire text at once, and resets any unspecified properties back to
      * default styles.
 
@@ -1818,8 +1963,8 @@ export declare class TextContentModel {
      * @param range - The start and length of character sequence to which the styles should be applied.
      * If not specified the styles will be applied to the entire piece of text content flow.
      */
-    applyCharacterStyles(
-        styles: CharacterStylesInput,
+    applyParagraphStyles(
+        styles: ParagraphStylesInput,
         range?: {
             start: number;
             length: number;
@@ -1906,10 +2051,11 @@ export declare class TextNode extends Node {
      * Sets the layout mode of the TextNode "frame."
      *
      * If this TextNode is part of a multi-frame text content flow, it must be configured to use {@link AreaTextLayout}. Other
-     * layout modes are only available for single-frame text.
+     * layout modes, except for {@link AreaTextLayout}, are only available for single-frame text.
      *
      * @throws if changing text layout to/from {@link TextType.magicFit} or {@link TextType.circular} layout when the text contains font(s) unavailable to the current user.
-     * @throws if TextNode is part of a multi-frame text content flow and the layout is not {@link AreaTextLayout}.
+     * @throws if {@link TextNode} is part of a multi-frame text content flow and the layout is not {@link AreaTextLayout}.
+     * @throws if {@link TextNode} is not a part of a multi-frame text content flow and the layout is {@link AreaTextLayout}.
      */
     set layout(layout: PointTextLayout | AutoHeightTextLayout | AreaTextLayout);
 }
@@ -1951,6 +2097,37 @@ export declare class UnknownNode extends Node {}
  * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
  *
  * @experimental
+ * UnorderedListStyle represents the style of an unordered list.
+ */
+export declare type UnorderedListStyle = Required<UnorderedListStyleInput>;
+
+/**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * Interface for specifying an unordered list style, such as a bullet list.
+ */
+export declare interface UnorderedListStyleInput extends BaseParagraphListStyle {
+    type: ParagraphListType.unordered;
+    /**
+     * Marker symbol to use. If undefined, it defaults to a different symbol depending on the paragraph's indent level.
+     * The defaults for increasing indent are: •, ◦, ◼, ◻, and then they repeat.
+     * Markers are always displayed using the default font (SourceSans3 Regular), regardless of the font(s) used in the
+     * paragraph's text content. A default marker is used instead if the default font does not support the symbol.
+     *
+     * Text or Unicode glyphs are accepted to represent the list marker.
+     */
+    marker?: string;
+}
+
+/**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
  */
 export declare interface UnsupportedTextLayout {
     type: TextType.magicFit | TextType.circular;
@@ -1962,11 +2139,11 @@ export declare interface UnsupportedTextLayout {
 export declare class Viewport {
     /**
      * Adjusts the viewport to make the node's bounds visible on-screen, assuming all bounds are within the artboard bounds.
-     * Makes the node's {@link ArtboardNode} or {@link PageNode} visible if they were not already
-     * (which may result in {@link Context.selection} being cleared). It is strongly recomended
-     * to further draw user's attention to the node by setting it as the {@link Context.selection} following this call.
+     * Makes the node's {@link ArtboardNode} or {@link PageNode} visible if they were not already visible
+     * (which may result in {@link Context.selection} being cleared). It is strongly recommended
+     * to further draw user's attention to the node, set it as the {@link Context.selection} following this call.
      *
-     * After this call, the value of {@link Context.insertionParent} will always be the node's containing {@link ArtboardNode}.
+     * After this call, the value of {@link Context.insertionParent} will always be the node containing {@link ArtboardNode}.
      *
      * Note that the node might still not appear visible if:
      *   - Its animation settings make it invisible at the beginning of the {@link ArtboardNode} "scene".

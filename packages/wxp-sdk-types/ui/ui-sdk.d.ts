@@ -238,7 +238,6 @@ declare interface ApplicationBase {
         dragOptions?: DragOptions
     ): DisableDragToDocument;
     /**
-     * @experimental - Experimental API
      * Register iframe with the add-on SDK.
      * @param element - HTMLIframeElement to be registered.
      * @returns UnregisterIframe - Callback to unregister iframe from the add-on SDK.
@@ -745,6 +744,11 @@ declare interface Document_2 {
      * Import a presentation to the document.
      */
     importPresentation(blob: Blob, attributes: MediaAttributes): void;
+    /**
+     * @experimental - Experimental API
+     * Run print quality check
+     */
+    runPrintQualityCheck(options: PrintQualityCheckOptions): void;
 }
 export { Document_2 as Document };
 
@@ -1134,6 +1138,10 @@ export declare interface PageMetadata {
      */
     hasTemporalContent: boolean;
     /**
+     * Whether the page is blank
+     */
+    isBlank?: boolean;
+    /**
      * Pixels per inch of the page
      */
     pixelsPerInch?: number;
@@ -1141,21 +1149,16 @@ export declare interface PageMetadata {
      * Whether page is ready to print
      */
     isPrintReady?: boolean;
+    /**
+     * Template details of the page
+     */
+    templateDetails?: TemplateDetails;
 }
 
 /**
  * Options for fetching page metadata
  */
-export declare interface PageMetadataOptions {
-    /**
-     * Page range of the document to get the metadata
-     */
-    range: Range_2;
-    /**
-     * Ids of the pages (Only required if the range is "specificPages")
-     */
-    pageIds?: string[];
-}
+export declare interface PageMetadataOptions extends RangeOptions {}
 
 export declare interface PageRendition extends Rendition {
     /**
@@ -1351,6 +1354,12 @@ export declare interface PngRenditionOptions extends RenditionOptions {
 }
 
 /**
+ * @experimental - Experimental API
+ * Options for running print quality check
+ */
+export declare interface PrintQualityCheckOptions extends RangeOptions {}
+
+/**
  * Takes a type and wraps it in a Promise, if it not already is one.
  * This is to avoid `Promise<Promise<T>>`.
  *
@@ -1391,6 +1400,20 @@ declare enum Range_2 {
     specificPages = "specificPages"
 }
 export { Range_2 as Range };
+
+/**
+ * Options for providing range of pages
+ */
+export declare interface RangeOptions {
+    /**
+     * Page range of the document
+     */
+    range: Range_2;
+    /**
+     * Ids of the pages (Only required if the range is "specificPages")
+     */
+    pageIds?: string[];
+}
 
 /**
  * Takes the raw type of a remote object or function in the other thread and returns the type as it is visible to
@@ -1484,19 +1507,11 @@ export declare enum RenditionIntent {
     print = "print"
 }
 
-export declare interface RenditionOptions {
-    /**
-     * Range of the document to get the rendition
-     */
-    range: Range_2;
+export declare interface RenditionOptions extends RangeOptions {
     /**
      * Format of the rendition
      */
     format: RenditionFormat;
-    /**
-     * Ids of the pages (Only required if the range is "specificPages")
-     */
-    pageIds?: string[];
 }
 
 /**
@@ -1585,6 +1600,20 @@ export declare interface SearchAction extends PanelAction {
 export declare type SimpleDialogOptions = AlertDialogOptions | InputDialogOptions;
 
 /**
+ * Represents template data for a page
+ */
+export declare interface TemplateDetails {
+    /**
+     * Unique id of the template
+     */
+    id: string;
+    /**
+     * Creative intent of the template
+     */
+    creativeIntent?: string;
+}
+
+/**
  * Interface that contains methods and properties that are Application UI related.
  */
 export declare interface UI {
@@ -1605,7 +1634,6 @@ export declare interface UI {
      */
     readonly locales: string[];
     /**
-     * @experimental - Experimental API
      * Opens an Editor Panel
      * @param panel - one of {@link EditorPanel}
      * @param action - optional action to be performed on the panel {@link PanelAction}
@@ -1629,7 +1657,6 @@ declare type Unpromisify<P> = P extends Promise<infer T> ? T : P;
 declare type UnproxyOrClone<T> = T extends RemoteObject<ProxyMarked> ? Local<T> : T;
 
 /**
- * @experimental - Experimental API
  * Callback to unregister iframe from the add-on SDK.
  */
 declare type UnregisterIframe = () => void;
