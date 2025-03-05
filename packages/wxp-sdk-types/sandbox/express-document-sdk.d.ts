@@ -83,7 +83,9 @@ declare namespace ApiConstants {
         TextAlignment,
         TextType,
         EditorEvent,
-        VisualEffectType
+        VisualEffectType,
+        ParagraphListType,
+        OrderedListNumbering
     };
 }
 
@@ -104,7 +106,13 @@ declare interface ApiModuleExport {
  */
 export declare interface AreaTextLayout {
     type: TextType.area;
+    /**
+     * The width of the text node in pixels.
+     */
     width: number;
+    /**
+     * The height of the text node in pixels.
+     */
     height: number;
 }
 
@@ -193,6 +201,9 @@ export declare class ArtboardNode extends VisualNode implements IRectangularNode
  */
 export declare interface AutoHeightTextLayout {
     type: TextType.autoHeight;
+    /**
+     * The width of the text node in pixels.
+     */
     width: number;
 }
 
@@ -201,11 +212,6 @@ export declare interface AutoHeightTextLayout {
  */
 export declare class AvailableFont extends BaseFont {
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * Whether the font is a premium Adobe font.
      */
     get isPremium(): boolean;
@@ -213,11 +219,6 @@ export declare class AvailableFont extends BaseFont {
 }
 
 /**
- * <InlineAlert slots="text" variant="warning"/>
- *
- * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
- *
- * @experimental
  * Base character styles that can be applied to any range of characters.
  * Excludes font style, which differs between the getter-oriented {@link CharacterStyles} interface and the
  * setter-oriented {@link CharacterStylesInput}.
@@ -249,29 +250,14 @@ declare interface BaseCharacterStyles {
  */
 declare abstract class BaseFont {
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * The PostScript name of the font.
      */
     get postscriptName(): string;
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * The font family containing the font.
      */
     get family(): string;
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * The style of the font within the family.
      */
     get style(): string;
@@ -434,11 +420,6 @@ declare enum BlendMode {
 }
 
 /**
- * <InlineAlert slots="text" variant="warning"/>
- *
- * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
- *
- * @experimental
  * Text styles that can be applied to any range of characters, even a short span like a single word. (Contrast with
  * ParagraphStyles, which must be applied to an entire paragraph atomically).
  */
@@ -447,11 +428,6 @@ export declare interface CharacterStyles extends BaseCharacterStyles {
 }
 
 /**
- * <InlineAlert slots="text" variant="warning"/>
- *
- * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
- *
- * @experimental
  * Variant of {@link CharacterStyles} with all style fields optional, used for applyCharacterStyles(). When using that API,
  * any fields not specified are left unchanged, preserving the text's existing styles.
  *
@@ -463,11 +439,6 @@ export declare interface CharacterStylesInput extends Partial<BaseCharacterStyle
 }
 
 /**
- * <InlineAlert slots="text" variant="warning"/>
- *
- * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
- *
- * @experimental
  * A set of {@link CharacterStyles} along with the range of characters they apply to. Seen in the characterStyleRanges getter.
  *
  * Note that fonts returned by the getter are *not* guaranteed to be ones the user has rights to edit with, even though they
@@ -476,11 +447,6 @@ export declare interface CharacterStylesInput extends Partial<BaseCharacterStyle
 export declare interface CharacterStylesRange extends CharacterStyles, StyleRange {}
 
 /**
- * <InlineAlert slots="text" variant="warning"/>
- *
- * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
- *
- * @experimental
  * Variant of {@link CharacterStylesRange} with all style fields optional, along with the range of characters they apply to.
  * Used for the characterStyleRanges setter. When invoking the setter, any fields not specified are reset to their defaults.
  *
@@ -910,11 +876,6 @@ declare enum FillType {
 }
 
 /**
- * <InlineAlert slots="text" variant="warning"/>
- *
- * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
- *
- * @experimental
  * Represents a font in the document.
  *
  * Note: not every font encountered in the existing content is available for editing.
@@ -927,11 +888,6 @@ export declare type Font = AvailableFont | UnavailableFont;
  */
 export declare class Fonts {
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * Get an {@link AvailableFont} that exactly matches the given PostScript name, if any. Only fonts that the user has permission to use
      * for editing content are returned, so the result of this call is always safe to apply to a {@link TextContentModel}'s styles.
      *
@@ -1003,6 +959,9 @@ export declare class GroupNode extends Node implements ContainerNode {
      */
     set maskShape(mask: FillableNode | undefined);
     /**
+     * {@inheritDoc VisualNode.boundsLocal}
+     *
+     * @returns
      * Note: If this group has a maskShape, group's bounds are always identical to the maskShape's, regardless of the
      * group's other content.
      */
@@ -1866,11 +1825,6 @@ export declare class TextContentModel {
      */
     get id(): string;
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * Get ordered list of all {@link TextNode}s that display this text content in the scenegraph. The text content
      * starts in the first  {@link TextNode} "frame", and then flows into the second node once it has filled the first one. The ending of the
      * text content may not be visible at all, if the last {@link TextNode} "frame" is not large enough to accommodate it.
@@ -1884,11 +1838,6 @@ export declare class TextContentModel {
     get text(): string;
     set text(textContent: string);
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * The character styles are applied to different ranges of this text content. When setting character styles, any style
      * properties that are not provided are reset to their defaults (contrast to {@link applyCharacterStyles} which
      * preserves the text's existing styles for any fields not specified). When *getting* styles, all fields are always
@@ -1925,11 +1874,6 @@ export declare class TextContentModel {
      */
     set paragraphStyleRanges(styles: readonly ParagraphStylesRangeInput[]);
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * Apply one or more styles to the characters in the given range, leaving any style properties that were not specified
      * unchanged. Does not modify any styles in the text outside this range. Contrast to the {@link characterStyleRanges}
      * setter, which specifies new style range(s) for the entire text at once, and resets any unspecified properties back to
@@ -1982,6 +1926,24 @@ export declare class TextContentModel {
  */
 export declare class TextNode extends Node {
     /**
+     * {@inheritDoc VisualNode.centerPointLocal}
+     *
+     * @returns
+     * Note: The center of the orphaned TextNode may be different from the center of the node placed on a page. It is
+     * recommended to use this property only when the node is placed on a page.
+     *
+     */
+    get centerPointLocal(): Readonly<Point>;
+    /**
+     * {@inheritDoc VisualNode.topLeftLocal}
+     *
+     * @returns
+     * Note: The top-left of the orphaned TextNode may be different from the top-left of the node placed on a
+     * page. It is recommended to use this property only when the node is placed on a page.
+     *
+     */
+    get topLeftLocal(): Readonly<Point>;
+    /**
      * The model containing the complete text string and its styles, only part of which may be visible within the bounds of
      * this specific TextNode "frame." The full text content flow may be split across multiple frames, and/or it may be clipped if a
      * fixed-size frame using {@link AreaTextLayout} does not fit all the (remaining) text.
@@ -1994,11 +1956,6 @@ export declare class TextNode extends Node {
      */
     get fullContent(): TextContentModel;
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * The next TextNode that text overflowing this node will spill into, if any. If undefined and this TextNode is fixed size
      * ({@link AreaTextLayout}), any text content that does not fit within this node's area will be clipped.
      *
@@ -2025,11 +1982,6 @@ export declare class TextNode extends Node {
     get textAlignment(): TextAlignment;
     set textAlignment(alignment: TextAlignment);
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * @returns The list of visual effects applied to the TextNode.
      */
     get visualEffects(): readonly VisualEffectType[];
@@ -2156,11 +2108,6 @@ export declare class Viewport {
 export declare const viewport: ExpressViewport;
 
 /**
- * <InlineAlert slots="text" variant="warning"/>
- *
- * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
- *
- * @experimental
  * Visual effects that can be applied to a text node.
  */
 declare enum VisualEffectType {
@@ -2198,8 +2145,7 @@ export declare class VisualNode extends BaseNode {
      */
     get boundsLocal(): Readonly<Rect>;
     /**
-     * Position of the node's centerpoint in its own local coordinate space, i.e. the center of the boundsLocal
-     * box.
+     * Position of the node's centerpoint in its own local coordinate space, i.e. the center of the boundsLocal box.
      */
     get centerPointLocal(): Readonly<Point>;
     /**
