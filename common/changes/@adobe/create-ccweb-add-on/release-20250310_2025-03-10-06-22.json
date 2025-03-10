@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/create-ccweb-add-on",
+      "comment": "bug fix - path.join expects actual path",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@adobe/create-ccweb-add-on"
+}
