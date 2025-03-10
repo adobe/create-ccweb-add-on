@@ -175,8 +175,7 @@ export class WxpAddOnFactory implements AddOnFactory {
         const targetPath = path.join(addOnDirectory, TEMP_TEMPLATE_PATH);
         fs.ensureDirSync(targetPath);
 
-        const templateFilePath = path.join(import.meta.url, "..", "..", "templates", templateName);
-        const templateDirectory = url.fileURLToPath(templateFilePath);
+        const templateDirectory = path.join(url.fileURLToPath(import.meta.url), "..", "..", "templates", templateName);
 
         if (fs.existsSync(templateDirectory)) {
             fs.copySync(templateDirectory, targetPath);
