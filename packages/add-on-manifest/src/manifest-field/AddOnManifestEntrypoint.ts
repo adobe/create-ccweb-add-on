@@ -24,8 +24,10 @@
 
 import { ManifestVersion } from "../AddOnManifest.js";
 import {
+    Command,
     EntrypointV1,
     EntrypointV2,
+    CommandEntrypoint,
     LocalisedStrings,
     ManifestEntrypoint,
     Permissions,
@@ -34,7 +36,7 @@ import {
 
 interface ManifestEntrypointTypeMap {
     [ManifestVersion.V1]: EntrypointV1;
-    [ManifestVersion.V2]: EntrypointV2;
+    [ManifestVersion.V2]: EntrypointV2 | CommandEntrypoint;
 }
 
 export type ManifestEntrypointType<T extends ManifestVersion> = ManifestEntrypointTypeMap[T];
@@ -121,6 +123,17 @@ export class AddOnManifestEntrypoint {
             }
             default: {
                 return (this._entrypoint as ManifestEntrypointType<ManifestVersion.V2>).discoverable;
+            }
+        }
+    }
+
+    get commands(): Command[] | undefined {
+        switch (this._manifestVersion) {
+            case ManifestVersion.V1: {
+                return undefined;
+            }
+            default: {
+                return (this._entrypoint as ManifestEntrypointType<ManifestVersion.V2> as CommandEntrypoint)?.commands;
             }
         }
     }

@@ -189,7 +189,7 @@ export class AddOnManifest {
         }
     }
 
-    get entryPoints(): Readonly<AddOnManifestEntrypoint[]> {
+    get entryPoints(): readonly AddOnManifestEntrypoint[] {
         if (!this._entrypoints.length) {
             this._manifest.entryPoints.forEach(entrypoint => {
                 this._entrypoints.push(new AddOnManifestEntrypoint(this._manifest.manifestVersion, entrypoint));

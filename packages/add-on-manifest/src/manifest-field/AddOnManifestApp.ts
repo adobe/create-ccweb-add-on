@@ -40,7 +40,7 @@ export class AddOnManifestApp {
         return this._app.apiVersion;
     }
 
-    get supportedDeviceClass(): Readonly<string[]> {
+    get supportedDeviceClass(): readonly string[] {
         return this._app.supportedDeviceClass || DEFAULT_SUPPORTED_DEVICE_CLASS;
     }
 }

@@ -23,6 +23,7 @@
  ********************************************************************************/
 
 import { assert } from "chai";
+import "mocha";
 import { OTHER_MANIFEST_ERRORS } from "../AddOnManifestTypes.js";
 import { AddOnManifestValidator } from "../AddOnManifestValidator.js";
 import {

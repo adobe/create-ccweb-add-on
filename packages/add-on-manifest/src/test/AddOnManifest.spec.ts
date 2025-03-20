@@ -23,6 +23,7 @@
  ********************************************************************************/
 
 import { assert } from "chai";
+import "mocha";
 import sinon from "sinon";
 import { AddOnManifest, ManifestVersion } from "../AddOnManifest.js";
 import { AddOnLogAction, AddOnLogLevel, OTHER_MANIFEST_ERRORS } from "../AddOnManifestTypes.js";
@@ -90,6 +91,7 @@ describe("AddOnManifest", () => {
 
         assert.equal(manifest.entryPoints[0].label, testManifest.entryPoints[0].label);
         assert.equal(manifest.entryPoints[0].defaultSize, testManifest.entryPoints[0].defaultSize);
+        assert.equal(manifest.entryPoints[0].commands, undefined);
         assert.equal(manifest.requirements.apps, testManifest.requirements.apps);
         assert.equal(manifest.requirements.privilegedApis, false);
         assert.equal(false, manifest.requirements.supportsTouch);
@@ -114,6 +116,7 @@ describe("AddOnManifest", () => {
 
         assert.equal(manifest.entryPoints[0].label, undefined);
         assert.equal(manifest.entryPoints[0].defaultSize, testManifest.entryPoints[0].defaultSize);
+        assert.deepEqual(manifest.entryPoints[1].commands, testManifest.entryPoints[1].commands);
 
         const apps = manifest.requirements.apps as AddOnManifestApp[];
         assert.equal(testManifest.requirements.supportsTouch, manifest.requirements.supportsTouch);
@@ -129,7 +132,7 @@ describe("AddOnManifest", () => {
         assert.equal(apps[1].supportedDeviceClass, DEFAULT_SUPPORTED_DEVICE_CLASS);
     });
 
-    it("should return deafult manifestVersion for dev AddOn", () => {
+    it("should return default manifestVersion for dev AddOn", () => {
         const devManifest = getTestDeveloperManifestV1() as ReturnType<typeof JSON.parse>;
         delete devManifest.manifestVersion;
         const { manifest } = AddOnManifest.createManifest(
