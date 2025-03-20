@@ -1,4 +1,4 @@
-import { LitElement, html } from "lit";
+import { LitElement, TemplateResult, html } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import { until } from "lit/directives/until.js";
 import "./components/App";
@@ -10,7 +10,7 @@ export class Root extends LitElement {
     @state()
     private _isAddOnUISdkReady = addOnUISdk.ready;
 
-    render() {
+    render(): TemplateResult {
         return html`
             ${until(
                 this._isAddOnUISdkReady.then(() => {

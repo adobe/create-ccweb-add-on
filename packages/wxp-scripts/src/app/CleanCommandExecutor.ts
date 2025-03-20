@@ -81,7 +81,6 @@ export class CleanCommandExecutor implements CommandExecutor {
 
 const LOGS = {
     newLine: "\n",
-    executeProgramExample: "{PROGRAM_NAME} build",
     cleaningOutputDirectory: "Cleaning output directory {DEFAULT_OUTPUT_DIRECTORY}/ ...",
     cleaningingSuccess: "Successfully cleaned output directory.",
     done: "Done."

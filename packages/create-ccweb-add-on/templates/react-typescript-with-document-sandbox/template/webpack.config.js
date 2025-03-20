@@ -18,6 +18,7 @@ module.exports = {
         outputModule: true
     },
     output: {
+        pathinfo: !isEnvProduction,
         path: path.resolve(__dirname, "dist"),
         module: true,
         filename: "[name].js"

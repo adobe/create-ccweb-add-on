@@ -33,5 +33,5 @@ export interface CommandExecutor {
      * @param options - Command arguments entered by user represented as {@link CommandOptions}.
      * @returns Promise.
      */
-    execute(options: CommandOptions): Promise<void>;
+    execute(options?: CommandOptions): Promise<void>;
 }

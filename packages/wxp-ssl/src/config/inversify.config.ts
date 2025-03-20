@@ -23,20 +23,27 @@
  ********************************************************************************/
 
 import { IContainer as ICoreContainer } from "@adobe/ccweb-add-on-core";
+import { Container } from "inversify";
 import "reflect-metadata";
 import type { CommandExecutor, SSLReader } from "../app/index.js";
-import { SetupCommandExecutor, WxpSSLReader } from "../app/index.js";
+import { PurgeCommandExecutor, SetupCommandExecutor, WxpSSLReader } from "../app/index.js";
 import type { CommandValidator } from "../validators/index.js";
 import { SetupCommandValidator } from "../validators/index.js";
 import { ITypes } from "./inversify.types.js";
 
-const container = ICoreContainer;
+const container: Container = ICoreContainer;
 
 container
     .bind<CommandExecutor>(ITypes.CommandExecutor)
     .to(SetupCommandExecutor)
     .inSingletonScope()
     .whenTargetNamed("setup");
+
+container
+    .bind<CommandExecutor>(ITypes.CommandExecutor)
+    .to(PurgeCommandExecutor)
+    .inSingletonScope()
+    .whenTargetNamed("purge");
 
 container
     .bind<CommandValidator>(ITypes.CommandValidator)

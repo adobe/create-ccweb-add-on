@@ -34,7 +34,7 @@ export class UncaughtExceptionHandler {
      * Register handler for catching any uncaught exception.
      * @param programName - Program from where the exception could be thrown.
      */
-    static registerExceptionHandler(programName: string) {
+    static registerExceptionHandler(programName: string): void {
         process.on("uncaughtException", error => this.handleUncaughtException(programName, error));
     }
 

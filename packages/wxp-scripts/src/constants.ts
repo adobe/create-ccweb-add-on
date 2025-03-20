@@ -24,7 +24,7 @@
 
 export const PROGRAM_NAME = "ccweb-add-on-scripts";
 
-export const EXTENSIONS_TO_TRANSPILE = new Set<string>([".ts", ".jsx", ".tsx"]);
+export const EXTENSIONS_TO_TRANSPILE: Set<string> = new Set<string>([".ts", ".jsx", ".tsx"]);
 
 export const HTTPS = "https";
 export const WSS = "wss";

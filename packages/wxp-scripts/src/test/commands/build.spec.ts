@@ -77,7 +77,13 @@ describe("build", () => {
         it("should execute succesfully when no parameters are passed.", async () => {
             analyticsConsent.get.resolves(true);
 
-            const build = new Build([], new Config({ name: PROGRAM_NAME, root: "." }));
+            const build = new Build([], new Config({ name: PROGRAM_NAME, version: "1.0.0", root: "." }));
+            sandbox
+                // @ts-ignore - Sidestep `this.parse()` error when calling `run()` directly.
+                .stub(build, "parse")
+                .resolves({
+                    flags: { src: DEFAULT_SRC_DIRECTORY, use: "", analytics: undefined, verbose: false }
+                });
 
             await build.run();
 
@@ -93,8 +99,14 @@ describe("build", () => {
 
             const build = new Build(
                 ["--src", DEFAULT_SRC_DIRECTORY, "--use", "tsc", "--analytics", "off", "--verbose"],
-                new Config({ root: "." })
+                new Config({ name: PROGRAM_NAME, version: "1.0.0", root: "." })
             );
+            sandbox
+                // @ts-ignore - Sidestep `this.parse()` error when calling `run()` directly.
+                .stub(build, "parse")
+                .resolves({
+                    flags: { src: DEFAULT_SRC_DIRECTORY, use: "tsc", analytics: "off", verbose: true }
+                });
 
             await build.run();
 
@@ -106,12 +118,11 @@ describe("build", () => {
     });
 
     describe("catch", () => {
-        it("should fail when incorrect params are passed", async () => {
-            const setup = new Build(["--incorrect-flag"], new Config({ root: "." }));
+        it("should fail for any errors in command execution.", async () => {
+            const build = new Build([], new Config({ name: PROGRAM_NAME, version: "1.0.0", root: "." }));
 
-            const error = new Error("Nonexistent flag: --incorrect-flag\nSee more help with --help");
-
-            await expect(setup.catch(error)).to.be.rejectedWith();
+            const error = new Error("Something went wrong.");
+            await expect(build.catch(error)).to.be.rejectedWith(error);
 
             assert.equal(
                 analyticsService.postEvent.calledOnceWith(

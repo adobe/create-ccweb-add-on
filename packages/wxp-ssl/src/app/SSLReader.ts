@@ -45,7 +45,8 @@ export interface SSLReader {
     /**
      * Read the SSL artifacts.
      * @param hostname - Hostname in the SSL certificate.
+     * @param port - Port where the add-on is being hosted.
      * @returns Promise of {@link SSLData}.
      */
-    read(hostname: string): Promise<SSLData>;
+    read(hostname: string, port: number): Promise<SSLData>;
 }

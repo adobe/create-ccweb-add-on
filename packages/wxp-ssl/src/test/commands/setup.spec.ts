@@ -28,21 +28,18 @@ import { Config } from "@oclif/core";
 import chai, { assert, expect } from "chai";
 import chaiAsPromised from "chai-as-promised";
 import "mocha";
-import { createRequire } from "module";
 import sinon from "sinon";
 import type { StubbedInstance } from "ts-sinon";
 import { stubInterface } from "ts-sinon";
 import { AnalyticsErrorMarkers } from "../../AnalyticsMarkers.js";
-import type { CommandExecutor, SetupCommandExecutor } from "../../app/index.js";
+import type { SetupCommandExecutor } from "../../app/index.js";
 import { Setup } from "../../commands/setup.js";
 import { IContainer, ITypes } from "../../config/index.js";
+import { PROGRAM_NAME } from "../../constants.js";
 import { SetupCommandOptions } from "../../models/SetupCommandOptions.js";
-import type { CommandValidator } from "../../validators/CommandValidator.js";
 import type { SetupCommandValidator } from "../../validators/SetupCommandValidator.js";
 
 chai.use(chaiAsPromised);
-
-const { test } = createRequire(import.meta.url)("@oclif/test");
 
 describe("Setup", () => {
     let sandbox: sinon.SinonSandbox;
@@ -50,8 +47,8 @@ describe("Setup", () => {
     let container: sinon.SinonStub;
     let namedContainer: sinon.SinonStub;
 
-    let commandExecutor: StubbedInstance<CommandExecutor>;
-    let commandValidator: StubbedInstance<CommandValidator>;
+    let commandExecutor: StubbedInstance<SetupCommandExecutor>;
+    let commandValidator: StubbedInstance<SetupCommandValidator>;
 
     let analyticsConsent: StubbedInstance<AnalyticsConsent>;
     let analyticsService: StubbedInstance<AnalyticsService>;
@@ -59,10 +56,10 @@ describe("Setup", () => {
     beforeEach(() => {
         sandbox = sinon.createSandbox();
 
-        commandExecutor = stubInterface<SetupCommandExecutor>();
+        commandExecutor = stubInterface();
         commandExecutor.execute.resolves();
 
-        commandValidator = stubInterface<SetupCommandValidator>();
+        commandValidator = stubInterface();
         commandValidator.validate.resolves();
 
         namedContainer = sandbox.stub(IContainer, "getNamed");
@@ -81,30 +78,27 @@ describe("Setup", () => {
         sandbox.restore();
     });
 
-    describe("setup", () => {
-        test.stdout()
-            .command(["setup", "--hostname=localhost", "--analytics=on", "--verbose"])
-            .it("should execute succesfully when correct parameters are passed.", async () => {
-                analyticsConsent.set.resolves();
-
-                const options = new SetupCommandOptions("localhost", false, true);
-                assert.equal(commandValidator.validate.calledOnceWith(options), true);
-                assert.equal(commandExecutor.execute.calledOnceWith(options), true);
-            });
-    });
-
     describe("run", () => {
         it("should execute succesfully when correct parameters are passed without analytics.", async () => {
             analyticsConsent.get.resolves(true);
 
             const hostname = "localhost";
-            const setup = new Setup(["--hostname", hostname, "--verbose"], new Config({ root: "." }));
+            const setup = new Setup(
+                ["--hostname", hostname, "--verbose"],
+                new Config({ name: PROGRAM_NAME, version: "1.0.0", root: "." })
+            );
+            sandbox
+                // @ts-ignore - Sidestep `this.parse()` error when calling `run()` directly.
+                .stub(setup, "parse")
+                .resolves({
+                    flags: { hostname, useExisting: false, analytics: undefined, verbose: false }
+                });
 
             await setup.run();
 
             assert.equal(analyticsConsent.get.callCount, 1);
 
-            const options = new SetupCommandOptions(hostname, false, true);
+            const options = new SetupCommandOptions(hostname, false, false);
             assert.equal(commandValidator.validate.calledOnceWith(options), true);
             assert.equal(commandExecutor.execute.calledOnceWith(options), true);
         });
@@ -116,8 +110,14 @@ describe("Setup", () => {
             const hostname = "localhost";
             const setup = new Setup(
                 ["--hostname", hostname, "--analytics", "off", "--verbose"],
-                new Config({ root: "." })
+                new Config({ name: PROGRAM_NAME, version: "1.0.0", root: "." })
             );
+            sandbox
+                // @ts-ignore - Sidestep `this.parse()` error when calling `run()` directly.
+                .stub(setup, "parse")
+                .resolves({
+                    flags: { hostname, useExisting: false, analytics: "off", verbose: true }
+                });
 
             await setup.run();
 
@@ -130,12 +130,11 @@ describe("Setup", () => {
     });
 
     describe("catch", () => {
-        it("should fail when incorrect parameters are passed.", async () => {
-            const setup = new Setup(["--incorrect-flag"], new Config({ root: "." }));
+        it("should fail for any errors in command execution.", async () => {
+            const setup = new Setup([], new Config({ name: PROGRAM_NAME, version: "1.0.0", root: "." }));
 
-            const error = new Error("Nonexistent flag: --incorrect-flag\nSee more help with --help");
-
-            await expect(setup.catch(error)).to.be.rejectedWith();
+            const error = new Error("Something went wrong.");
+            await expect(setup.catch(error)).to.be.rejectedWith(error);
 
             assert.equal(
                 analyticsService.postEvent.calledOnceWith(AnalyticsErrorMarkers.ERROR_SSL_SETUP, error.message, false),

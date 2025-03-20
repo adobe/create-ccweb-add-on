@@ -24,7 +24,7 @@
 
 import type { Logger, PackageJson, TemplateJson } from "@adobe/ccweb-add-on-core";
 import { IContainer as ICoreContainer, ITypes as ICoreTypes } from "@adobe/ccweb-add-on-core";
-import type { interfaces } from "inversify";
+import type { Container, interfaces } from "inversify";
 import "reflect-metadata";
 import type { AddOnBuilder, AddOnScaffolder, PackageBuilder } from "../app/index.js";
 import { TemplateAddOnBuilder, TemplateAddOnScaffolder, TemplatePackageBuilder } from "../app/index.js";
@@ -33,7 +33,7 @@ import type { TemplateValidator } from "../validators/index.js";
 import { AddOnTemplateValidator } from "../validators/index.js";
 import { ITypes } from "./inversify.types.js";
 
-const container = ICoreContainer;
+const container: Container = ICoreContainer;
 
 container
     .bind<interfaces.Factory<AddOnBuilder>>(ITypes.AddOnBuilder)

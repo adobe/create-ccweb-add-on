@@ -25,10 +25,10 @@
 import type { AnalyticsService } from "@adobe/ccweb-add-on-analytics";
 import type { Logger, Preferences } from "@adobe/ccweb-add-on-core";
 import { ADD_ON_PREFERENCES_FILE, PreferenceJson } from "@adobe/ccweb-add-on-core";
+import devcert from "@adobe/ccweb-add-on-devcert";
 import chai, { assert, expect } from "chai";
 import chaiAsPromised from "chai-as-promised";
 import chalk from "chalk";
-import devcert from "@adobe/ccweb-add-on-devcert";
 import type { Stats } from "fs-extra";
 import fs from "fs-extra";
 import "mocha";
@@ -47,7 +47,7 @@ import { SSLRemoveOption, SSLSetupOption, SetupCommandOptions } from "../../mode
 
 chai.use(chaiAsPromised);
 
-describe("SSLSetupCommandExecutor", () => {
+describe("SetupCommandExecutor", () => {
     let sandbox: SinonSandbox;
 
     let preferences: StubbedInstance<Preferences>;
@@ -140,8 +140,6 @@ describe("SSLSetupCommandExecutor", () => {
 
                 analyticsService.postEvent.resolves();
 
-                logger.warning.returns();
-
                 const processExitStub = sandbox.stub(process, "exit");
 
                 const options = new SetupCommandOptions(hostname, true, false);
@@ -191,7 +189,6 @@ describe("SSLSetupCommandExecutor", () => {
 
                 analyticsService.postEvent.resolves();
 
-                logger.warning.returns();
                 logger.error.returns();
 
                 const processExitStub = sandbox.stub(process, "exit");
@@ -280,7 +277,6 @@ describe("SSLSetupCommandExecutor", () => {
 
                 analyticsService.postEvent.resolves();
 
-                logger.warning.returns();
                 logger.error.returns();
 
                 const processExitStub = sandbox.stub(process, "exit");
@@ -355,9 +351,6 @@ describe("SSLSetupCommandExecutor", () => {
 
                 analyticsService.postEvent.resolves();
 
-                logger.warning.returns();
-                logger.success.returns();
-
                 const existsStub = sandbox.stub(fs, "existsSync");
                 existsStub.withArgs(certificatePath).returns(true);
                 existsStub.withArgs(keyPath).returns(true);
@@ -422,10 +415,6 @@ describe("SSLSetupCommandExecutor", () => {
 
                 analyticsService.postEvent.resolves();
 
-                logger.warning.returns();
-                logger.success.returns();
-                logger.message.returns();
-
                 const options = new SetupCommandOptions(hostname, true, false);
                 await commandExecutor.execute(options);
 
@@ -444,7 +433,9 @@ describe("SSLSetupCommandExecutor", () => {
                 assert.equal(
                     logger.message
                         .getCall(0)
-                        .calledWith("This is only a one time step and may require you to enter your system's password"),
+                        .calledWith(
+                            "This is only a one time step and may require you to enter your system's password,"
+                        ),
                     true
                 );
                 assert.equal(
@@ -505,7 +496,7 @@ describe("SSLSetupCommandExecutor", () => {
                 initial: 0
             };
 
-            it("should prompt on whether to remove existing SSL and log warning and exit when user does not select any option.", async () => {
+            it("should prompt on whether to remove existing SSL and exit when user does not select any option.", async () => {
                 const hostname = "localhost";
                 sslReader.isCustomSSL.withArgs(hostname).returns(true);
                 sslReader.isWxpSSL.withArgs(hostname).returns(false);
@@ -514,8 +505,6 @@ describe("SSLSetupCommandExecutor", () => {
                 promptStub.withArgs(shouldRemovePrompt).resolves({ shouldRemove: undefined });
 
                 analyticsService.postEvent.resolves();
-
-                logger.warning.returns();
 
                 const processExitStub = sandbox.stub(process, "exit");
 
@@ -562,8 +551,6 @@ describe("SSLSetupCommandExecutor", () => {
 
                 analyticsService.postEvent.resolves();
 
-                logger.warning.returns();
-
                 const options = new SetupCommandOptions(hostname, false, false);
                 await commandExecutor.execute(options);
 
@@ -597,8 +584,6 @@ describe("SSLSetupCommandExecutor", () => {
 
                 analyticsService.postEvent.resolves();
 
-                logger.warning.returns();
-
                 preferences.get.onCall(0).returns(
                     new PreferenceJson({
                         ssl: {
@@ -619,9 +604,6 @@ describe("SSLSetupCommandExecutor", () => {
                 preferences.set.returns();
 
                 analyticsService.postEvent.resolves();
-
-                logger.warning.returns();
-                logger.success.returns();
 
                 const existsStub = sandbox.stub(fs, "existsSync");
                 existsStub.withArgs(certificatePath).returns(true);
@@ -657,7 +639,12 @@ describe("SSLSetupCommandExecutor", () => {
                     true
                 );
 
-                assert.equal(logger.success.getCall(0).calledWith("Removed.", { postfix: "\n" }), true);
+                assert.equal(
+                    logger.success
+                        .getCall(0)
+                        .calledWith("Removed existing SSL certificate.", { prefix: "\n", postfix: "\n" }),
+                    true
+                );
 
                 assert.equal(
                     logger.success
@@ -674,7 +661,7 @@ describe("SSLSetupCommandExecutor", () => {
                 );
             });
 
-            it("should remove existing and create a new one when user chooses to remove an automatically set up SSL.", async () => {
+            it("should re-create an SSL certificate when user chooses to remove a valid, automatically set up SSL.", async () => {
                 const hostname = "localhost";
 
                 // SSL remove.
@@ -685,8 +672,6 @@ describe("SSLSetupCommandExecutor", () => {
                 promptStub.withArgs(shouldRemovePrompt).resolves({ shouldRemove: SSLRemoveOption.Remove });
 
                 analyticsService.postEvent.resolves();
-
-                logger.warning.returns();
 
                 // SSL setup.
                 promptStub.withArgs(sslSetupTypePrompt).resolves({
@@ -705,16 +690,14 @@ describe("SSLSetupCommandExecutor", () => {
                     // @ts-ignore -- IReturnData mock response
                     .resolves({ cert: <Buffer>{}, key: <Buffer>{}, caPath });
 
+                sandbox.stub(devcert, "caExpiryInDays").returns(100);
+
                 const removeDomainStub = sandbox.stub(devcert, "removeDomain");
                 removeDomainStub.withArgs(hostname).resolves();
 
                 sandbox.stub(path, "resolve").withArgs(caPath, "..", "..", "domains", hostname).returns(sslDirectory);
 
                 analyticsService.postEvent.resolves();
-
-                logger.warning.returns();
-                logger.success.returns();
-                logger.message.returns();
 
                 const options = new SetupCommandOptions(hostname, false, false);
                 await commandExecutor.execute(options);
@@ -741,13 +724,137 @@ describe("SSLSetupCommandExecutor", () => {
                     true
                 );
 
-                assert.equal(logger.success.getCall(0).calledWith("Removed.", { postfix: "\n" }), true);
+                assert.equal(
+                    logger.success
+                        .getCall(0)
+                        .calledWith("Removed existing SSL certificate.", { prefix: "\n", postfix: "\n" }),
+                    true
+                );
                 assert.equal(logger.success.getCall(1).calledWith("SSL setup complete!", { prefix: "\n" }), true);
 
                 assert.equal(
                     logger.message
                         .getCall(0)
-                        .calledWith("This is only a one time step and may require you to enter your system's password"),
+                        .calledWith(
+                            "This is only a one time step and may require you to enter your system's password,"
+                        ),
+                    true
+                );
+                assert.equal(
+                    logger.message
+                        .getCall(1)
+                        .calledWith(
+                            "so that the SSL certificate can be added to your system's trusted certificate path."
+                        ),
+                    true
+                );
+                assert.equal(
+                    logger.message
+                        .getCall(2)
+                        .calledWith("[If this takes longer than expected, please break and retry]"),
+                    true
+                );
+
+                assert.equal(
+                    logger.information
+                        .getCall(0)
+                        .calledWith("Setting up self-signed SSL certificate ...", { prefix: "\n" }),
+                    true
+                );
+                assert.equal(
+                    logger.information
+                        .getCall(1)
+                        .calledWith(format("You can find the SSL certificate in {sslDirectory}.", { sslDirectory }), {
+                            postfix: "\n"
+                        }),
+                    true
+                );
+
+                assert.equal(
+                    analyticsService.postEvent
+                        .getCall(1)
+                        .calledWith(AnalyticsSuccessMarkers.SUCCESSFUL_SSL_AUTOMATIC_SETUP, options.hostname, true),
+                    true
+                );
+            });
+
+            it("should re-create an SSL certificate when user chooses to remove an expired, automatically set up SSL.", async () => {
+                const hostname = "localhost";
+
+                // SSL remove.
+                sslReader.isCustomSSL.withArgs(hostname).returns(false);
+                sslReader.isWxpSSL.withArgs(hostname).returns(true);
+
+                const promptStub = sandbox.stub(prompts, "prompt");
+                promptStub.withArgs(shouldRemovePrompt).resolves({ shouldRemove: SSLRemoveOption.Remove });
+
+                analyticsService.postEvent.resolves();
+
+                // SSL setup.
+                promptStub.withArgs(sslSetupTypePrompt).resolves({
+                    sslSetupType: SSLSetupOption.Automatically
+                });
+
+                preferences.get.onCall(1).returns(new PreferenceJson({}));
+                preferences.set.returns();
+
+                const caPath = "/some-directory/certificate-authority/certificate.cert";
+                const sslDirectory = `/some-directory/domains/${hostname}`;
+
+                sandbox
+                    .stub(devcert, "certificateFor")
+                    .withArgs(hostname, { getCaPath: true })
+                    // @ts-ignore -- IReturnData mock response
+                    .resolves({ cert: <Buffer>{}, key: <Buffer>{}, caPath });
+
+                sandbox.stub(devcert, "caExpiryInDays").returns(0);
+
+                const removeAllStub = sandbox.stub(devcert, "removeAll");
+                removeAllStub.returns();
+
+                sandbox.stub(path, "resolve").withArgs(caPath, "..", "..", "domains", hostname).returns(sslDirectory);
+
+                analyticsService.postEvent.resolves();
+
+                const options = new SetupCommandOptions(hostname, false, false);
+                await commandExecutor.execute(options);
+
+                assert.equal(removeAllStub.calledOnce, true);
+
+                assert.equal(
+                    logger.warning.calledOnceWith(
+                        format(
+                            "A trusted SSL certificate is already configured for the Add-on to run on https://{hostname}",
+                            { hostname: options.hostname }
+                        ),
+                        {
+                            prefix: "\n"
+                        }
+                    ),
+                    true
+                );
+
+                assert.equal(
+                    analyticsService.postEvent
+                        .getCall(0)
+                        .calledWith(AnalyticsSuccessMarkers.SUCCESSFUL_SSL_AUTOMATIC_REMOVE, options.hostname, true),
+                    true
+                );
+
+                assert.equal(
+                    logger.success
+                        .getCall(0)
+                        .calledWith("Removed existing SSL certificate.", { prefix: "\n", postfix: "\n" }),
+                    true
+                );
+                assert.equal(logger.success.getCall(1).calledWith("SSL setup complete!", { prefix: "\n" }), true);
+
+                assert.equal(
+                    logger.message
+                        .getCall(0)
+                        .calledWith(
+                            "This is only a one time step and may require you to enter your system's password,"
+                        ),
                     true
                 );
                 assert.equal(

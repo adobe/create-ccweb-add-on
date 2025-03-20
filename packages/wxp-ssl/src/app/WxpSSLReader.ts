@@ -28,6 +28,7 @@ import devcert from "@adobe/ccweb-add-on-devcert";
 import fs from "fs-extra";
 import { inject, injectable } from "inversify";
 import "reflect-metadata";
+import format from "string-template";
 import type { SSLData } from "../models/index.js";
 
 /**
@@ -70,23 +71,26 @@ export class WxpSSLReader {
     /**
      * Read the SSL artifacts.
      * @param hostname - Hostname in the SSL certificate.
+     * @param port - Port where the add-on is being hosted.
      * @returns Promise of {@link SSLData}.
      */
-    async read(hostname: string): Promise<SSLData> {
+    async read(hostname: string, port: number): Promise<SSLData> {
         const sslSettings = this._getUserDefinedSSL(hostname);
 
         // When SSL is set up manuually by the `user`.
         if (sslSettings !== undefined) {
             const { certificatePath, keyPath } = sslSettings;
             if (!certificatePath || !isFile(certificatePath)) {
-                this._logger.error(LOGS.invalidCertificatePath);
+                this._handleInvalidUserSSLCertificate(LOGS.invalidCertificatePath);
                 return process.exit(1);
             }
 
             if (!keyPath || !isFile(keyPath)) {
-                this._logger.error(LOGS.invalidKeyPath);
+                this._handleInvalidUserSSLCertificate(LOGS.invalidKeyPath);
                 return process.exit(1);
             }
+
+            this._handleUnknownExpirySSLCertificate(hostname, port);
 
             return {
                 cert: fs.readFileSync(certificatePath),
@@ -96,10 +100,23 @@ export class WxpSSLReader {
 
         // When SSL is set up automatically by `devcert`.
         if (this.isWxpSSL(hostname)) {
+            const caExpiry = devcert.caExpiryInDays();
+            const certificateExpiry = devcert.certificateExpiryInDays(hostname);
+
+            const expiry = Math.min(certificateExpiry, caExpiry);
+            if (expiry <= 0) {
+                this._handleExpiredSSLCertificate();
+                return process.exit(1);
+            }
+
+            if (expiry <= 7) {
+                this._handleNearingExpirySSLCertificate(expiry);
+            }
+
             return await devcert.certificateFor(hostname);
         }
 
-        this._logger.error(LOGS.noSSLDataFound, { postfix: LOGS.newLine });
+        this._handleNoSSLCertificateFound();
         return process.exit(1);
     }
 
@@ -111,11 +128,60 @@ export class WxpSSLReader {
 
         return ssl.get(hostname);
     }
+
+    private _handleExpiredSSLCertificate() {
+        this._logger.error(LOGS.noValidSSLCertificateFound);
+        this._logger.error(LOGS.expiredSSLCertificate);
+        this._recreateSSLCertificate();
+    }
+
+    private _handleNearingExpirySSLCertificate(expiry: number) {
+        this._logger.warning(format(LOGS.nearingExpirySSLCertificate, { expiry }));
+        this._recreateSSLCertificate();
+    }
+
+    private _handleNoSSLCertificateFound() {
+        this._logger.error(LOGS.noValidSSLCertificateFound);
+        this._logger.error(LOGS.invalidatedSSLCertificate);
+        this._recreateSSLCertificate();
+    }
+
+    private _handleInvalidUserSSLCertificate(errorMessage: string) {
+        this._logger.error(errorMessage);
+        this._recreateSSLCertificate();
+    }
+
+    private _handleUnknownExpirySSLCertificate(hostname: string, port: number) {
+        this._logger.warning(LOGS.undeterminedExpirySSLCertificate);
+        this._logger.warning(LOGS.unableToSideloadAddOn);
+        this._logger.warning(format(LOGS.checkCertificateValidity, { hostname, port }));
+        this._recreateSSLCertificate();
+    }
+
+    private _recreateSSLCertificate() {
+        this._logger.warning(LOGS.recreateSSLCertificate, { prefix: LOGS.newLine });
+        this._logger.information(LOGS.setupSSLCommand, { prefix: LOGS.tab });
+
+        this._logger.warning(LOGS.example, { prefix: LOGS.newLine });
+        this._logger.information(LOGS.setupSSLCommandExample, { prefix: LOGS.tab, postfix: LOGS.newLine });
+    }
 }
 
 const LOGS = {
     newLine: "\n",
+    tab: "  ",
     invalidCertificatePath: "Invalid SSL certificate file path.",
     invalidKeyPath: "Invalid SSL key file path.",
-    noSSLDataFound: "No SSL related certificate or key files were found. Please retry after setting them up."
+    noValidSSLCertificateFound: "Could not locate a valid SSL certificate to host the add-on.",
+    expiredSSLCertificate: "The SSL certificate has expired.",
+    nearingExpirySSLCertificate: "Your SSL certificate will expire in {expiry} days.",
+    invalidatedSSLCertificate:
+        "If you had previously set it up, it may have been invalidated due to a version upgrade.",
+    undeterminedExpirySSLCertificate: "Could not determine the expiry of your SSL certificate.",
+    unableToSideloadAddOn: "If you are unable to sideload your add-on, please check the validity of:",
+    checkCertificateValidity: "https://{hostname}:{port} certificate in your browser.",
+    recreateSSLCertificate: "To re-create the SSL certificate, you may run:",
+    setupSSLCommand: "npx @adobe/ccweb-add-on-ssl setup --hostname [hostname]",
+    example: "Example:",
+    setupSSLCommandExample: "npx @adobe/ccweb-add-on-ssl setup --hostname localhost"
 };

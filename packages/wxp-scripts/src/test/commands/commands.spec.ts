@@ -25,21 +25,20 @@
 import type { AnalyticsConsent, AnalyticsService } from "@adobe/ccweb-add-on-analytics";
 import { ITypes as IAnalyticsTypes } from "@adobe/ccweb-add-on-analytics";
 import { DEFAULT_HOST_NAME, DEFAULT_PORT, DEFAULT_SRC_DIRECTORY } from "@adobe/ccweb-add-on-core";
+import { runCommand } from "@oclif/test";
 import { assert } from "chai";
 import type { Express } from "express";
 import "mocha";
-import { createRequire } from "module";
 import sinon from "sinon";
 import type { StubbedInstance } from "ts-sinon";
 import { stubInterface } from "ts-sinon";
+import { AnalyticsErrorMarkers } from "../../AnalyticsMarkers.js";
 import type { CommandExecutor } from "../../app/CommandExecutor.js";
 import { IContainer, ITypes } from "../../config/index.js";
 import { BuildCommandOptions } from "../../models/BuildCommandOptions.js";
 import { PackageCommandOptions } from "../../models/PackageCommandOptions.js";
 import { StartCommandOptions } from "../../models/StartCommandOptions.js";
 import type { CommandValidator } from "../../validators/CommandValidator.js";
-
-const { test } = createRequire(import.meta.url)("@oclif/test");
 
 describe("ccweb-add-on-scripts", () => {
     let sandbox: sinon.SinonSandbox;
@@ -91,64 +90,132 @@ describe("ccweb-add-on-scripts", () => {
     });
 
     describe("clean", () => {
-        test.stdout()
-            .command(["clean", "--analytics", "off"])
-            .it("should execute succesfully when no parameters are passed.", async () => {
-                assert.equal(commandExecutor.execute.callCount, 1);
-            });
+        it("should execute succesfully when no parameters are passed.", async () => {
+            await runCommand("clean", { root: "." });
+            assert.equal(commandExecutor.execute.callCount, 1);
+        });
+
+        it("should execute succesfully parameters are passed.", async () => {
+            await runCommand(["clean", "--analytics=off"], { root: "." });
+            assert.equal(commandExecutor.execute.callCount, 1);
+        });
+
+        it("should fail for any errors in command execution.", async () => {
+            const error = new Error("Something went wrong.");
+            commandExecutor.execute.rejects(error);
+
+            await runCommand("clean", { root: "." }).then(result => assert.deepEqual(result.error, error));
+
+            assert.equal(
+                analyticsService.postEvent.calledOnceWith(
+                    AnalyticsErrorMarkers.SCRIPTS_CLEAN_COMMAND_ERROR,
+                    error.message,
+                    false
+                ),
+                true
+            );
+        });
     });
 
     describe("build", () => {
-        test.stdout()
-            .command(["build"])
-            .it("should execute succesfully when no parameters are passed.", async () => {
-                const options = new BuildCommandOptions(DEFAULT_SRC_DIRECTORY, "", false);
-                assert.equal(commandExecutor.execute.calledWith(options), true);
-            });
+        it("should execute succesfully when no parameters are passed.", async () => {
+            await runCommand("build", { root: "." });
 
-        test.stdout()
-            .command(["build", "--use=tsc", "-v"])
-            .it("should execute succesfully when parameters are passed.", async () => {
-                const options = new BuildCommandOptions(DEFAULT_SRC_DIRECTORY, "tsc", true);
-                assert.equal(commandExecutor.execute.calledWith(options), true);
-            });
+            const options = new BuildCommandOptions(DEFAULT_SRC_DIRECTORY, "", false);
+            assert.equal(commandExecutor.execute.calledWith(options), true);
+        });
+
+        it("should execute succesfully when parameters are passed.", async () => {
+            await runCommand(["build", "--use=tsc", "-v"], { root: "." });
+
+            const options = new BuildCommandOptions(DEFAULT_SRC_DIRECTORY, "tsc", true);
+            assert.equal(commandExecutor.execute.calledWith(options), true);
+        });
+
+        it("should fail for any errors in command execution.", async () => {
+            const error = new Error("Something went wrong.");
+            commandExecutor.execute.rejects(error);
+
+            await runCommand("build", { root: "." }).then(result => assert.deepEqual(result.error, error));
+
+            assert.equal(
+                analyticsService.postEvent.calledOnceWith(
+                    AnalyticsErrorMarkers.SCRIPTS_BUILD_COMMAND_ERROR,
+                    error.message,
+                    false
+                ),
+                true
+            );
+        });
     });
 
     describe("start", () => {
-        test.stdout()
-            .command(["start"])
-            .it("should execute succesfully when no parameters are passed.", async () => {
-                const options = new StartCommandOptions(
-                    DEFAULT_SRC_DIRECTORY,
-                    "",
-                    DEFAULT_HOST_NAME,
-                    parseInt(DEFAULT_PORT),
-                    false
-                );
-                assert.equal(commandExecutor.execute.calledWith(options, expressApp), true);
-            });
+        it("should execute succesfully when no parameters are passed.", async () => {
+            await runCommand("start", { root: "." });
 
-        test.stdout()
-            .command(["start", "--use=tsc", "-v", "--port=8000"])
-            .it("should execute succesfully when parameters are passed.", async () => {
-                const options = new StartCommandOptions(DEFAULT_SRC_DIRECTORY, "tsc", DEFAULT_HOST_NAME, 8000, true);
-                assert.equal(commandExecutor.execute.calledWith(options, expressApp), true);
-            });
+            const options = new StartCommandOptions(
+                DEFAULT_SRC_DIRECTORY,
+                "",
+                DEFAULT_HOST_NAME,
+                parseInt(DEFAULT_PORT),
+                false
+            );
+            assert.equal(commandExecutor.execute.calledWith(options, expressApp), true);
+        });
+
+        it("should execute succesfully when parameters are passed.", async () => {
+            await runCommand(["start", "--use=tsc", "-v", "--port=8000"], { root: "." });
+
+            const options = new StartCommandOptions(DEFAULT_SRC_DIRECTORY, "tsc", DEFAULT_HOST_NAME, 8000, true);
+            assert.equal(commandExecutor.execute.calledWith(options, expressApp), true);
+        });
+
+        it("should fail for any errors in command execution.", async () => {
+            const error = new Error("Something went wrong.");
+            commandExecutor.execute.rejects(error);
+
+            await runCommand("start", { root: "." }).then(result => assert.deepEqual(result.error, error));
+
+            assert.equal(
+                analyticsService.postEvent.calledOnceWith(
+                    AnalyticsErrorMarkers.SCRIPTS_START_COMMAND_ERROR,
+                    error.message,
+                    false
+                ),
+                true
+            );
+        });
     });
 
     describe("package", () => {
-        test.stdout()
-            .command(["package"])
-            .it("should execute succesfully when no parameters are passed.", async () => {
-                const options = new PackageCommandOptions(DEFAULT_SRC_DIRECTORY, "", true, false);
-                assert.equal(commandExecutor.execute.calledWith(options), true);
-            });
+        it("should execute succesfully when no parameters are passed.", async () => {
+            await runCommand("package", { root: "." });
 
-        test.stdout()
-            .command(["package", "--use=tsc", "-v"])
-            .it("should execute succesfully when parameters are passed.", async () => {
-                const options = new PackageCommandOptions(DEFAULT_SRC_DIRECTORY, "tsc", true, true);
-                assert.equal(commandExecutor.execute.calledWith(options), true);
-            });
+            const options = new PackageCommandOptions(DEFAULT_SRC_DIRECTORY, "", true, false);
+            assert.equal(commandExecutor.execute.calledWith(options), true);
+        });
+
+        it("should execute succesfully when parameters are passed.", async () => {
+            await runCommand(["package", "--use=tsc", "-v"], { root: "." });
+
+            const options = new PackageCommandOptions(DEFAULT_SRC_DIRECTORY, "tsc", true, true);
+            assert.equal(commandExecutor.execute.calledWith(options), true);
+        });
+
+        it("should fail for any errors in command execution.", async () => {
+            const error = new Error("Something went wrong.");
+            commandExecutor.execute.rejects(error);
+
+            await runCommand("package", { root: "." }).then(result => assert.deepEqual(result.error, error));
+
+            assert.equal(
+                analyticsService.postEvent.calledOnceWith(
+                    AnalyticsErrorMarkers.SCRIPTS_PACKAGE_COMMAND_ERROR,
+                    error.message,
+                    false
+                ),
+                true
+            );
+        });
     });
 });

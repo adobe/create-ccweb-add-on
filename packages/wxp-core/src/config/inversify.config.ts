@@ -28,7 +28,7 @@ import type { Logger, Preferences, Process } from "../utilities/index.js";
 import { CLIPreferences, CLIProcess, ConsoleLogger } from "../utilities/index.js";
 import { ITypes } from "./inversify.types.js";
 
-const container = new Container();
+const container: Container = new Container();
 
 container.bind<Logger>(ITypes.Logger).to(ConsoleLogger).inTransientScope();
 

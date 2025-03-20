@@ -30,7 +30,7 @@ export const DEFAULT_ADD_ON_VERSION = "1.0.0";
 export const DEFAULT_SRC_DIRECTORY = "src";
 export const DEFAULT_OUTPUT_DIRECTORY = "dist";
 
-export const CCWEB_ADDON_DIRECTORY = path.join("Adobe", "CCWebAddOn");
+export const CCWEB_ADDON_DIRECTORY: string = path.join("Adobe", "CCWebAddOn");
 export const ADD_ON_PREFERENCES_FILE = "add-on-preferences.json";
 export const ADDITIONAL_ADD_ON_INFO = {
     sourceId: "developerSource",
@@ -38,4 +38,4 @@ export const ADDITIONAL_ADD_ON_INFO = {
     isDeveloperAddOn: true
 };
 
-export const ALLOWED_HOSTNAMES = /[a-zA-Z]\.adobe.com$/;
+export const ALLOWED_HOSTNAMES: RegExp = /[a-zA-Z]\.adobe.com$/;

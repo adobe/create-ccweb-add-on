@@ -191,8 +191,8 @@ const LOGS = {
     newLine: "\n",
     tab: "  ",
     specifyAddOnName: "Please specify an Add-on name",
-    executeProgram: "{PROGRAM_NAME} <add-on-name> --kind <panel> --template <javascript>",
-    executeProgramExample: "{PROGRAM_NAME} my-add-on --kind panel --template javascript",
+    executeProgram: "{PROGRAM_NAME} <add-on-name> --entrypoint <panel> --template <javascript>",
+    executeProgramExample: "{PROGRAM_NAME} my-add-on --entrypoint panel --template javascript",
     forExample: "For example:",
     npmNamingRestriction: "Cannot create a project named {addOnName} because of NPM naming restrictions.",
     dependencyNamingRestriction:

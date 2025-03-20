@@ -25,6 +25,7 @@
 import type { AnalyticsConsent, AnalyticsService } from "@adobe/ccweb-add-on-analytics";
 import { ITypes as IAnalyticsTypes } from "@adobe/ccweb-add-on-analytics";
 import { EntrypointType } from "@adobe/ccweb-add-on-manifest";
+import { PROGRAM_NAME } from "@adobe/ccweb-add-on-scaffolder";
 import { Config } from "@oclif/core";
 import chai, { assert, expect } from "chai";
 import chaiAsPromised from "chai-as-promised";
@@ -34,13 +35,13 @@ import type { StubbedInstance } from "ts-sinon";
 import { stubInterface } from "ts-sinon";
 import { AnalyticsErrorMarkers } from "../../AnalyticsMarkers.js";
 import type { AddOnFactory } from "../../app/index.js";
-import { CreateCCWebAddOn } from "../../commands/create.js";
+import { Create } from "../../commands/create.js";
 import { IContainer, ITypes } from "../../config/index.js";
 import { CLIOptions } from "../../models/index.js";
 
 chai.use(chaiAsPromised);
 
-describe("CreateCCWebAddOn", () => {
+describe("Create", () => {
     let sandbox: sinon.SinonSandbox;
 
     let container: sinon.SinonStub;
@@ -52,6 +53,7 @@ describe("CreateCCWebAddOn", () => {
 
     beforeEach(() => {
         sandbox = sinon.createSandbox();
+        sandbox.stub(console, "log");
 
         addOnFactory = stubInterface();
         addOnFactory.create.resolves();
@@ -74,12 +76,24 @@ describe("CreateCCWebAddOn", () => {
         it("should execute succesfully when correct parameters are passed without analytics.", async () => {
             analyticsConsent.get.resolves(true);
 
-            const createCCWebAddOn = new CreateCCWebAddOn(
-                ["hello-world", "--kind=panel", "--template=react-javascript", "--verbose"],
-                new Config({ root: "." })
+            const create = new Create(
+                ["hello-world", "--entrypoint=panel", "--template=react-javascript", "--verbose"],
+                new Config({ name: PROGRAM_NAME, version: "1.0.0", root: "." })
             );
+            sandbox
+                // @ts-ignore - Sidestep `this.parse()` error when calling `run()` directly.
+                .stub(create, "parse")
+                .resolves({
+                    args: { name: "hello-world" },
+                    flags: {
+                        entrypoint: EntrypointType.PANEL,
+                        template: "react-javascript",
+                        analytics: undefined,
+                        verbose: true
+                    }
+                });
 
-            await createCCWebAddOn.run();
+            await create.run();
 
             assert.equal(analyticsConsent.get.callCount, 1);
 
@@ -91,12 +105,24 @@ describe("CreateCCWebAddOn", () => {
             analyticsConsent.get.resolves(true);
             analyticsConsent.set.withArgs(false).resolves();
 
-            const createCCWebAddOn = new CreateCCWebAddOn(
-                ["hello-world", "--kind=panel", "--template=react-javascript", "--analytics=off", "--verbose"],
-                new Config({ root: "." })
+            const create = new Create(
+                ["hello-world", "--entrypoint=panel", "--template=react-javascript", "--analytics=off", "--verbose"],
+                new Config({ name: PROGRAM_NAME, version: "1.0.0", root: "." })
             );
+            sandbox
+                // @ts-ignore - Sidestep `this.parse()` error when calling `run()` directly.
+                .stub(create, "parse")
+                .resolves({
+                    args: { name: "hello-world" },
+                    flags: {
+                        entrypoint: EntrypointType.PANEL,
+                        template: "react-javascript",
+                        analytics: "off",
+                        verbose: true
+                    }
+                });
 
-            await createCCWebAddOn.run();
+            await create.run();
 
             assert.equal(analyticsConsent.set.calledOnceWith(false), true);
 
@@ -106,11 +132,11 @@ describe("CreateCCWebAddOn", () => {
     });
 
     describe("catch", () => {
-        it("should fail when incorrect parameters are passed.", async () => {
-            const createCCWebAddOn = new CreateCCWebAddOn(["--incorrect-flag"], new Config({ root: "." }));
+        it("should fail for any errors in command execution.", async () => {
+            const create = new Create([], new Config({ name: PROGRAM_NAME, version: "1.0.0", root: "." }));
 
-            const error = new Error("Nonexistent flag: --incorrect-flag\nSee more help with --help");
-            await expect(createCCWebAddOn.catch(error)).to.be.rejectedWith();
+            const error = new Error("Something went wrong.");
+            await expect(create.catch(error)).to.be.rejectedWith(error);
 
             assert.equal(
                 analyticsService.postEvent.calledOnceWith(

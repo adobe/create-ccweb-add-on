@@ -53,3 +53,43 @@ export function createManifest(): AddOnManifest {
 
     return manifest!;
 }
+
+export function createCommandManifest(): AddOnManifest {
+    const { manifest } = AddOnManifest.createManifest({
+        manifest: {
+            testId: "test-app",
+            name: "Test App",
+            version: "1.0.0",
+            manifestVersion: 2,
+            requirements: {
+                apps: [
+                    {
+                        name: "Express",
+                        apiVersion: 1
+                    }
+                ]
+            },
+            entryPoints: [
+                {
+                    type: "command",
+                    id: "assetProvider",
+                    main: "command.html",
+                    commands: [
+                        {
+                            name: "getAssets",
+                            supportedMimeTypes: ["image/jpeg", "image/png", "image/bmp"],
+                            discoverable: true
+                        }
+                    ],
+                    permissions: {
+                        oauth: ["accounts.google.com"]
+                    },
+                    discoverable: false
+                }
+            ]
+        },
+        additionalInfo: ADDITIONAL_ADD_ON_INFO
+    });
+
+    return manifest!;
+}

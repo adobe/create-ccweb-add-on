@@ -30,14 +30,14 @@ import { CLIOptions } from "../../models/index.js";
 describe("CLIOptions", () => {
     describe("constructor", () => {
         it("should create a new instance of CLIOptions.", () => {
-            const addOnKind = EntrypointType.PANEL;
+            const entrypointType = EntrypointType.PANEL;
             const addOnName = "test-app";
             const templateName = "javascript";
             const verbose = false;
 
-            const cliOptions = new CLIOptions(addOnKind as EntrypointType, addOnName, templateName, verbose);
+            const cliOptions = new CLIOptions(entrypointType as EntrypointType, addOnName, templateName, verbose);
 
-            assert.equal(cliOptions.addOnKind, addOnKind);
+            assert.equal(cliOptions.entrypointType, entrypointType);
             assert.equal(cliOptions.addOnName, addOnName);
             assert.equal(cliOptions.templateName, templateName);
             assert.equal(cliOptions.verbose, verbose);

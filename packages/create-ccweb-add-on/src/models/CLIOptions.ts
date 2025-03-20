@@ -29,9 +29,9 @@ import type { EntrypointType } from "@adobe/ccweb-add-on-manifest";
  */
 export class CLIOptions {
     /**
-     * Kind of the Add-on. For example: panel.
+     * Entrypoint type of the Add-on. Example: 'panel'.
      */
-    readonly addOnKind: EntrypointType;
+    readonly entrypointType: EntrypointType;
 
     /**
      * Name of the Add-on.
@@ -50,14 +50,14 @@ export class CLIOptions {
 
     /**
      * Instantiate {@link CLIOptions}.
-     * @param addOnKind - Kind of the Add-on. For example: panel.
+     * @param entrypointType - Kind of the Add-on. For example: panel.
      * @param addOnName - Name of the Add-on.
      * @param templateName - Template name.
      * @param verbose - Verbose flag.
      * @returns Reference to a new {@link CLIOptions} instance.
      */
-    constructor(addOnKind: EntrypointType, addOnName: string, templateName: string, verbose: boolean) {
-        this.addOnKind = addOnKind;
+    constructor(entrypointType: EntrypointType, addOnName: string, templateName: string, verbose: boolean) {
+        this.entrypointType = entrypointType;
         this.addOnName = addOnName;
         this.templateName = templateName;
         this.verbose = verbose;

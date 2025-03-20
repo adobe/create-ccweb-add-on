@@ -73,7 +73,7 @@ export class WxpExpressServer implements ExpressServer {
                 return;
             }, false);
             const baseUrl = getBaseUrl(HTTPS, request.headers.host ?? `${request.hostname}:${options.port}`);
-            const addOns = AddOnResourceUtils.getAddOns(manifest!, addOnDirectory, baseUrl);
+            const addOns = AddOnResourceUtils.getAddOnListingData(manifest!, addOnDirectory, baseUrl);
             response.set("Content-Type", "application/json");
             response.status(200).json({ addOns });
             /* c8 ignore stop */

@@ -23,6 +23,7 @@
  ********************************************************************************/
 
 export * from "./CommandExecutor.js";
-export * from "./SSLReader.js";
+export * from "./PurgeCommandExecutor.js";
 export * from "./SetupCommandExecutor.js";
+export * from "./SSLReader.js";
 export * from "./WxpSSLReader.js";

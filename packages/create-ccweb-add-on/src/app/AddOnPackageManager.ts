@@ -23,31 +23,29 @@
  ********************************************************************************/
 
 import { PackageJson } from "@adobe/ccweb-add-on-core";
-import { EntrypointType } from "@adobe/ccweb-add-on-manifest";
-import { assert } from "chai";
-import "mocha";
-import { AddOnManager } from "../../app/index.js";
+import type { EntrypointType } from "@adobe/ccweb-add-on-manifest";
 
-describe("AddOnManager", () => {
-    describe("getPackageJson ...", () => {
-        const runs = [{ addOnKind: EntrypointType.PANEL, addOnName: "test-app" }];
-        runs.forEach(run => {
-            it("should return package.json.", async () => {
-                const packageJson = AddOnManager.getPackageJson(run.addOnKind as EntrypointType, run.addOnName);
-                const expectedPackageJson = new PackageJson({
-                    name: run.addOnName,
-                    version: "1.0.0",
-                    description: "Adobe Creative Cloud Web Add-on.",
-                    keywords: ["Adobe", "Creative Cloud Web", "Add-on", run.addOnKind],
-                    scripts: {
-                        clean: "ccweb-add-on-scripts clean",
-                        build: "ccweb-add-on-scripts build",
-                        start: "ccweb-add-on-scripts start"
-                    }
-                });
-
-                assert.deepEqual(packageJson, expectedPackageJson);
-            });
+/**
+ * Class to manage the Add-on project requirements.
+ */
+export class AddOnPackageManager {
+    /**
+     * Get package.json for the Add-on project.
+     * @param entrypointType - Entrypoint type of Add-on. For example: panel, command, etc.
+     * @param addOnName - Name of Add-on.
+     * @returns package.json as {@link PackageJson}.
+     */
+    static getPackageJson(entrypointType: EntrypointType, addOnName: string): PackageJson {
+        return new PackageJson({
+            name: addOnName,
+            version: "1.0.0",
+            description: "Adobe Creative Cloud Web Add-on.",
+            keywords: ["Adobe", "Creative Cloud Web", "Add-on", entrypointType],
+            scripts: {
+                clean: "ccweb-add-on-scripts clean",
+                build: "ccweb-add-on-scripts build",
+                start: "ccweb-add-on-scripts start"
+            }
         });
-    });
-});
+    }
+}

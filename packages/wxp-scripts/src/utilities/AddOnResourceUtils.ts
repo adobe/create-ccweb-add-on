@@ -22,7 +22,7 @@
  * SOFTWARE.
  ********************************************************************************/
 
-import type { Schema as AddOnSchema, EntryPointData } from "@adobe/ccweb-add-on-core";
+import type { AddOnListingData } from "@adobe/ccweb-add-on-core";
 import { DEFAULT_OUTPUT_DIRECTORY, traverseDirectory } from "@adobe/ccweb-add-on-core";
 import type { AddOnManifest } from "@adobe/ccweb-add-on-manifest";
 import path from "path";
@@ -37,9 +37,13 @@ export class AddOnResourceUtils {
      * Get Add-on schema details as an array.
      * @param manifest - {@link AddOnManifest} Information about the Add-on.
      * @param baseUrl - Base URL of the server.
-     * @returns Array of {@link AddOnSchema}
+     * @returns Array of {@link AddOnListingData}
      */
-    static getAddOns(manifest: AddOnManifest, addOnDirectory: AddOnDirectory, baseUrl: string): AddOnSchema[] {
+    static getAddOnListingData(
+        manifest: AddOnManifest,
+        addOnDirectory: AddOnDirectory,
+        baseUrl: string
+    ): AddOnListingData[] {
         // fallback to previously stored manifest incase manifest validation fails
         const testId =
             (manifest?.manifestProperties.testId as string) ??
@@ -47,13 +51,11 @@ export class AddOnResourceUtils {
 
         const addOnName = (manifest?.manifestProperties?.name as string) ?? DEFAULT_ADD_ON_NAME;
 
-        const entryPointsData: EntryPointData[] = [];
-        manifest?.entryPoints?.map((entryPoint: ReturnType<typeof JSON.parse>) => {
-            entryPointsData.push({
-                type: entryPoint.type,
-                discoverable: entryPoint.discoverable ?? true
-            });
-        });
+        const entryPoints =
+            manifest?.entryPoints?.map(entrypoint => {
+                const entrypointProperties = entrypoint.entrypointProperties;
+                return { ...entrypointProperties, discoverable: entrypoint.discoverable ?? true };
+            }) ?? [];
 
         return [
             {
@@ -67,7 +69,7 @@ export class AddOnResourceUtils {
                         name: addOnName
                     }
                 },
-                entryPoints: entryPointsData
+                entryPoints
             }
         ];
     }

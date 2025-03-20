@@ -48,7 +48,7 @@ export function isNullOrWhiteSpace(value: string | null | undefined): boolean {
  * @param value - Value to check.
  * @returns Boolean value representing whether the value is an object.
  */
-export function isObject(value: unknown) {
+export function isObject(value: unknown): value is object {
     return typeof value === "object" && value !== null;
 }
 

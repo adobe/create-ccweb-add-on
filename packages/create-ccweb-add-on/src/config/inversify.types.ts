@@ -22,7 +22,13 @@
  * SOFTWARE.
  ********************************************************************************/
 
-export const ITypes = {
+export const ITypes: {
+    Command: symbol;
+    AddOnFactory: symbol;
+    DirectoryValidator: symbol;
+    EnvironmentValidator: symbol;
+    TemplateSelector: symbol;
+} = {
     Command: Symbol.for("Command"),
     AddOnFactory: Symbol.for("AddOnFactory"),
     DirectoryValidator: Symbol.for("DirectoryValidator"),

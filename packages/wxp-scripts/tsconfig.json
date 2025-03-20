@@ -17,12 +17,14 @@
         "outDir": "dist",
         "preserveConstEnums": true,
         "resolveJsonModule": true,
+        "skipLibCheck": true,
         "sourceMap": true,
         "strict": true,
         "target": "ESNext",
         "types": ["reflect-metadata"],
-        "useUnknownInCatchVariables": false
+        "useUnknownInCatchVariables": false,
+        "isolatedDeclarations": true
     },
-    "exclude": ["node_modules", "src/test/**/*"],
+    "exclude": ["node_modules"],
     "include": ["src/**/*"]
 }

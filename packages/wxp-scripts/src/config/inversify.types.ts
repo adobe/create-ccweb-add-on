@@ -22,7 +22,19 @@
  * SOFTWARE.
  ********************************************************************************/
 
-export const ITypes = {
+export const ITypes: {
+    Command: symbol;
+    CommandValidator: symbol;
+    CommandExecutor: symbol;
+    ExpressApp: symbol;
+    ExpressServer: symbol;
+    ScriptManager: symbol;
+    SecureServer: symbol;
+    SocketApp: symbol;
+    SocketServer: symbol;
+    EntityTracker: symbol;
+    AddOnManifestReader: symbol;
+} = {
     Command: Symbol.for("Command"),
     CommandValidator: Symbol.for("CommandValidator"),
     CommandExecutor: Symbol.for("CommandExecutor"),

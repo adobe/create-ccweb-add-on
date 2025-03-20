@@ -70,9 +70,14 @@ describe("AddOnTemplateSelector", () => {
             sandbox.restore();
         });
 
-        it("should return error if the Add-on kind is not valid.", async () => {
+        it("should return error if the Add-on entrypoint is not valid.", async () => {
             const processExitStub = sandbox.stub(process, "exit");
-            const options = new CLIOptions("test-add-on-kind" as EntrypointType, "test-add-on", templateName, false);
+            const options = new CLIOptions(
+                "test-add-on-entrypoint" as EntrypointType,
+                "test-add-on",
+                templateName,
+                false
+            );
 
             const templateSelector: TemplateSelector = new AddOnTemplateSelector(logger, analyticsService);
 
@@ -80,11 +85,15 @@ describe("AddOnTemplateSelector", () => {
 
             assert.equal(logger.warning.callCount, 2);
             assert.equal(
-                logger.warning.getCall(0).calledWith("Please choose a valid Add-on kind (valid kind: panel)"),
+                logger.warning
+                    .getCall(0)
+                    .calledWith("Please choose a valid Add-on entrypoint (valid entrypoint: panel)"),
                 true
             );
             assert.equal(
-                logger.warning.getCall(1).calledWith(`${PROGRAM_NAME} <add-on-name> --kind <panel>`, { prefix: "  " }),
+                logger.warning
+                    .getCall(1)
+                    .calledWith(`${PROGRAM_NAME} <add-on-name> --entrypoint <panel>`, { prefix: "  " }),
                 true
             );
 
@@ -93,7 +102,7 @@ describe("AddOnTemplateSelector", () => {
 
             assert.equal(logger.information.callCount, 1);
             assert.equal(
-                logger.information.calledWith(`${PROGRAM_NAME} my-add-on --kind panel`, {
+                logger.information.calledWith(`${PROGRAM_NAME} my-add-on --entrypoint panel`, {
                     prefix: "  "
                 }),
                 true
@@ -102,28 +111,37 @@ describe("AddOnTemplateSelector", () => {
             assert.equal(
                 analyticsService.postEvent.calledWith(
                     AnalyticsErrorMarkers.ERROR_INVALID_KIND,
-                    "Invalid Add-on kind specified"
+                    "Invalid Add-on entrypoint specified"
                 ),
                 true
             );
             assert.equal(processExitStub.calledWith(0), true);
         });
 
-        it("should return error if the app kind is not valid.", async () => {
+        it("should return error if the app entrypoint is not valid.", async () => {
             const processExitStub = sandbox.stub(process, "exit");
 
-            const cliOptions = new CLIOptions("test-add-on-kind" as EntrypointType, "test-add-on", templateName, false);
+            const cliOptions = new CLIOptions(
+                "test-add-on-entrypoint" as EntrypointType,
+                "test-add-on",
+                templateName,
+                false
+            );
 
             const templateSelector: TemplateSelector = new AddOnTemplateSelector(logger, analyticsService);
             await templateSelector.setupTemplate(cliOptions);
 
             assert.equal(logger.warning.callCount, 2);
             assert.equal(
-                logger.warning.getCall(0).calledWith("Please choose a valid Add-on kind (valid kind: panel)"),
+                logger.warning
+                    .getCall(0)
+                    .calledWith("Please choose a valid Add-on entrypoint (valid entrypoint: panel)"),
                 true
             );
             assert.equal(
-                logger.warning.getCall(1).calledWith(`${PROGRAM_NAME} <add-on-name> --kind <panel>`, { prefix: "  " }),
+                logger.warning
+                    .getCall(1)
+                    .calledWith(`${PROGRAM_NAME} <add-on-name> --entrypoint <panel>`, { prefix: "  " }),
                 true
             );
 
@@ -132,7 +150,7 @@ describe("AddOnTemplateSelector", () => {
 
             assert.equal(logger.information.callCount, 1);
             assert.equal(
-                logger.information.calledWith(`${PROGRAM_NAME} my-add-on --kind panel`, {
+                logger.information.calledWith(`${PROGRAM_NAME} my-add-on --entrypoint panel`, {
                     prefix: "  "
                 }),
                 true
@@ -141,7 +159,7 @@ describe("AddOnTemplateSelector", () => {
             assert.equal(
                 analyticsService.postEvent.calledWith(
                     AnalyticsErrorMarkers.ERROR_INVALID_KIND,
-                    "Invalid Add-on kind specified"
+                    "Invalid Add-on entrypoint specified"
                 ),
                 true
             );
