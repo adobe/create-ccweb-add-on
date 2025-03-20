@@ -23,6 +23,7 @@
  ********************************************************************************/
 
 import { assert } from "chai";
+import "mocha";
 import sinon from "sinon";
 import { AddOnManifestType, ManifestVersion } from "../AddOnManifest.js";
 import {
@@ -213,8 +214,15 @@ describe("ManifestSchema Validations - Version 1", () => {
     });
 
     it("should have a valid entry point type", () => {
-        const validTypePatterns = ["panel", "mobile.media.audio", "mobile.your-stuff.files"];
-        const invalidTypePatterns = ["widgets", "panels", "mobile.media", "mobile.your-stuff"];
+        const validTypePatterns = [
+            "panel",
+            "mobile.media.audio",
+            "mobile.your-stuff.files",
+            "contextual.replace",
+            "contextual.upload",
+            "contextual.bulk-create"
+        ];
+        const invalidTypePatterns = ["widgets", "panels", "mobile.media", "mobile.your-stuff", "contextual.insert"];
 
         const testFn = (manifest: ReturnType<typeof JSON.parse>, value: string) => {
             (manifest.entryPoints[0] as MutableObject<ManifestEntrypoint>).type = value;
@@ -704,8 +712,15 @@ describe("ManifestSchema Validations - Version 2", () => {
     });
 
     it("should have a valid entry point type", () => {
-        const validTypePatterns = ["panel", "mobile.media.audio", "mobile.your-stuff.files"];
-        const invalidTypePatterns = ["widgets", "panels", "mobile.media", "mobile.your-stuff"];
+        const validTypePatterns = [
+            "panel",
+            "mobile.media.audio",
+            "mobile.your-stuff.files",
+            "contextual.replace",
+            "contextual.upload",
+            "contextual.bulk-create"
+        ];
+        const invalidTypePatterns = ["widgets", "panels", "mobile.media", "mobile.your-stuff", "contextual.insert"];
 
         const testFn = (manifest: ReturnType<typeof JSON.parse>, value: string) => {
             (manifest.entryPoints[0] as MutableObject<ManifestEntrypoint>).type = value;

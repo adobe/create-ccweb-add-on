@@ -126,6 +126,21 @@ export function getTestManifestV1(privileged?: boolean): AddOnManifestV1 {
                 type: EntrypointType.MOBILE_YOUR_STUFF_FILES,
                 id: `mobile-your-stuff-files-${count}`,
                 ...entryPointDetails
+            },
+            {
+                type: EntrypointType.CONTEXTUAL_REPLACE,
+                id: `contextual-replace-${count}`,
+                ...entryPointDetails
+            },
+            {
+                type: EntrypointType.CONTEXTUAL_UPLOAD,
+                id: `contextual-upload-${count}`,
+                ...entryPointDetails
+            },
+            {
+                type: EntrypointType.CONTEXTUAL_BULK_CREATE,
+                id: `contextual-bulk-create-${count}`,
+                ...entryPointDetails
             }
         ],
         icon: [
@@ -200,6 +215,21 @@ export function getTestManifestV2(privileged?: boolean): AddOnManifestV2 {
                 hostDomain: "https://localhost.adobe.com"
             },
             {
+                type: EntrypointType.COMMAND,
+                id: "assetProvider",
+                main: "command.html",
+                commands: [
+                    {
+                        name: "assetProvider.getAssets",
+                        supportedMimeTypes: ["image/jpeg", "image/png", "image/bmp"],
+                        discoverable: true
+                    }
+                ],
+                permissions: {
+                    oauth: ["accounts.google.com"]
+                }
+            },
+            {
                 type: EntrypointType.MOBILE_MEDIA_AUDIO,
                 id: `mobile-media-audio-${count}`,
                 main: "index.html"
@@ -207,6 +237,21 @@ export function getTestManifestV2(privileged?: boolean): AddOnManifestV2 {
             {
                 type: EntrypointType.MOBILE_YOUR_STUFF_FILES,
                 id: `mobile-your-stuff-files-${count}`,
+                main: "index.html"
+            },
+            {
+                type: EntrypointType.CONTEXTUAL_REPLACE,
+                id: `contextual-replace-${count}`,
+                main: "index.html"
+            },
+            {
+                type: EntrypointType.CONTEXTUAL_UPLOAD,
+                id: `contextual-upload-${count}`,
+                main: "index.html"
+            },
+            {
+                type: EntrypointType.CONTEXTUAL_BULK_CREATE,
+                id: `contextual-bulk-create-${count}`,
                 main: "index.html"
             }
         ]

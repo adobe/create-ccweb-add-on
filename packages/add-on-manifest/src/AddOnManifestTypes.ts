@@ -99,6 +99,12 @@ export type Permissions = {
     readonly clipboard?: string[];
 };
 
+export type Command = {
+    readonly name: string;
+    readonly supportedMimeTypes?: string[];
+    readonly discoverable?: boolean;
+};
+
 export type EntrypointV1 = {
     readonly type: string;
     readonly id: string;
@@ -118,7 +124,11 @@ export type EntrypointV2 = Omit<EntrypointV1, "label"> & {
     readonly hostDomain?: string;
 };
 
-export type ManifestEntrypoint = EntrypointV1 | EntrypointV2;
+export type CommandEntrypoint = EntrypointV2 & {
+    readonly commands: Command[];
+};
+
+export type ManifestEntrypoint = EntrypointV1 | EntrypointV2 | CommandEntrypoint;
 export type ManifestRequirements = RequirementsV1 | RequirementsV2;
 
 /**
@@ -138,7 +148,11 @@ export enum EntrypointType {
     CONTENT_HUB = "content-hub",
     MOBILE_MEDIA_AUDIO = "mobile.media.audio",
     MOBILE_YOUR_STUFF_FILES = "mobile.your-stuff.files",
-    MOBILE_MORE = "mobile.more"
+    MOBILE_MORE = "mobile.more",
+    SCHEDULE = "schedule",
+    CONTEXTUAL_REPLACE = "contextual.replace",
+    CONTEXTUAL_UPLOAD = "contextual.upload",
+    CONTEXTUAL_BULK_CREATE = "contextual.bulk-create"
 }
 
 export type AuthorInfo = {

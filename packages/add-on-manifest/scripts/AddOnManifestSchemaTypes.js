@@ -22,7 +22,8 @@
  * SOFTWARE.
  ********************************************************************************/
 
-const typePattern = "^(panel|share|content-hub|mobile.your-stuff.files|mobile.media.audio|mobile.more)$";
+const typePattern =
+    "^(panel|command|share|content-hub|mobile.your-stuff.files|mobile.media.audio|mobile.more|schedule|contextual.replace|contextual.upload|contextual.bulk-create)$";
 const sandboxPattern = "^(allow-popups|allow-presentation|allow-downloads|allow-popups-to-escape-sandbox|allow-forms)$";
 const clipboardPattern = "^(clipboard-write|clipboard-read)$";
 const iconPattern = "^(lightest|light|medium|dark|darkest|all)$";
@@ -59,6 +60,17 @@ export const AuthorInfoSchema = {
         url: { type: "string" }
     },
     required: ["name", "email"],
+    additionalProperties: false
+};
+
+export const CommandSchema = {
+    type: "object",
+    properties: {
+        name: { type: "string" },
+        supportedMimeTypes: { type: "array", items: { type: "string" } },
+        discoverable: { type: "boolean" }
+    },
+    required: ["name"],
     additionalProperties: false
 };
 
@@ -103,6 +115,7 @@ export const EntrypointSchemaV2 = {
         script: { type: "string" },
         documentSandbox: { type: "string" },
         hostDomain: { type: "string" },
+        commands: { type: "array", items: CommandSchema },
         permissions: {
             type: "object",
             properties: {
