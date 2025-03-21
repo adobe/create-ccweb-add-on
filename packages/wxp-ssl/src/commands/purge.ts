@@ -22,9 +22,8 @@
  * SOFTWARE.
  ********************************************************************************/
 
-import type { AnalyticsConsent, AnalyticsService } from "@adobe/ccweb-add-on-analytics";
-import { CLIProgram, ITypes as IAnalyticsTypes } from "@adobe/ccweb-add-on-analytics";
-import { BaseCommand, UncaughtExceptionHandler } from "@adobe/ccweb-add-on-core";
+import { BaseCommand, CLIProgram } from "@adobe/ccweb-add-on-analytics";
+import { UncaughtExceptionHandler } from "@adobe/ccweb-add-on-core";
 import type { Config } from "@oclif/core";
 import process from "process";
 import "reflect-metadata";
@@ -37,9 +36,6 @@ import { PROGRAM_NAME } from "../constants.js";
  * SSL Purge command.
  */
 export class Purge extends BaseCommand {
-    private readonly _analyticsConsent: AnalyticsConsent;
-    private readonly _analyticsService: AnalyticsService;
-
     private readonly _commandExecutor: CommandExecutor;
 
     static description = "Remove and invalidate all add-on related SSL artifacts from your system.";
@@ -49,13 +45,7 @@ export class Purge extends BaseCommand {
     static flags = {};
 
     constructor(argv: string[], config: Config) {
-        super(argv, config);
-
-        this._analyticsConsent = IContainer.get<AnalyticsConsent>(IAnalyticsTypes.AnalyticsConsent);
-
-        this._analyticsService = IContainer.get<AnalyticsService>(IAnalyticsTypes.AnalyticsService);
-        this._analyticsService.program = new CLIProgram(PROGRAM_NAME, this.config.name + "@" + this.config.version);
-        this._analyticsService.startTime = Date.now();
+        super(argv, config, new CLIProgram(PROGRAM_NAME, config.name + "@" + config.version));
 
         this._commandExecutor = IContainer.getNamed<CommandExecutor>(ITypes.CommandExecutor, "purge");
     }
@@ -78,13 +68,5 @@ export class Purge extends BaseCommand {
     async catch(error: { message: string }): Promise<void> {
         this._analyticsService.postEvent(AnalyticsErrorMarkers.ERROR_SSL_PURGE, error.message, false);
         throw error;
-    }
-
-    private async _seekAnalyticsConsent(analytics: string | undefined): Promise<void> {
-        if (analytics === undefined) {
-            await this._analyticsConsent.get();
-        } else {
-            await this._analyticsConsent.set(analytics === "on");
-        }
     }
 }

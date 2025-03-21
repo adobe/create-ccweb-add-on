@@ -253,6 +253,22 @@ declare interface ApplicationBase {
     showModalDialog(dialogOptions: CustomDialogOptions): Promise<CustomDialogResult>;
 
     /**
+     * @experimental - Experimental API
+     * Shows a color picker popover anchored to the specified element.
+     * The anchor element must be an instance of HTMLElement.
+     * Custom DOM events are dispatched on the anchor element when the color changes or the color picker closes.
+     * See {@link ColorPickerEvents} for more details.
+     * @param anchorElement - The HTML element to anchor the color picker to.
+     * @param options - Optional configuration options for customizing the color picker behavior and appearance.
+     */
+    showColorPicker(anchorElement: HTMLElement, options?: ColorPickerOptions): Promise<void>;
+    /**
+     * @experimental - Experimental API
+     * Hides the color picker popover if it is currently visible.
+     */
+    hideColorPicker(): Promise<void>;
+
+    /**
      * Triggers/Starts the in-app monetization upgrade flow
      * @returns if the user is premium user or not
      */
@@ -516,6 +532,78 @@ export declare interface ClientStorage {
     clear(): Promise<void>;
 }
 
+/**
+ * @experimental - Experimental API
+ * Custom DOM events dispatched on the anchor element passed to `showColorPicker()` API.
+ */
+export declare enum ColorPickerEvents {
+    /**
+     * Color change event dispatched when a color is selected.
+     * The event detail will contain a 'color' property of type string.
+     */
+    colorChange = "colorpicker-color-change",
+    /**
+     * Color picker closed event dispatched when the color picker is closed.
+     */
+    close = "colorpicker-close"
+}
+
+/**
+ * @experimental - Experimental API
+ * Options that can be passed to the `showColorPicker` API to customize the color picker's behavior and appearance.
+ */
+export declare interface ColorPickerOptions {
+    /**
+     * Title text displayed in the color picker popover header.
+     * Default title is an empty string.
+     */
+    title?: string;
+    /**
+     * Initial color for the color picker, in 0xRRGGBB format.
+     * Default color is 0xFFFFFF (white).
+     */
+    initialColor?: number;
+    /**
+     * Placement of the color picker popover relative to the anchor element.
+     * Default placement is ColorPickerPlacement.left.
+     */
+    placement?: ColorPickerPlacement;
+    /**
+     * Controls whether the color picker popover should be temporarily hidden while using the EyeDropper tool.
+     * Default value is false.
+     */
+    eyedropperHidesPicker?: boolean;
+    /**
+     * Controls whether the transparency/alpha slider is shown in the color picker.
+     * Default value is false.
+     */
+    disableAlphaChannel?: boolean;
+}
+
+/**
+ * @experimental - Experimental API
+ * Denotes the placement of the color picker popover relative to its anchor element.
+ * Used in the placement option of `showColorPicker()` API.
+ */
+export declare enum ColorPickerPlacement {
+    /**
+     * The color picker popover will be positioned above the anchor element.
+     */
+    top = "top",
+    /**
+     * The color picker popover will be positioned below the anchor element.
+     */
+    bottom = "bottom",
+    /**
+     * The color picker popover will be positioned to the left of the anchor element.
+     */
+    left = "left",
+    /**
+     * The color picker popover will be positioned to the right of the anchor element.
+     */
+    right = "right"
+}
+
 declare namespace Constants {
     export {
         Range_2 as Range,
@@ -536,6 +624,8 @@ declare namespace Constants {
         PlatformEnvironment,
         DeviceClass,
         PlatformType,
+        ColorPickerPlacement,
+        ColorPickerEvents,
         AuthorizationStatus
     };
 }

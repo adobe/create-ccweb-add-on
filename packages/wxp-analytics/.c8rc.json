@@ -2,12 +2,13 @@
     "all": true,
     "include": ["src/**/*.ts"],
     "exclude": [
+        "**/*.d.ts",
         "src/**/*.spec.ts",
         "src/**/*Types.ts",
         "src/**/index.ts",
+        "src/base/BaseCommand.ts",
         "src/config/*",
-        "src/constants.ts",
-        "**/*.d.ts"
+        "src/constants.ts"
     ],
     "reporter": ["html", "text", "text-summary"],
     "report-dir": "coverage"

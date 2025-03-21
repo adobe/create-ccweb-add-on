@@ -22,9 +22,8 @@
  * SOFTWARE.
  ********************************************************************************/
 
-import type { AnalyticsConsent, AnalyticsService } from "@adobe/ccweb-add-on-analytics";
-import { CLIProgram, ITypes as IAnalyticsTypes } from "@adobe/ccweb-add-on-analytics";
-import { BaseCommand, UncaughtExceptionHandler } from "@adobe/ccweb-add-on-core";
+import { BaseCommand, CLIProgram } from "@adobe/ccweb-add-on-analytics";
+import { UncaughtExceptionHandler } from "@adobe/ccweb-add-on-core";
 import { EntrypointType } from "@adobe/ccweb-add-on-manifest";
 import type { Config } from "@oclif/core";
 import { Args, Flags } from "@oclif/core";
@@ -40,9 +39,6 @@ import { CLIOptions } from "../models/CLIOptions.js";
  * Implementation class of the create-ccweb-add-on command.
  */
 export class Create extends BaseCommand {
-    private readonly _analyticsConsent: AnalyticsConsent;
-    private readonly _analyticsService: AnalyticsService;
-
     private readonly _addOnFactory: AddOnFactory;
 
     static description = "Create an Adobe Creative Cloud Web Add-on.";
@@ -79,13 +75,7 @@ export class Create extends BaseCommand {
     };
 
     constructor(argv: string[], config: Config) {
-        super(argv, config);
-
-        this._analyticsConsent = IContainer.get<AnalyticsConsent>(IAnalyticsTypes.AnalyticsConsent);
-
-        this._analyticsService = IContainer.get<AnalyticsService>(IAnalyticsTypes.AnalyticsService);
-        this._analyticsService.program = new CLIProgram(PROGRAM_NAME, this.config.name + "@" + this.config.version);
-        this._analyticsService.startTime = Date.now();
+        super(argv, config, new CLIProgram(PROGRAM_NAME, config.name + "@" + config.version));
 
         this._addOnFactory = IContainer.get<AddOnFactory>(ITypes.AddOnFactory);
     }
@@ -115,13 +105,5 @@ export class Create extends BaseCommand {
     async catch(error: { message: string }): Promise<void> {
         await this._analyticsService.postEvent(AnalyticsErrorMarkers.ERROR_INVALID_ARGS, error.message, false);
         throw error;
-    }
-
-    private async _seekAnalyticsConsent(analytics: string | undefined): Promise<void> {
-        if (analytics === undefined) {
-            await this._analyticsConsent.get();
-        } else {
-            await this._analyticsConsent.set(analytics === "on");
-        }
     }
 }

@@ -22,10 +22,8 @@
  * SOFTWARE.
  ********************************************************************************/
 
-import type { AnalyticsConsent, AnalyticsService } from "@adobe/ccweb-add-on-analytics";
-import { CLIProgram, ITypes as IAnalyticsTypes } from "@adobe/ccweb-add-on-analytics";
+import { BaseCommand, CLIProgram } from "@adobe/ccweb-add-on-analytics";
 import {
-    BaseCommand,
     DEFAULT_HOST_NAME,
     DEFAULT_PORT,
     DEFAULT_SRC_DIRECTORY,
@@ -48,9 +46,6 @@ import type { CommandValidator } from "../validators/CommandValidator.js";
  * Start Command's implementation class.
  */
 export class Start extends BaseCommand {
-    private readonly _analyticsConsent: AnalyticsConsent;
-    private readonly _analyticsService: AnalyticsService;
-
     private readonly _expressApp: Express;
     private readonly _commandValidator: CommandValidator;
     private readonly _commandExecutor: CommandExecutor;
@@ -88,13 +83,7 @@ export class Start extends BaseCommand {
     };
 
     constructor(argv: string[], config: Config) {
-        super(argv, config);
-
-        this._analyticsConsent = IContainer.get<AnalyticsConsent>(IAnalyticsTypes.AnalyticsConsent);
-
-        this._analyticsService = IContainer.get<AnalyticsService>(IAnalyticsTypes.AnalyticsService);
-        this._analyticsService.program = new CLIProgram(PROGRAM_NAME, this.config.name + "@" + this.config.version);
-        this._analyticsService.startTime = Date.now();
+        super(argv, config, new CLIProgram(PROGRAM_NAME, config.name + "@" + config.version));
 
         this._expressApp = IContainer.get<Express>(ITypes.ExpressApp);
 
@@ -122,13 +111,5 @@ export class Start extends BaseCommand {
     async catch(error: { message: string }): Promise<void> {
         this._analyticsService.postEvent(AnalyticsErrorMarkers.SCRIPTS_START_COMMAND_ERROR, error.message, false);
         throw error;
-    }
-
-    private async _seekAnalyticsConsent(analytics: string | undefined): Promise<void> {
-        if (analytics === undefined) {
-            await this._analyticsConsent.get();
-        } else {
-            await this._analyticsConsent.set(analytics === "on");
-        }
     }
 }

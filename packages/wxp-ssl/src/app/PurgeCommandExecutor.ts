@@ -108,9 +108,9 @@ export class PurgeCommandExecutor implements CommandExecutor {
         if (userPreference.ssl !== undefined) {
             userPreference.ssl = undefined;
             this._preferences.set(userPreference);
-        }
 
-        this._analyticsService.postEvent(AnalyticsSuccessMarkers.SUCCESSFUL_SSL_MANUAL_PURGE, "", true);
+            this._analyticsService.postEvent(AnalyticsSuccessMarkers.SUCCESSFUL_SSL_MANUAL_PURGE, "", true);
+        }
     }
 
     private _purgeWxpSSL(): void {

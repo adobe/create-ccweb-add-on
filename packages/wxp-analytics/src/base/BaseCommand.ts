@@ -22,10 +22,27 @@
  * SOFTWARE.
  ********************************************************************************/
 
-import { Command, Flags } from "@oclif/core";
+import { Command, Config, Flags } from "@oclif/core";
 import { BooleanFlag, CustomOptions, OptionFlag } from "@oclif/core/lib/interfaces/parser.js";
+import { AnalyticsConsent } from "../app/AnalyticsConsent.js";
+import { AnalyticsService } from "../app/AnalyticsService.js";
+import { IContainer, ITypes } from "../config/index.js";
+import { CLIProgram } from "../models/index.js";
 
 export abstract class BaseCommand extends Command {
+    protected readonly _analyticsConsent: AnalyticsConsent;
+    protected readonly _analyticsService: AnalyticsService;
+
+    constructor(argv: string[], config: Config, program: CLIProgram) {
+        super(argv, config);
+
+        this._analyticsConsent = IContainer.get<AnalyticsConsent>(ITypes.AnalyticsConsent);
+
+        this._analyticsService = IContainer.get<AnalyticsService>(ITypes.AnalyticsService);
+        this._analyticsService.program = program;
+        this._analyticsService.startTime = Date.now();
+    }
+
     static baseFlags: {
         analytics: OptionFlag<string | undefined, CustomOptions>;
         verbose: BooleanFlag<boolean>;
@@ -43,4 +60,12 @@ export abstract class BaseCommand extends Command {
             required: false
         })
     };
+
+    protected async _seekAnalyticsConsent(analytics: string | undefined): Promise<void> {
+        if (analytics === undefined) {
+            await this._analyticsConsent.get();
+        } else {
+            await this._analyticsConsent.set(analytics === "on");
+        }
+    }
 }

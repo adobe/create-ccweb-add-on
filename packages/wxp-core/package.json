@@ -25,7 +25,6 @@
     },
     "dependencies": {
         "@adobe/ccweb-add-on-manifest": "workspace:*",
-        "@oclif/core": "4.2.8",
         "@swc/helpers": "0.5.12",
         "application-config-path": "0.1.0",
         "chalk": "4.1.1",
