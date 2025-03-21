@@ -103,7 +103,7 @@ describe("PurgeCommandExecutor", () => {
             assert.equal(logger.information.notCalled, true);
         });
 
-        it.skip("should prompt on whether to remove SSL artifacts and remove both custom and WXP SSL artifacts when user chooses to remove.", async () => {
+        it("should prompt on whether to remove SSL artifacts and remove both custom and WXP SSL artifacts when user chooses to remove.", async () => {
             const promptStub = sandbox.stub(prompts, "prompt");
             promptStub.withArgs(shouldPurgePrompt).resolves({ purgeConfirmation: SSLRemoveOption.Remove });
 
