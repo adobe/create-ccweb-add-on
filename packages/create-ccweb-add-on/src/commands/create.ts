@@ -22,12 +22,12 @@
  * SOFTWARE.
  ********************************************************************************/
 
-import type { AnalyticsConsent, AnalyticsService } from "@adobe/ccweb-add-on-analytics";
-import { CLIProgram, ITypes as IAnalyticsTypes } from "@adobe/ccweb-add-on-analytics";
+import { BaseCommand, CLIProgram } from "@adobe/ccweb-add-on-analytics";
 import { UncaughtExceptionHandler } from "@adobe/ccweb-add-on-core";
 import { EntrypointType } from "@adobe/ccweb-add-on-manifest";
 import type { Config } from "@oclif/core";
-import { Args, Command, Flags } from "@oclif/core";
+import { Args, Flags } from "@oclif/core";
+import { Arg, CustomOptions, OptionFlag } from "@oclif/core/lib/interfaces/parser.js";
 import "reflect-metadata";
 import { AnalyticsErrorMarkers } from "../AnalyticsMarkers.js";
 import type { AddOnFactory } from "../app/AddOnFactory.js";
@@ -38,20 +38,20 @@ import { CLIOptions } from "../models/CLIOptions.js";
 /**
  * Implementation class of the create-ccweb-add-on command.
  */
-export class CreateCCWebAddOn extends Command {
-    private readonly _analyticsConsent: AnalyticsConsent;
-    private readonly _analyticsService: AnalyticsService;
-
+export class Create extends BaseCommand {
     private readonly _addOnFactory: AddOnFactory;
 
     static description = "Create an Adobe Creative Cloud Web Add-on.";
 
-    static examples = ["create-ccweb-add-on <add-on-name> --template <javascript>"];
+    static examples: string[] = ["create-ccweb-add-on <add-on-name> --template <javascript>"];
 
-    static flags = {
-        kind: Flags.string({
-            char: "k",
-            description: "Kind of Add-on (panel).",
+    static flags: {
+        entrypoint: OptionFlag<string, CustomOptions>;
+        template: OptionFlag<string, CustomOptions>;
+    } = {
+        entrypoint: Flags.string({
+            char: "e",
+            description: "Entrypoint type of Add-on (By default it is set as 'panel').",
             default: EntrypointType.PANEL,
             required: false,
             hidden: true
@@ -61,37 +61,21 @@ export class CreateCCWebAddOn extends Command {
             description: "Template to use for creating the Add-on project.",
             default: "",
             required: false
-        }),
-        analytics: Flags.string({
-            char: "a",
-            description: "Turn on/off sending analytics to Adobe.",
-            options: ["on", "off"],
-            required: false
-        }),
-        verbose: Flags.boolean({
-            char: "v",
-            description: "Enable verbose logging.",
-            default: false,
-            required: false
         })
     };
 
-    static args = {
-        addOnName: Args.string({
-            name: "addOnName",
+    static args: {
+        name: Arg<string, Record<string, unknown>>;
+    } = {
+        name: Args.string({
+            name: "name",
             description: "Name of the Add-on project.",
             required: true
         })
     };
 
     constructor(argv: string[], config: Config) {
-        super(argv, config);
-
-        this._analyticsConsent = IContainer.get<AnalyticsConsent>(IAnalyticsTypes.AnalyticsConsent);
-
-        this._analyticsService = IContainer.get<AnalyticsService>(IAnalyticsTypes.AnalyticsService);
-        this._analyticsService.program = new CLIProgram(PROGRAM_NAME, this.config.name + "@" + this.config.version);
-        this._analyticsService.startTime = Date.now();
+        super(argv, config, new CLIProgram(PROGRAM_NAME, config.name + "@" + config.version));
 
         this._addOnFactory = IContainer.get<AddOnFactory>(ITypes.AddOnFactory);
     }
@@ -100,17 +84,17 @@ export class CreateCCWebAddOn extends Command {
         UncaughtExceptionHandler.registerExceptionHandler(PROGRAM_NAME);
 
         const {
-            args: { addOnName },
-            flags: { kind, template, analytics, verbose }
-        } = await this.parse(CreateCCWebAddOn);
+            args: { name },
+            flags: { entrypoint, template, analytics, verbose }
+        } = await this.parse(Create);
 
         await this._seekAnalyticsConsent(analytics);
 
         console.log();
 
         const options = new CLIOptions(
-            kind.toLowerCase() as EntrypointType,
-            addOnName,
+            entrypoint.toLowerCase() as EntrypointType,
+            name,
             template.toLowerCase(),
             verbose
         );
@@ -118,16 +102,8 @@ export class CreateCCWebAddOn extends Command {
         await this._addOnFactory.create(options);
     }
 
-    async catch(error: { message: string }) {
+    async catch(error: { message: string }): Promise<void> {
         await this._analyticsService.postEvent(AnalyticsErrorMarkers.ERROR_INVALID_ARGS, error.message, false);
         throw error;
-    }
-
-    private async _seekAnalyticsConsent(analytics: string | undefined): Promise<void> {
-        if (analytics === undefined) {
-            await this._analyticsConsent.get();
-        } else {
-            await this._analyticsConsent.set(analytics === "on");
-        }
     }
 }

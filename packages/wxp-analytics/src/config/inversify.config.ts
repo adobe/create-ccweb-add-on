@@ -27,8 +27,9 @@ import "reflect-metadata";
 import type { AnalyticsConsent, AnalyticsService } from "../app/index.js";
 import { WxpAnalyticsConsent, WxpAnalyticsService } from "../app/index.js";
 import { ITypes } from "./inversify.types.js";
+import { Container } from "inversify";
 
-const container = ICoreContainer;
+const container: Container = ICoreContainer;
 
 container.bind<AnalyticsConsent>(ITypes.AnalyticsConsent).to(WxpAnalyticsConsent).inSingletonScope();
 

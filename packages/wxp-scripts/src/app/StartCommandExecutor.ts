@@ -140,7 +140,7 @@ export class StartCommandExecutor implements CommandExecutor {
         const addOnManifest = this._manifestReader.getManifest(this._onValidationFailed)!;
         const addOnDirectory = new AddOnDirectory(options.srcDirectory, addOnManifest);
 
-        const sslConfig = await this._sslReader.read(options.hostname);
+        const sslConfig = await this._sslReader.read(options.hostname, options.port);
         const server = await this._serverProvider(sslConfig);
 
         this._logger.information(format(LOGS.startingServer));

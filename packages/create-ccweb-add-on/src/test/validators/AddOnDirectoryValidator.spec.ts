@@ -76,7 +76,7 @@ describe("AddOnDirectoryValidator", () => {
                 assert.equal(
                     logger.warning
                         .getCall(1)
-                        .calledWith(`${PROGRAM_NAME} <add-on-name> --kind <panel> --template <javascript>`, {
+                        .calledWith(`${PROGRAM_NAME} <add-on-name> --entrypoint <panel> --template <javascript>`, {
                             prefix: "  "
                         }),
                     true
@@ -92,10 +92,13 @@ describe("AddOnDirectoryValidator", () => {
 
                 assert.equal(logger.information.callCount, 1);
                 assert.equal(
-                    logger.information.calledWith(`${PROGRAM_NAME} my-add-on --kind panel --template javascript`, {
-                        prefix: "  ",
-                        postfix: "\n"
-                    }),
+                    logger.information.calledWith(
+                        `${PROGRAM_NAME} my-add-on --entrypoint panel --template javascript`,
+                        {
+                            prefix: "  ",
+                            postfix: "\n"
+                        }
+                    ),
                     true
                 );
                 assert.equal(analyticsService.postEvent.callCount, 1);
@@ -130,7 +133,7 @@ describe("AddOnDirectoryValidator", () => {
                 assert.equal(
                     logger.warning
                         .getCall(1)
-                        .calledWith(`${PROGRAM_NAME} <add-on-name> --kind <panel> --template <javascript>`, {
+                        .calledWith(`${PROGRAM_NAME} <add-on-name> --entrypoint <panel> --template <javascript>`, {
                             prefix: "  "
                         }),
                     true
@@ -146,10 +149,13 @@ describe("AddOnDirectoryValidator", () => {
 
                 assert.equal(logger.information.callCount, 1);
                 assert.equal(
-                    logger.information.calledWith(`${PROGRAM_NAME} my-add-on --kind panel --template javascript`, {
-                        prefix: "  ",
-                        postfix: "\n"
-                    }),
+                    logger.information.calledWith(
+                        `${PROGRAM_NAME} my-add-on --entrypoint panel --template javascript`,
+                        {
+                            prefix: "  ",
+                            postfix: "\n"
+                        }
+                    ),
                     true
                 );
                 assert.equal(analyticsService.postEvent.callCount, 1);
@@ -191,7 +197,7 @@ describe("AddOnDirectoryValidator", () => {
                 assert.equal(
                     logger.warning
                         .getCall(1)
-                        .calledWith(`${PROGRAM_NAME} <add-on-name> --kind <panel> --template <javascript>`, {
+                        .calledWith(`${PROGRAM_NAME} <add-on-name> --entrypoint <panel> --template <javascript>`, {
                             prefix: "  "
                         }),
                     true
@@ -207,10 +213,13 @@ describe("AddOnDirectoryValidator", () => {
 
                 assert.equal(logger.information.callCount, 1);
                 assert.equal(
-                    logger.information.calledWith(`${PROGRAM_NAME} my-add-on --kind panel --template javascript`, {
-                        prefix: "  ",
-                        postfix: "\n"
-                    }),
+                    logger.information.calledWith(
+                        `${PROGRAM_NAME} my-add-on --entrypoint panel --template javascript`,
+                        {
+                            prefix: "  ",
+                            postfix: "\n"
+                        }
+                    ),
                     true
                 );
                 assert.equal(analyticsService.postEvent.callCount, 1);

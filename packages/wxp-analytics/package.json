@@ -1,6 +1,6 @@
 {
     "name": "@adobe/ccweb-add-on-analytics",
-    "version": "2.5.0",
+    "version": "3.0.0",
     "author": "Adobe",
     "license": "MIT",
     "description": "Analytics libraries for Adobe Creative Cloud Web Add-on.",
@@ -25,19 +25,20 @@
     },
     "dependencies": {
         "@adobe/ccweb-add-on-core": "workspace:*",
-        "axios": "1.6.0",
+        "@oclif/core": "4.2.8",
+        "@swc/helpers": "0.5.12",
+        "axios": "1.8.4",
         "chalk": "4.1.1",
         "inversify": "6.0.1",
         "os-name": "4.0.1",
         "prompts": "2.4.2",
         "reflect-metadata": "0.1.13",
-        "tslib": "2.6.2",
-        "@swc/helpers": "0.5.12"
+        "tslib": "2.7.0"
     },
     "devDependencies": {
         "@types/chai": "4.2.14",
         "@types/mocha": "9.1.1",
-        "@types/node": "16.18.36",
+        "@types/node": "18.18.2",
         "@types/prompts": "2.0.14",
         "@types/sinon": "9.0.8",
         "c8": "7.7.2",
@@ -48,6 +49,6 @@
         "sinon": "9.2.1",
         "ts-node": "10.9.2",
         "ts-sinon": "2.0.1",
-        "typescript": "5.4.5"
+        "typescript": "5.7.3"
     }
 }

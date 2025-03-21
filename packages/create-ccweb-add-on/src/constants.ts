@@ -24,7 +24,7 @@
 
 export const PROGRAM_NAME = "create-ccweb-add-on";
 
-export const ADD_ON_TEMPLATES = new Map<string, string>([
+export const ADD_ON_TEMPLATES: Map<string, string> = new Map<string, string>([
     ["javascript", "Get started with Add-on development using JavaScript"],
     ["swc-javascript", "Get started with Add-on development using using Spectrum Web Components and JavaScript"],
     ["swc-typescript", "Get started with Add-on development using using Spectrum Web Components and TypeScript"],
@@ -36,7 +36,7 @@ export const TEMP_TEMPLATE_PATH = ".template";
 
 export const WITH_DOCUMENT_SANDBOX = "with-document-sandbox";
 
-export const AVAILABLE_ADD_ON_TEMPLATES = [
+export const AVAILABLE_ADD_ON_TEMPLATES: string[] = [
     "javascript",
     "swc-javascript",
     "swc-typescript",

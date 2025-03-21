@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
 import oclif from "@oclif/core";
+import url from "url";
 
-oclif
-    .run(process.argv.slice(2), import.meta.url)
+await oclif
+    .execute({ dir: url.fileURLToPath(import.meta.url) })
     .then(oclif.flush)
     .catch(oclif.Errors.handle);

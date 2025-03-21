@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/create-ccweb-add-on",
+      "comment": "Node version update and SWC version update in templates",
+      "type": "major"
+    }
+  ],
+  "packageName": "@adobe/create-ccweb-add-on"
+}

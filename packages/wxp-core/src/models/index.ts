@@ -22,6 +22,7 @@
  * SOFTWARE.
  ********************************************************************************/
 
+export * from "./AddOnListingData.js";
 export * from "./PackageJson.js";
 export * from "./PreferenceJson.js";
 export * from "./TemplateJson.js";

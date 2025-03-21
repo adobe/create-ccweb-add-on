@@ -66,7 +66,7 @@ export class NodeEnvironmentValidator implements EnvironmentValidator {
      * Validate the node version in the user's system.
      */
     async validateNodeVersion(): Promise<void> {
-        const minNode = "16.0.0";
+        const minNode = "18.0.0";
         try {
             const result = this._process.executeSync("node", ["--version"]);
             const nodeVersion = String(result?.data)?.trim();
@@ -96,7 +96,7 @@ export class NodeEnvironmentValidator implements EnvironmentValidator {
      * Validate the npm version in the user's system.
      */
     async validateNpmVersion(): Promise<void> {
-        const minNpm = "8.0.0";
+        const minNpm = "10.0.0";
         try {
             const result = this._process.executeSync("npm", ["--version"]);
             const npmVersion = result.data ? String(result.data)?.trim() : undefined;

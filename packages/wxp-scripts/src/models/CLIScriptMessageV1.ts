@@ -84,7 +84,7 @@ export class AddOnSourceChangedPayloadV1 {
      * Get the payload properties for serialization.
      * @returns Payload properties.
      */
-    getProperties() {
+    getProperties(): this {
         return { ...this };
     }
 }

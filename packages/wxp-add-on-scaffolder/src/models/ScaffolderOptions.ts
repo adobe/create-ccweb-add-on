@@ -41,7 +41,7 @@ export class ScaffolderOptions {
     /**
      * Kind of the Add-on. For example: panel.
      */
-    readonly addOnKind: EntrypointType;
+    readonly entrypointType: EntrypointType;
 
     /**
      * Path of the Add-on root directory.
@@ -62,7 +62,7 @@ export class ScaffolderOptions {
      * Instantiate {@link ScaffolderOptions}.
      * @param addOnDirectory - Path of the Add-on directory.
      * @param addOnName - Name of the Add-on.
-     * @param addOnKind - Kind of the Add-on. For example: panel.
+     * @param entrypointType - Kind of the Add-on. For example: panel.
      * @param rootDirectory - Path of the Add-on root directory.
      * @param templateName - Name of the template with which the Add-on is to be scaffolded.
      * @param verbose - Verbose flag.
@@ -71,14 +71,14 @@ export class ScaffolderOptions {
     constructor(
         addOnDirectory: string,
         addOnName: string,
-        addOnKind: EntrypointType,
+        entrypointType: EntrypointType,
         rootDirectory: string,
         templateName: string,
         verbose: boolean
     ) {
         this.addOnDirectory = addOnDirectory;
         this.addOnName = addOnName;
-        this.addOnKind = addOnKind;
+        this.entrypointType = entrypointType;
         this.rootDirectory = rootDirectory;
         this.templateName = templateName;
         this.verbose = verbose;

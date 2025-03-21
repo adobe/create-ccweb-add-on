@@ -6,8 +6,8 @@
         "package": "ccweb-add-on-scripts package --use webpack"
     },
     "dependencies": {
-        "@swc-react/button": "0.39.4",
-        "@swc-react/theme": "0.39.4",
+        "@swc-react/button": "1.0.3",
+        "@swc-react/theme": "1.0.3",
         "react-dom": "18.2.0",
         "react": "18.2.0"
     },
@@ -20,7 +20,7 @@
         "css-loader": "6.8.1",
         "html-webpack-plugin": "5.5.3",
         "style-loader": "3.3.3",
-        "webpack-cli": "5.1.4",
-        "webpack": "5.89.0"
+        "webpack-cli": "6.0.1",
+        "webpack": "5.98.0"
     }
 }

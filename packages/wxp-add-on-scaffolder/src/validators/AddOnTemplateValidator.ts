@@ -53,7 +53,7 @@ export class AddOnTemplateValidator implements TemplateValidator {
      *
      * @param templateName - Name of the template.
      */
-    validateTemplate(templateName: string) {
+    validateTemplate(templateName: string): void {
         if (isNullOrWhiteSpace(templateName)) {
             this._logger.warning(LOGS.specifyValidTemplateName);
             this._logger.warning(format(LOGS.executeProgram, { PROGRAM_NAME }), {

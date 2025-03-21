@@ -26,3 +26,5 @@ export * from "./app/index.js";
 export * from "./config/index.js";
 export * from "./constants.js";
 export * from "./models/index.js";
+
+export { run } from "@oclif/core";

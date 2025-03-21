@@ -22,6 +22,7 @@
  * SOFTWARE.
  ********************************************************************************/
 
+import type { AddOnListingData } from "@adobe/ccweb-add-on-core";
 import { DEFAULT_HOST_NAME, DEFAULT_OUTPUT_DIRECTORY, getBaseUrl } from "@adobe/ccweb-add-on-core";
 import { assert } from "chai";
 import type { Dirent, Stats } from "fs-extra";
@@ -33,7 +34,7 @@ import sinon from "sinon";
 import { DEFAULT_ADD_ON_NAME, HTTPS, MANIFEST_JSON } from "../../constants.js";
 import { AddOnDirectory, StartCommandOptions } from "../../models/index.js";
 import { AddOnResourceUtils } from "../../utilities/index.js";
-import { createManifest } from "../test-utilities.js";
+import { createCommandManifest, createManifest } from "../test-utilities.js";
 
 describe("AddOnResourceUtils", () => {
     let sandbox: SinonSandbox;
@@ -46,12 +47,12 @@ describe("AddOnResourceUtils", () => {
         sandbox.restore();
     });
 
-    describe("getAddOns", () => {
-        it("should return content for addOns.json.", () => {
+    describe("getAddOnListingData", () => {
+        it("should return add-on listing data for panel entrypoint.", () => {
             const options = new StartCommandOptions("src", "tsc", "localhost", 5241, true);
             const addOnDirectory = new AddOnDirectory("src", createManifest());
 
-            const expectedAddOnsJson = [
+            const expectedAddOnsJson: AddOnListingData[] = [
                 {
                     addonId: "test-app",
                     versionString: "1.0.0",
@@ -65,14 +66,16 @@ describe("AddOnResourceUtils", () => {
                     },
                     entryPoints: [
                         {
+                            id: "panel1",
                             type: "panel",
+                            main: "index.html",
                             discoverable: true
                         }
                     ]
                 }
             ];
 
-            const addOnsJson = AddOnResourceUtils.getAddOns(
+            const addOnsJson = AddOnResourceUtils.getAddOnListingData(
                 createManifest(),
                 addOnDirectory,
                 getBaseUrl(HTTPS, DEFAULT_HOST_NAME, options.port)
@@ -81,7 +84,53 @@ describe("AddOnResourceUtils", () => {
             assert.deepEqual(addOnsJson, expectedAddOnsJson);
         });
 
-        it("should return content for addOns.json and fallback to manifest available in addon directory when manifest validation fails.", () => {
+        it("should return add-on listing data for command entrypoint.", () => {
+            const options = new StartCommandOptions("src", "tsc", "localhost", 5241, true);
+            const addOnDirectory = new AddOnDirectory("src", createManifest());
+
+            const expectedAddOnsJson: AddOnListingData[] = [
+                {
+                    addonId: "test-app",
+                    versionString: "1.0.0",
+                    supportedLanguages: ["en-US"],
+                    supportedApps: ["Express"],
+                    downloadUrl: `${getBaseUrl(HTTPS, DEFAULT_HOST_NAME, options.port)}/test-app/${MANIFEST_JSON}`,
+                    addon: {
+                        localizedMetadata: {
+                            name: "Test App"
+                        }
+                    },
+                    entryPoints: [
+                        {
+                            type: "command",
+                            id: "assetProvider",
+                            main: "command.html",
+                            commands: [
+                                {
+                                    name: "getAssets",
+                                    supportedMimeTypes: ["image/jpeg", "image/png", "image/bmp"],
+                                    discoverable: true
+                                }
+                            ],
+                            permissions: {
+                                oauth: ["accounts.google.com"]
+                            },
+                            discoverable: false
+                        }
+                    ]
+                }
+            ];
+
+            const addOnsJson = AddOnResourceUtils.getAddOnListingData(
+                createCommandManifest(),
+                addOnDirectory,
+                getBaseUrl(HTTPS, DEFAULT_HOST_NAME, options.port)
+            );
+
+            assert.deepEqual(addOnsJson, expectedAddOnsJson);
+        });
+
+        it("should return add-on listing data and fallback to manifest available in addon directory when manifest validation fails.", () => {
             const options = new StartCommandOptions("src", "tsc", "localhost", 5241, true);
             const addOnDirectory = new AddOnDirectory("src", createManifest());
 
@@ -101,7 +150,7 @@ describe("AddOnResourceUtils", () => {
                 }
             ];
 
-            const addOnsJson = AddOnResourceUtils.getAddOns(
+            const addOnsJson = AddOnResourceUtils.getAddOnListingData(
                 undefined!,
                 addOnDirectory,
                 getBaseUrl(HTTPS, DEFAULT_HOST_NAME, options.port)

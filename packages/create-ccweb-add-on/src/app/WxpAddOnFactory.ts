@@ -42,7 +42,7 @@ import { TEMP_TEMPLATE_PATH } from "../constants.js";
 import type { CLIOptions } from "../models/CLIOptions.js";
 import type { DirectoryValidator, EnvironmentValidator } from "../validators/index.js";
 import type { AddOnFactory } from "./AddOnFactory.js";
-import { AddOnManager } from "./AddOnManager.js";
+import { AddOnPackageManager } from "./AddOnPackageManager.js";
 import type { TemplateSelector } from "./TemplateSelector.js";
 
 /**
@@ -114,7 +114,7 @@ export class WxpAddOnFactory implements AddOnFactory {
 
             const templateName = await this._templateSelector.setupTemplate(options);
 
-            const packageJson = AddOnManager.getPackageJson(options.addOnKind, options.addOnName);
+            const packageJson = AddOnPackageManager.getPackageJson(options.entrypointType, options.addOnName);
             const packageJsonPath = path.join(addOnDirectory, PACKAGE_JSON);
 
             fs.writeFileSync(packageJsonPath, packageJson.toJSON() + os.EOL);
@@ -141,7 +141,7 @@ export class WxpAddOnFactory implements AddOnFactory {
             const scaffolderOptions = new ScaffolderOptions(
                 addOnDirectory,
                 options.addOnName,
-                options.addOnKind,
+                options.entrypointType,
                 rootDirectory,
                 templateName,
                 options.verbose
@@ -156,8 +156,8 @@ export class WxpAddOnFactory implements AddOnFactory {
             const analyticsEventData = [
                 "--addOnName",
                 options.addOnName,
-                "--kind",
-                options.addOnKind,
+                "--entrypointType",
+                options.entrypointType,
                 "--template",
                 templateName
             ];

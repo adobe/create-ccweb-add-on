@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /********************************************************************************
  * MIT License
 
@@ -24,11 +22,11 @@
  * SOFTWARE.
  ********************************************************************************/
 
-import type { AnalyticsConsent, AnalyticsService } from "@adobe/ccweb-add-on-analytics";
-import { CLIProgram, ITypes as IAnalyticsTypes } from "@adobe/ccweb-add-on-analytics";
+import { BaseCommand, CLIProgram } from "@adobe/ccweb-add-on-analytics";
 import { DEFAULT_SRC_DIRECTORY, UncaughtExceptionHandler } from "@adobe/ccweb-add-on-core";
 import type { Config } from "@oclif/core";
-import { Command, Flags } from "@oclif/core";
+import { Flags } from "@oclif/core";
+import { CustomOptions, OptionFlag } from "@oclif/core/lib/interfaces/parser.js";
 import process from "process";
 import "reflect-metadata";
 import { AnalyticsErrorMarkers } from "../AnalyticsMarkers.js";
@@ -40,17 +38,17 @@ import { BuildCommandOptions } from "../models/BuildCommandOptions.js";
 /**
  * Build Command's implementation class.
  */
-export class Build extends Command {
-    private readonly _analyticsConsent: AnalyticsConsent;
-    private readonly _analyticsService: AnalyticsService;
-
+export class Build extends BaseCommand {
     private readonly _commandExecutor: CommandExecutor;
 
-    static description = "ccweb-add-on-scripts build command used to build the source folder.";
+    static description = "Build the source folder.";
 
     static args = {};
 
-    static flags = {
+    static flags: {
+        src: OptionFlag<string, CustomOptions>;
+        use: OptionFlag<string, CustomOptions>;
+    } = {
         src: Flags.string({
             description: "Directory where the source code for the add-on is present.",
             required: false,
@@ -60,34 +58,16 @@ export class Build extends Command {
             description: "Transpiler to be used.",
             required: false,
             default: ""
-        }),
-        analytics: Flags.string({
-            char: "a",
-            description: "Turn on/off sending analytics to Adobe.",
-            options: ["on", "off"],
-            required: false
-        }),
-        verbose: Flags.boolean({
-            char: "v",
-            description: "Print detailed messages.",
-            required: false,
-            default: false
         })
     };
 
     constructor(argv: string[], config: Config) {
-        super(argv, config);
-
-        this._analyticsConsent = IContainer.get<AnalyticsConsent>(IAnalyticsTypes.AnalyticsConsent);
-
-        this._analyticsService = IContainer.get<AnalyticsService>(IAnalyticsTypes.AnalyticsService);
-        this._analyticsService.program = new CLIProgram(PROGRAM_NAME, this.config.name + "@" + this.config.version);
-        this._analyticsService.startTime = Date.now();
+        super(argv, config, new CLIProgram(PROGRAM_NAME, config.name + "@" + config.version));
 
         this._commandExecutor = IContainer.getNamed<CommandExecutor>(ITypes.CommandExecutor, "build");
     }
 
-    async run() {
+    async run(): Promise<void> {
         UncaughtExceptionHandler.registerExceptionHandler(PROGRAM_NAME);
 
         const rootDirectory = process.cwd();
@@ -103,16 +83,8 @@ export class Build extends Command {
         await this._commandExecutor.execute(options);
     }
 
-    async catch(error: { message: string }) {
+    async catch(error: { message: string }): Promise<void> {
         this._analyticsService.postEvent(AnalyticsErrorMarkers.SCRIPTS_BUILD_COMMAND_ERROR, error.message, false);
         throw error;
-    }
-
-    private async _seekAnalyticsConsent(analytics: string | undefined): Promise<void> {
-        if (analytics === undefined) {
-            await this._analyticsConsent.get();
-        } else {
-            await this._analyticsConsent.set(analytics === "on");
-        }
     }
 }

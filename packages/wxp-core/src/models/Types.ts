@@ -61,26 +61,3 @@ export type LoggerOptions = {
      */
     postfix?: string;
 };
-
-export type AddOnMetaData = {
-    name: string;
-};
-
-export type AddOn = {
-    localizedMetadata: AddOnMetaData;
-};
-
-export type EntryPointData = {
-    type: string;
-    discoverable: boolean;
-};
-
-export type Schema = {
-    addonId: string;
-    versionString: string;
-    supportedLanguages: string[];
-    supportedApps: string[];
-    downloadUrl: string;
-    addon: AddOn;
-    entryPoints: EntryPointData[];
-};

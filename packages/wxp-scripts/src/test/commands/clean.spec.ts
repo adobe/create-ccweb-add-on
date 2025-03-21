@@ -75,7 +75,9 @@ describe("clean", () => {
         it("should execute succesfully when no parameters are passed.", async () => {
             analyticsConsent.get.resolves(true);
 
-            const clean = new Clean([], new Config({ name: PROGRAM_NAME, root: "." }));
+            const clean = new Clean([], new Config({ name: PROGRAM_NAME, version: "1.0.0", root: "." }));
+            // @ts-ignore - Sidestep `this.parse()` error when calling `run()` directly.
+            sandbox.stub(clean, "parse").resolves({ flags: { analytics: undefined } });
 
             await clean.run();
 
@@ -88,7 +90,12 @@ describe("clean", () => {
             analyticsConsent.get.resolves(true);
             analyticsConsent.set.withArgs(true).resolves();
 
-            const clean = new Clean(["--analytics", "off"], new Config({ root: "." }));
+            const clean = new Clean(
+                ["--analytics", "off"],
+                new Config({ name: PROGRAM_NAME, version: "1.0.0", root: "." })
+            );
+            // @ts-ignore - Sidestep @oclif/test issue https://github.com/oclif/test/issues/720
+            sandbox.stub(clean, "parse").resolves({ flags: { analytics: "off" } });
 
             await clean.run();
 
@@ -99,12 +106,11 @@ describe("clean", () => {
     });
 
     describe("catch", () => {
-        it("should fail when incorrect params are passed", async () => {
-            const setup = new Clean(["--incorrect-flag"], new Config({ root: "." }));
+        it("should fail for any errors in command execution.", async () => {
+            const clean = new Clean([], new Config({ name: PROGRAM_NAME, version: "1.0.0", root: "." }));
 
-            const error = new Error("Nonexistent flag: --incorrect-flag\nSee more help with --help");
-
-            await expect(setup.catch(error)).to.be.rejectedWith();
+            const error = new Error("Something went wrong.");
+            await expect(clean.catch(error)).to.be.rejectedWith(error);
 
             assert.equal(
                 analyticsService.postEvent.calledOnceWith(

@@ -63,7 +63,7 @@ describe("NodeEnvironmentValidator", () => {
     });
 
     describe("validateNodeVersion", () => {
-        const runs = [{ version: "10.0.0" }, { version: "15.9.9" }];
+        const runs = [{ version: "10.0.0" }, { version: "17.9.9" }];
         runs.forEach(({ version }) => {
             it(`should exit for lower node version: ${version}.`, async () => {
                 const validator: EnvironmentValidator = new NodeEnvironmentValidator(
@@ -84,7 +84,7 @@ describe("NodeEnvironmentValidator", () => {
 
                 assert.equal(logger.information.callCount, 2);
                 assert.equal(
-                    logger.information.getCall(0).calledWith(`${PROGRAM_NAME} requires node 16.0.0 or higher.`),
+                    logger.information.getCall(0).calledWith(`${PROGRAM_NAME} requires node 18.0.0 or higher.`),
                     true
                 );
                 assert.equal(logger.information.getCall(1).calledWith("Please update your version of node."), true);
@@ -134,7 +134,7 @@ describe("NodeEnvironmentValidator", () => {
 
                 assert.equal(logger.information.callCount, 2);
                 assert.equal(
-                    logger.information.getCall(0).calledWith(`${PROGRAM_NAME} requires npm 8.0.0 or higher.`),
+                    logger.information.getCall(0).calledWith(`${PROGRAM_NAME} requires npm 10.0.0 or higher.`),
                     true
                 );
                 assert.equal(logger.information.getCall(1).calledWith("Please install npm."), true);
@@ -147,7 +147,7 @@ describe("NodeEnvironmentValidator", () => {
             });
         });
 
-        const runs = [{ version: "3.0.0" }, { version: "7.9.9" }];
+        const runs = [{ version: "3.0.0" }, { version: "9.9.9" }];
         runs.forEach(run => {
             it(`should exit for lower npm version: ${run.version}.`, async () => {
                 const validator: EnvironmentValidator = new NodeEnvironmentValidator(
@@ -168,7 +168,7 @@ describe("NodeEnvironmentValidator", () => {
 
                 assert.equal(logger.information.callCount, 2);
                 assert.equal(
-                    logger.information.getCall(0).calledWith(`${PROGRAM_NAME} requires npm 8.0.0 or higher.`),
+                    logger.information.getCall(0).calledWith(`${PROGRAM_NAME} requires npm 10.0.0 or higher.`),
                     true
                 );
                 assert.equal(logger.information.getCall(1).calledWith("Please update your version of npm."), true);

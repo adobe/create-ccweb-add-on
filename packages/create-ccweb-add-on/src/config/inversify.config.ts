@@ -29,8 +29,9 @@ import { AddOnTemplateSelector, WxpAddOnFactory } from "../app/index.js";
 import type { DirectoryValidator, EnvironmentValidator } from "../validators/index.js";
 import { AddOnDirectoryValidator, NodeEnvironmentValidator } from "../validators/index.js";
 import { ITypes } from "./inversify.types.js";
+import { Container } from "inversify";
 
-const container = ICoreContainer;
+const container: Container = ICoreContainer;
 
 container.bind<AddOnFactory>(ITypes.AddOnFactory).to(WxpAddOnFactory).inSingletonScope();
 

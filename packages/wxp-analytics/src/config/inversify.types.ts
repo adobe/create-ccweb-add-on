@@ -22,7 +22,10 @@
  * SOFTWARE.
  ********************************************************************************/
 
-export const ITypes = {
+export const ITypes: {
+    AnalyticsService: symbol;
+    AnalyticsConsent: symbol;
+} = {
     AnalyticsService: Symbol.for("AnalyticsService"),
     AnalyticsConsent: Symbol.for("AnalyticsConsent")
 };

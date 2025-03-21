@@ -92,7 +92,20 @@ describe("start", () => {
         it("should execute succesfully when no parameters are passed.", async () => {
             analyticsConsent.get.resolves(true);
 
-            const start = new Start([], new Config({ name: PROGRAM_NAME, root: "." }));
+            const start = new Start([], new Config({ name: PROGRAM_NAME, version: "1.0.0", root: "." }));
+            sandbox
+                // @ts-ignore - Sidestep `this.parse()` error when calling `run()` directly.
+                .stub(start, "parse")
+                .resolves({
+                    flags: {
+                        src: DEFAULT_SRC_DIRECTORY,
+                        use: "",
+                        hostname: DEFAULT_HOST_NAME,
+                        port: DEFAULT_PORT,
+                        analytics: undefined,
+                        verbose: false
+                    }
+                });
 
             await start.run();
 
@@ -112,8 +125,21 @@ describe("start", () => {
         it("should execute succesfully when parameters are passed.", async () => {
             const start = new Start(
                 ["--src", DEFAULT_SRC_DIRECTORY, "--use", "tsc", "--port", "8000", "--analytics", "off", "--verbose"],
-                new Config({ name: PROGRAM_NAME, root: "." })
+                new Config({ name: PROGRAM_NAME, version: "1.0.0", root: "." })
             );
+            sandbox
+                // @ts-ignore - Sidestep `this.parse()` error when calling `run()` directly.
+                .stub(start, "parse")
+                .resolves({
+                    flags: {
+                        src: DEFAULT_SRC_DIRECTORY,
+                        use: "tsc",
+                        hostname: DEFAULT_HOST_NAME,
+                        port: "8000",
+                        analytics: "off",
+                        verbose: true
+                    }
+                });
 
             await start.run();
 
@@ -125,12 +151,11 @@ describe("start", () => {
     });
 
     describe("catch", () => {
-        it("should fail when incorrect params are passed", async () => {
-            const setup = new Start(["--incorrect-flag"], new Config({ name: PROGRAM_NAME, root: "." }));
+        it("should fail for any errors in command execution.", async () => {
+            const build = new Start([], new Config({ name: PROGRAM_NAME, version: "1.0.0", root: "." }));
 
-            const error = new Error("Nonexistent flag: --incorrect-flag\nSee more help with --help");
-
-            await expect(setup.catch(error)).to.be.rejectedWith();
+            const error = new Error("Something went wrong.");
+            await expect(build.catch(error)).to.be.rejectedWith(error);
 
             assert.equal(
                 analyticsService.postEvent.calledOnceWith(

@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /********************************************************************************
  * MIT License
 
@@ -24,11 +22,11 @@
  * SOFTWARE.
  ********************************************************************************/
 
-import type { AnalyticsConsent, AnalyticsService } from "@adobe/ccweb-add-on-analytics";
-import { CLIProgram, ITypes as IAnalyticsTypes } from "@adobe/ccweb-add-on-analytics";
+import { BaseCommand, CLIProgram } from "@adobe/ccweb-add-on-analytics";
 import { DEFAULT_SRC_DIRECTORY, UncaughtExceptionHandler } from "@adobe/ccweb-add-on-core";
 import type { Config } from "@oclif/core";
-import { Command, Flags } from "@oclif/core";
+import { Flags } from "@oclif/core";
+import type { BooleanFlag, CustomOptions, OptionFlag } from "@oclif/core/lib/interfaces/parser.js";
 import "reflect-metadata";
 import { AnalyticsErrorMarkers } from "../AnalyticsMarkers.js";
 import type { CommandExecutor } from "../app/CommandExecutor.js";
@@ -39,18 +37,18 @@ import { PackageCommandOptions } from "../models/PackageCommandOptions.js";
 /**
  * Package Command's implementation class.
  */
-export class Package extends Command {
-    private readonly _analyticsConsent: AnalyticsConsent;
-    private readonly _analyticsService: AnalyticsService;
-
+export class Package extends BaseCommand {
     private readonly _commandExecutor: CommandExecutor;
 
-    static description =
-        "ccweb-add-on-scripts package command is used to create a production build for the add-on and package it into a zip.";
+    static description = "Create a production build for the add-on and package it into a zip.";
 
     static args = {};
 
-    static flags = {
+    static flags: {
+        src: OptionFlag<string, CustomOptions>;
+        use: OptionFlag<string, CustomOptions>;
+        "no-rebuild": BooleanFlag<boolean>;
+    } = {
         src: Flags.string({
             description: "Directory where the source code for the add-on is present.",
             required: false,
@@ -65,34 +63,16 @@ export class Package extends Command {
             description: "Create a zip from the dist folder without rebuilding the add-on.",
             required: false,
             default: false
-        }),
-        analytics: Flags.string({
-            char: "a",
-            description: "Turn on/off sending analytics to Adobe.",
-            options: ["on", "off"],
-            required: false
-        }),
-        verbose: Flags.boolean({
-            char: "v",
-            description: "Print detailed messages.",
-            required: false,
-            default: false
         })
     };
 
     constructor(argv: string[], config: Config) {
-        super(argv, config);
-
-        this._analyticsConsent = IContainer.get<AnalyticsConsent>(IAnalyticsTypes.AnalyticsConsent);
-
-        this._analyticsService = IContainer.get<AnalyticsService>(IAnalyticsTypes.AnalyticsService);
-        this._analyticsService.program = new CLIProgram(PROGRAM_NAME, this.config.name + "@" + this.config.version);
-        this._analyticsService.startTime = Date.now();
+        super(argv, config, new CLIProgram(PROGRAM_NAME, config.name + "@" + config.version));
 
         this._commandExecutor = IContainer.getNamed<CommandExecutor>(ITypes.CommandExecutor, "package");
     }
 
-    async run() {
+    async run(): Promise<void> {
         // Add-on needs to be built in the production mode and then packaged.
         process.env.NODE_ENV = "production";
 
@@ -109,16 +89,8 @@ export class Package extends Command {
         await this._commandExecutor.execute(options);
     }
 
-    async catch(error: { message: string }) {
+    async catch(error: { message: string }): Promise<void> {
         this._analyticsService.postEvent(AnalyticsErrorMarkers.SCRIPTS_PACKAGE_COMMAND_ERROR, error.message, false);
         throw error;
-    }
-
-    private async _seekAnalyticsConsent(analytics: string | undefined): Promise<void> {
-        if (analytics === undefined) {
-            await this._analyticsConsent.get();
-        } else {
-            await this._analyticsConsent.set(analytics === "on");
-        }
     }
 }

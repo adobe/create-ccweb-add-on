@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /********************************************************************************
  * MIT License
 
@@ -24,11 +22,11 @@
  * SOFTWARE.
  ********************************************************************************/
 
-import type { AnalyticsConsent, AnalyticsService } from "@adobe/ccweb-add-on-analytics";
-import { CLIProgram, ITypes as IAnalyticsTypes } from "@adobe/ccweb-add-on-analytics";
+import { BaseCommand, CLIProgram } from "@adobe/ccweb-add-on-analytics";
 import { UncaughtExceptionHandler } from "@adobe/ccweb-add-on-core";
 import type { Config } from "@oclif/core";
-import { Command, Flags } from "@oclif/core";
+import { Flags } from "@oclif/core";
+import type { BooleanFlag, CustomOptions, OptionFlag } from "@oclif/core/lib/interfaces/parser.js";
 import process from "process";
 import "reflect-metadata";
 import { AnalyticsErrorMarkers } from "../AnalyticsMarkers.js";
@@ -41,18 +39,18 @@ import type { CommandValidator } from "../validators/CommandValidator.js";
 /**
  * SSL Setup command.
  */
-export class Setup extends Command {
-    private readonly _analyticsConsent: AnalyticsConsent;
-    private readonly _analyticsService: AnalyticsService;
-
+export class Setup extends BaseCommand {
     private readonly _commandValidator: CommandValidator;
     private readonly _commandExecutor: CommandExecutor;
 
-    static description = "Setup a trusted SSL certificate for hosting an add-on.";
+    static description = "Setup a locally trusted SSL certificate for hosting an add-on.";
 
     static args = {};
 
-    static flags = {
+    static flags: {
+        hostname: OptionFlag<string, CustomOptions>;
+        useExisting: BooleanFlag<boolean>;
+    } = {
         hostname: Flags.string({
             char: "h",
             description: "Hostname in the SSL certificate.",
@@ -64,35 +62,17 @@ export class Setup extends Command {
             required: false,
             default: false,
             hidden: true
-        }),
-        analytics: Flags.string({
-            char: "a",
-            description: "Turn on/off sending analytics to Adobe.",
-            options: ["on", "off"],
-            required: false
-        }),
-        verbose: Flags.boolean({
-            char: "v",
-            description: "Print detailed logs.",
-            required: false,
-            default: false
         })
     };
 
     constructor(argv: string[], config: Config) {
-        super(argv, config);
-
-        this._analyticsConsent = IContainer.get<AnalyticsConsent>(IAnalyticsTypes.AnalyticsConsent);
-
-        this._analyticsService = IContainer.get<AnalyticsService>(IAnalyticsTypes.AnalyticsService);
-        this._analyticsService.program = new CLIProgram(PROGRAM_NAME, this.config.name + "@" + this.config.version);
-        this._analyticsService.startTime = Date.now();
+        super(argv, config, new CLIProgram(PROGRAM_NAME, config.name + "@" + config.version));
 
         this._commandValidator = IContainer.getNamed<CommandValidator>(ITypes.CommandValidator, "setup");
         this._commandExecutor = IContainer.getNamed<CommandExecutor>(ITypes.CommandExecutor, "setup");
     }
 
-    async run() {
+    async run(): Promise<void> {
         UncaughtExceptionHandler.registerExceptionHandler(PROGRAM_NAME);
 
         const rootDirectory = process.cwd();
@@ -109,16 +89,8 @@ export class Setup extends Command {
         await this._commandExecutor.execute(options);
     }
 
-    async catch(error: { message: string }) {
+    async catch(error: { message: string }): Promise<void> {
         this._analyticsService.postEvent(AnalyticsErrorMarkers.ERROR_SSL_SETUP, error.message, false);
         throw error;
-    }
-
-    private async _seekAnalyticsConsent(analytics: string | undefined): Promise<void> {
-        if (analytics === undefined) {
-            await this._analyticsConsent.get();
-        } else {
-            await this._analyticsConsent.set(analytics === "on");
-        }
     }
 }

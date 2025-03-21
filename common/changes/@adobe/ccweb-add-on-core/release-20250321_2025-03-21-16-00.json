@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-core",
+      "comment": "Node version update",
+      "type": "major"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-core"
+}

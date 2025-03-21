@@ -79,6 +79,7 @@ describe("StartCommandExecutor", () => {
         server = stubInterface<Server>();
         serverProvider = sandbox.stub().resolves(server);
 
+        expressApp = stubInterface();
         expressServer = stubInterface();
         socketServer = stubInterface();
         scriptManager = stubInterface();

@@ -23,7 +23,7 @@
  ********************************************************************************/
 
 export * from "./AddOnFactory.js";
-export * from "./AddOnManager.js";
+export * from "./AddOnPackageManager.js";
 export * from "./AddOnTemplateSelector.js";
 export * from "./TemplateSelector.js";
 export * from "./WxpAddOnFactory.js";

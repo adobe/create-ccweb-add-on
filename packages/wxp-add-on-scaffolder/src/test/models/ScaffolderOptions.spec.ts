@@ -33,25 +33,25 @@ describe("ScaffolderOptions", () => {
             {
                 addOnDirectory: "/apps/test-app",
                 addOnName: "test-app",
-                addOnKind: EntrypointType.PANEL,
+                entrypointType: EntrypointType.PANEL,
                 rootDirectory: "/apps",
                 templateName: "javascript",
                 verbose: false
             }
         ];
         runs.forEach(run => {
-            it(`should create a new instance for: ${run.addOnKind}.`, () => {
+            it(`should create a new instance for: ${run.entrypointType}.`, () => {
                 const scaffolderOptions = new ScaffolderOptions(
                     run.addOnDirectory,
                     run.addOnName,
-                    run.addOnKind as EntrypointType,
+                    run.entrypointType as EntrypointType,
                     run.rootDirectory,
                     run.templateName,
                     run.verbose
                 );
                 assert.equal(scaffolderOptions.addOnDirectory, run.addOnDirectory);
                 assert.equal(scaffolderOptions.addOnName, run.addOnName);
-                assert.equal(scaffolderOptions.addOnKind, run.addOnKind);
+                assert.equal(scaffolderOptions.entrypointType, run.entrypointType);
                 assert.equal(scaffolderOptions.rootDirectory, run.rootDirectory);
                 assert.equal(scaffolderOptions.templateName, run.templateName);
                 assert.equal(scaffolderOptions.verbose, run.verbose);

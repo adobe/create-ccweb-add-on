@@ -63,7 +63,7 @@ export class AddOnTemplateSelector implements TemplateSelector {
      * @returns User selected/provided template name.
      */
     async setupTemplate(options: CLIOptions): Promise<string> {
-        await this._validateAddOnKind(options.addOnKind);
+        await this._validateAddOnEntrypoint(options.entrypointType);
 
         if (!isNullOrWhiteSpace(options.templateName)) {
             if (AVAILABLE_ADD_ON_TEMPLATES.includes(options.templateName)) {
@@ -144,14 +144,14 @@ export class AddOnTemplateSelector implements TemplateSelector {
     }
 
     /**
-     * Validate whether addOnKind is valid or not.
-     * @param addOnKind - Kind of Add-on. For example: panel.
+     * Validate whether entrypointType is valid or not.
+     * @param entrypointType - Add-on entrypoint. For example: panel.
      */
-    private async _validateAddOnKind(addOnKind: EntrypointType): Promise<void> {
-        if (addOnKind !== EntrypointType.PANEL) {
-            this._logger.warning(LOGS.chooseValidKind);
+    private async _validateAddOnEntrypoint(entrypointType: EntrypointType): Promise<void> {
+        if (entrypointType !== EntrypointType.PANEL) {
+            this._logger.warning(LOGS.chooseValidEntrypointType);
             this._logger.warning(
-                format(LOGS.executeProgramWithValidKind, {
+                format(LOGS.executeProgramWithValidEntrypointType, {
                     PROGRAM_NAME
                 }),
                 {
@@ -160,7 +160,7 @@ export class AddOnTemplateSelector implements TemplateSelector {
             );
             this._logger.message(LOGS.forExample, { prefix: LOGS.newLine });
             this._logger.information(
-                format(LOGS.executeProgramWithValidKindExample, {
+                format(LOGS.executeProgramWithValidEntrypointTypeExample, {
                     PROGRAM_NAME
                 }),
                 {
@@ -170,7 +170,7 @@ export class AddOnTemplateSelector implements TemplateSelector {
 
             await this._analyticsService.postEvent(
                 AnalyticsErrorMarkers.ERROR_INVALID_KIND,
-                LOGS.analyticsInvalidKind,
+                LOGS.analyticsInvalidEntrypointType,
                 false
             );
             return process.exit(0);
@@ -181,12 +181,12 @@ const LOGS = {
     newLine: "\n",
     tab: "  ",
     setupTemplate: "Please select a template which you want to scaffold the Add-on project with",
-    chooseValidKind: "Please choose a valid Add-on kind (valid kind: panel)",
-    executeProgramWithValidKind: "{PROGRAM_NAME} <add-on-name> --kind <panel>",
-    executeProgramWithValidKindExample: "{PROGRAM_NAME} my-add-on --kind panel",
+    chooseValidEntrypointType: "Please choose a valid Add-on entrypoint (valid entrypoint: panel)",
+    executeProgramWithValidEntrypointType: "{PROGRAM_NAME} <add-on-name> --entrypoint <panel>",
+    executeProgramWithValidEntrypointTypeExample: "{PROGRAM_NAME} my-add-on --entrypoint panel",
     chooseValidTemplate: "You have chosen an invalid template.",
     forExample: "For example:",
-    analyticsInvalidKind: "Invalid Add-on kind specified",
+    analyticsInvalidEntrypointType: "Invalid Add-on entrypoint specified",
     includeDocumentSandbox: "Do you want to include document sandbox runtime?",
     yes: "Yes",
     no: "No"

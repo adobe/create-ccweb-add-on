@@ -26,8 +26,8 @@ import type { AnalyticsService } from "@adobe/ccweb-add-on-analytics";
 import { ITypes as IAnalyticsTypes } from "@adobe/ccweb-add-on-analytics";
 import type { Logger, Preferences } from "@adobe/ccweb-add-on-core";
 import { ITypes as ICoreTypes, isFile } from "@adobe/ccweb-add-on-core";
-import chalk from "chalk";
 import devcert from "@adobe/ccweb-add-on-devcert";
+import chalk from "chalk";
 import { inject, injectable } from "inversify";
 import path from "path";
 import process from "process";
@@ -147,8 +147,6 @@ export class SetupCommandExecutor implements CommandExecutor {
             prefix: LOGS.newLine
         });
 
-        // Consider updating the signature of `_removeExistingSSL` to accept only `options`
-        // when we introduce the @oclf command to `remove` an existing SSL.
         return await this._removeExistingSSL(options, isCustomSSL, isWxpSSL);
     }
 
@@ -229,7 +227,12 @@ export class SetupCommandExecutor implements CommandExecutor {
         }
 
         if (isWxpSSL) {
-            await devcert.removeDomain(options.hostname);
+            if (devcert.caExpiryInDays() <= 0) {
+                devcert.removeAll();
+            } else {
+                await devcert.removeDomain(options.hostname);
+            }
+
             this._analyticsService.postEvent(
                 AnalyticsSuccessMarkers.SUCCESSFUL_SSL_AUTOMATIC_REMOVE,
                 options.hostname,
@@ -237,7 +240,7 @@ export class SetupCommandExecutor implements CommandExecutor {
             );
         }
 
-        this._logger.success(LOGS.removed, { postfix: LOGS.newLine });
+        this._logger.success(LOGS.removedExistingSSL, { prefix: LOGS.newLine, postfix: LOGS.newLine });
         return true;
     }
 
@@ -295,7 +298,7 @@ const LOGS = {
     automatically: "Automatically, set it up for me",
     manually: "Manually, I already have an SSL certificate and key",
     settingUpSSL: "Setting up self-signed SSL certificate ...",
-    requireSystemPassword: "This is only a one time step and may require you to enter your system's password",
+    requireSystemPassword: "This is only a one time step and may require you to enter your system's password,",
     requireSystemPasswordReason: "so that the SSL certificate can be added to your system's trusted certificate path.",
     retryRunningIfTakingLonger: "[If this takes longer than expected, please break and retry]",
     sslSetupComplete: "SSL setup complete!",
@@ -306,5 +309,5 @@ const LOGS = {
     invalidPathSpecified: "Invalid {asset} path specified.",
     sslSetupOptionNotSpecified: "SSL setup option is not specified.",
     sslRemoveOptionNotSpecified: "SSL remove option is not specified.",
-    removed: "Removed."
+    removedExistingSSL: "Removed existing SSL certificate."
 };

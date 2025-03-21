@@ -96,12 +96,12 @@ describe("WxpAddOnFactory", () => {
 
             const processExitStub = sandbox.stub(process, "exit");
 
-            const addOnKind = EntrypointType.PANEL;
+            const entrypointType = EntrypointType.PANEL;
             const addOnName = "test-add-on";
             const templateName = "javascript";
             const verbose = false;
 
-            await addOnFactory.create(new CLIOptions(addOnKind, addOnName, templateName, verbose));
+            await addOnFactory.create(new CLIOptions(entrypointType, addOnName, templateName, verbose));
 
             assert.equal(cliProcess.handleError.callCount, 1);
             assert.equal(cliProcess.handleError.calledWith(error), true);
@@ -118,7 +118,7 @@ describe("WxpAddOnFactory", () => {
 
         it("should handle the errors when template doesnt exist.", async () => {
             const run = {
-                addOnKind: EntrypointType.PANEL,
+                entrypointType: EntrypointType.PANEL,
                 addOnName: "test-add-on",
                 templateName: "javascript",
                 verbose: false
@@ -149,7 +149,7 @@ describe("WxpAddOnFactory", () => {
             templateSelector.setupTemplate.resolves(run.templateName);
 
             const options = new CLIOptions(
-                run.addOnKind as EntrypointType,
+                run.entrypointType as EntrypointType,
                 run.addOnName,
                 run.templateName,
                 run.verbose
@@ -162,19 +162,19 @@ describe("WxpAddOnFactory", () => {
 
         const runs = [
             {
-                addOnKind: EntrypointType.PANEL,
+                entrypointType: EntrypointType.PANEL,
                 addOnName: "test-add-on",
                 templateName: "javascript",
                 verbose: false
             },
             {
-                addOnKind: EntrypointType.PANEL,
+                entrypointType: EntrypointType.PANEL,
                 addOnName: "test-add-on",
                 templateName: "typescript",
                 verbose: true
             },
             {
-                addOnKind: EntrypointType.PANEL,
+                entrypointType: EntrypointType.PANEL,
                 addOnName: "test-add-on",
                 templateName: "react-javascript",
                 verbose: false
@@ -207,7 +207,7 @@ describe("WxpAddOnFactory", () => {
                 templateSelector.setupTemplate.resolves(run.templateName);
 
                 const options = new CLIOptions(
-                    run.addOnKind as EntrypointType,
+                    run.entrypointType as EntrypointType,
                     run.addOnName,
                     run.templateName,
                     run.verbose
@@ -236,7 +236,7 @@ describe("WxpAddOnFactory", () => {
                 const scaffolderOptions = new ScaffolderOptions(
                     addOnDirectory,
                     options.addOnName,
-                    options.addOnKind,
+                    options.entrypointType,
                     rootDirectory,
                     run.templateName,
                     options.verbose
@@ -244,8 +244,8 @@ describe("WxpAddOnFactory", () => {
                 const analyticsServiceEventData = [
                     "--addOnName",
                     run.addOnName,
-                    "--kind",
-                    run.addOnKind,
+                    "--entrypointType",
+                    run.entrypointType,
                     "--template",
                     run.templateName
                 ];

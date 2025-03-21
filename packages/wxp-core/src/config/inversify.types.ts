@@ -22,7 +22,12 @@
  * SOFTWARE.
  ********************************************************************************/
 
-export const ITypes = {
+export const ITypes: {
+    Logger: symbol;
+    Process: symbol;
+    Preferences: symbol;
+    AccountService: symbol;
+} = {
     Logger: Symbol.for("Logger"),
     Process: Symbol.for("Process"),
     Preferences: Symbol.for("Preferences"),

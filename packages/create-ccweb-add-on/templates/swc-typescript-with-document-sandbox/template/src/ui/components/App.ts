@@ -1,4 +1,4 @@
-// To support: theme="express" scale="medium" color="light"
+// To support: system="express" scale="medium" color="light"
 // import these spectrum web components modules:
 import "@spectrum-web-components/theme/express/scale-medium.js";
 import "@spectrum-web-components/theme/express/theme-light.js";
@@ -10,7 +10,7 @@ import "@spectrum-web-components/theme/theme-light.js";
 import "@spectrum-web-components/button/sp-button.js";
 import "@spectrum-web-components/theme/sp-theme.js";
 
-import { LitElement, html } from "lit";
+import { LitElement, TemplateResult, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { DocumentSandboxApi } from "../../models/DocumentSandboxApi";
 import { style } from "./App.css";
@@ -43,10 +43,10 @@ export class App extends LitElement {
         this._sandboxProxy.createRectangle();
     }
 
-    render() {
+    render(): TemplateResult {
         // Please note that the below "<sp-theme>" component does not react to theme changes in Express.
         // You may use "this.addOnUISdk.app.ui.theme" to get the current theme and react accordingly.
-        return html` <sp-theme theme="express" color="light" scale="medium">
+        return html` <sp-theme system="express" color="light" scale="medium">
             <div class="container">
                 <sp-button size="m" @click=${this._handleClick}>Create Rectangle</sp-button>
             </div>

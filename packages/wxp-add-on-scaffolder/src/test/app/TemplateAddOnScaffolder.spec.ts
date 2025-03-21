@@ -105,7 +105,7 @@ describe("TemplateAddOnScaffolder", () => {
 
             const addOnDirectory = `${__dirname}/data/first-test-app`;
             const addOnName = "first-test-app";
-            const addOnKind = EntrypointType.PANEL;
+            const entrypointType = EntrypointType.PANEL;
             const rootDirectory = `${__dirname}/data`;
             const templateName = "javascript";
             const verbose = false;
@@ -113,7 +113,7 @@ describe("TemplateAddOnScaffolder", () => {
             const options = new ScaffolderOptions(
                 addOnDirectory,
                 addOnName,
-                addOnKind,
+                entrypointType,
                 rootDirectory,
                 templateName,
                 verbose
@@ -131,7 +131,7 @@ describe("TemplateAddOnScaffolder", () => {
             {
                 addOnDirectory: `${__dirname}/data/first-test-app`,
                 addOnName: "first-test-app",
-                addOnKind: EntrypointType.PANEL,
+                entrypointType: EntrypointType.PANEL,
                 rootDirectory: `${__dirname}/data`,
                 templateName: "javascript",
                 verbose: true
@@ -139,7 +139,7 @@ describe("TemplateAddOnScaffolder", () => {
             {
                 addOnDirectory: `${__dirname}/data/second-test-app`,
                 addOnName: "second-test-app",
-                addOnKind: EntrypointType.PANEL,
+                entrypointType: EntrypointType.PANEL,
                 rootDirectory: `${__dirname}/data`,
                 templateName: "javascript",
                 verbose: false
@@ -152,8 +152,8 @@ describe("TemplateAddOnScaffolder", () => {
                 const packageJson = new PackageJson({
                     name: run.addOnName,
                     version: "1.0.0",
-                    description: `WXP ${run.addOnKind} application.`,
-                    keywords: ["adobe", "wxp", run.addOnKind],
+                    description: `WXP ${run.entrypointType} application.`,
+                    keywords: ["adobe", "wxp", run.entrypointType],
                     scripts: {
                         clean: "ccweb-add-on-scripts clean",
                         build: "ccweb-add-on-scripts build",
@@ -182,8 +182,8 @@ describe("TemplateAddOnScaffolder", () => {
                 const combinedPackageJson = new PackageJson({
                     name: run.addOnName,
                     version: "1.0.0",
-                    description: `WXP ${run.addOnKind} application.`,
-                    keywords: ["adobe", "wxp", run.addOnKind],
+                    description: `WXP ${run.entrypointType} application.`,
+                    keywords: ["adobe", "wxp", run.entrypointType],
                     scripts: {
                         clean: "ccweb-add-on-scripts clean",
                         build: "ccweb-add-on-scripts build",
@@ -243,7 +243,7 @@ describe("TemplateAddOnScaffolder", () => {
                 const options = new ScaffolderOptions(
                     run.addOnDirectory,
                     run.addOnName,
-                    run.addOnKind as EntrypointType,
+                    run.entrypointType as EntrypointType,
                     run.rootDirectory,
                     run.templateName,
                     run.verbose

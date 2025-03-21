@@ -30,7 +30,7 @@ import osName from "os-name";
 import "reflect-metadata";
 import { ANALYTICS_API } from "../constants.js";
 import { CLIProgram } from "../models/index.js";
-import type { AnalyticsService } from "./AnalyticsService";
+import type { AnalyticsService } from "./AnalyticsService.js";
 
 /**
  * Analytics service implementation.

@@ -22,7 +22,11 @@
  * SOFTWARE.
  ********************************************************************************/
 
-export const ITypes = {
+export const ITypes: {
+    CommandExecutor: symbol;
+    CommandValidator: symbol;
+    SSLReader: symbol;
+} = {
     CommandExecutor: Symbol.for("CommandExecutor"),
     CommandValidator: Symbol.for("CommandValidator"),
     SSLReader: Symbol.for("SSLReader")

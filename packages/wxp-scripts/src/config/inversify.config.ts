@@ -23,13 +23,13 @@
  ********************************************************************************/
 
 import { IContainer } from "@adobe/ccweb-add-on-core";
-import { type SSLData } from "@adobe/ccweb-add-on-ssl";
+import type { SSLData } from "@adobe/ccweb-add-on-ssl";
 import cors from "cors";
 import type { Express } from "express";
 import express from "express";
 import type { Server } from "https";
 import { createServer } from "https";
-import type { interfaces } from "inversify";
+import type { Container, interfaces } from "inversify";
 import "reflect-metadata";
 import { WebSocketServer } from "ws";
 import { BuildCommandExecutor } from "../app/BuildCommandExecutor.js";
@@ -44,7 +44,7 @@ import type { CommandValidator } from "../validators/CommandValidator.js";
 import { StartCommandValidator } from "../validators/StartCommandValidator.js";
 import { ITypes } from "./inversify.types.js";
 
-const container = IContainer;
+const container: Container = IContainer;
 
 container.bind<Express>(ITypes.ExpressApp).toConstantValue(
     express()
