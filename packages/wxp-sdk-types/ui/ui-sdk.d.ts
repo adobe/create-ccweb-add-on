@@ -152,6 +152,10 @@ export declare enum AppEvent {
      */
     documentIdAvailable = "documentIdAvailable",
     /**
+     * triggered when the document link is available in the application.
+     */
+    documentLinkAvailable = "documentLinkAvailable",
+    /**
      * triggered when the document title is changed in the application.
      */
     documentTitleChange = "documentTitleChange"
@@ -171,6 +175,7 @@ declare interface AppEventsTypeMap {
     [AppEvent.dragend]: AppDragEndEventData;
 
     [AppEvent.documentIdAvailable]: DocumentIdAvailableEventData;
+    [AppEvent.documentLinkAvailable]: DocumentLinkAvailableEventData;
     [AppEvent.documentTitleChange]: DocumentTitleChangeEventData;
 }
 
@@ -195,6 +200,11 @@ export declare interface Application extends ApplicationBase {
      * Represents the active document of the host application
      */
     readonly document: Document_2;
+    /**
+     * @experimental
+     * Invoke command/actions in an add-on and handle response.
+     */
+    readonly command: Command;
     /**
      * OAuth 2.0 middleware for handling user authorization.
      */
@@ -604,9 +614,28 @@ export declare enum ColorPickerPlacement {
     right = "right"
 }
 
+/**
+ * @experimental
+ * Provides APIs to handle command execution in the add-on.
+ */
+export declare interface Command {
+    /**
+     * Register a handler for handling command execution in the add-on.
+     *
+     * _Note:_ This is similar to a JavaScript event handler.
+     * If there are multiple handlers registered for a command,
+     * each will be invoked when the host application triggers the command.
+     * In most of the cases, one handler per command is the way to go.
+     * @param command - Command triggered from the host application.
+     * @param handler - Handler for command execution.
+     */
+    register(command: string, handler: (params: Record<string, unknown>) => unknown): void;
+}
+
 declare namespace Constants {
     export {
         Range_2 as Range,
+        LinkOptions,
         RenditionFormat,
         RenditionType,
         RenditionIntent,
@@ -823,6 +852,11 @@ declare interface Document_2 {
      */
     id(): Promise<string | undefined>;
     /**
+     * @experimental - Experimental API
+     * Get document Link
+     */
+    link(options: LinkOptions): Promise<string | undefined>;
+    /**
      * Get document name/title
      */
     title(): Promise<string>;
@@ -847,6 +881,13 @@ export { Document_2 as Document };
  */
 declare interface DocumentIdAvailableEventData {
     documentId: string | undefined;
+}
+
+/**
+ * The payload data sent to the document link available event handler.
+ */
+declare interface DocumentLinkAvailableEventData {
+    documentLink: string | undefined;
 }
 
 /**
@@ -1050,6 +1091,17 @@ export declare interface JpgRenditionOptions extends RenditionOptions {
         width?: number;
         height?: number;
     };
+}
+
+/**
+ * @experimental - Experimental API
+ * Link options for document link
+ */
+export declare enum LinkOptions {
+    /**
+     * Link to the current document
+     */
+    document = "document"
 }
 
 /**
