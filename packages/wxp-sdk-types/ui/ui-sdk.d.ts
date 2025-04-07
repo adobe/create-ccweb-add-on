@@ -201,11 +201,6 @@ export declare interface Application extends ApplicationBase {
      */
     readonly document: Document_2;
     /**
-     * @experimental
-     * Invoke command/actions in an add-on and handle response.
-     */
-    readonly command: Command;
-    /**
      * OAuth 2.0 middleware for handling user authorization.
      */
     readonly oauth: OAuth;
@@ -612,24 +607,6 @@ export declare enum ColorPickerPlacement {
      * The color picker popover will be positioned to the right of the anchor element.
      */
     right = "right"
-}
-
-/**
- * @experimental
- * Provides APIs to handle command execution in the add-on.
- */
-export declare interface Command {
-    /**
-     * Register a handler for handling command execution in the add-on.
-     *
-     * _Note:_ This is similar to a JavaScript event handler.
-     * If there are multiple handlers registered for a command,
-     * each will be invoked when the host application triggers the command.
-     * In most of the cases, one handler per command is the way to go.
-     * @param command - Command triggered from the host application.
-     * @param handler - Handler for command execution.
-     */
-    register(command: string, handler: (params: Record<string, unknown>) => unknown): void;
 }
 
 declare namespace Constants {
