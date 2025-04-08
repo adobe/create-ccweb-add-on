@@ -175,6 +175,7 @@ export declare class ArtboardNode extends VisualNode implements IRectangularNode
     get children(): ItemList<Node>;
     /**
      * The background fill of the artboard. Artboards must always have a fill.
+     *
      */
     set fill(fill: Fill);
     get fill(): Readonly<Fill>;
@@ -1885,13 +1886,7 @@ export declare class TextContentModel {
      * If the specified range doesn't align well with the paragraph boundaries, the range will be expanded to cover the
      * entire paragraphs, it overlaps.
      */
-    applyCharacterStyles(
-        styles: CharacterStylesInput,
-        range?: {
-            start: number;
-            length: number;
-        }
-    ): void;
+    applyCharacterStyles(styles: CharacterStylesInput, range?: TextRange): void;
     /**
      * <InlineAlert slots="text" variant="warning"/>
      *
@@ -1907,13 +1902,19 @@ export declare class TextContentModel {
      * @param range - The start and length of character sequence to which the styles should be applied.
      * If not specified the styles will be applied to the entire piece of text content flow.
      */
-    applyParagraphStyles(
-        styles: ParagraphStylesInput,
-        range?: {
-            start: number;
-            length: number;
-        }
-    ): void;
+    applyParagraphStyles(styles: ParagraphStylesInput, range?: TextRange): void;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Returns true if this text contains any fonts unavailable to the current user.
+     * Currently, if any unavailable fonts are present, the text content cannot be modified and
+     * certain styling changes are limited as well. To remove these restrictions, you must modify
+     * the character styles to use only AvailableFonts.
+     */
+    hasUnavailableFonts(): boolean;
 }
 
 /**
@@ -2013,22 +2014,30 @@ export declare class TextNode extends Node {
 }
 
 /**
+ * A range of text in a {@link TextContentModel}.
+ */
+declare interface TextRange {
+    start: number;
+    length: number;
+}
+
+/**
  * <InlineAlert slots="text" variant="warning"/>
  *
  * *Do not depend on the literal numeric values of these constants*, as they may change. Always reference the enum identifiers in your code.
  */
 declare enum TextType {
-    /**
-     * Point text
-     */
-    autoWidth = 0,
+    area = 1,
     /**
      * Soft bottom
      */
-    autoHeight = 1,
-    area = 2,
-    magicFit = 3,
-    circular = 4
+    autoHeight = 2,
+    /**
+     * Point text
+     */
+    autoWidth = 3,
+    circular = 4,
+    magicFit = 5
 }
 
 /**

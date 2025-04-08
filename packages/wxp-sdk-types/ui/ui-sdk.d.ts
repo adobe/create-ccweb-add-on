@@ -152,6 +152,10 @@ export declare enum AppEvent {
      */
     documentIdAvailable = "documentIdAvailable",
     /**
+     * triggered when the document link is available in the application.
+     */
+    documentLinkAvailable = "documentLinkAvailable",
+    /**
      * triggered when the document title is changed in the application.
      */
     documentTitleChange = "documentTitleChange"
@@ -171,6 +175,7 @@ declare interface AppEventsTypeMap {
     [AppEvent.dragend]: AppDragEndEventData;
 
     [AppEvent.documentIdAvailable]: DocumentIdAvailableEventData;
+    [AppEvent.documentLinkAvailable]: DocumentLinkAvailableEventData;
     [AppEvent.documentTitleChange]: DocumentTitleChangeEventData;
 }
 
@@ -607,6 +612,7 @@ export declare enum ColorPickerPlacement {
 declare namespace Constants {
     export {
         Range_2 as Range,
+        LinkOptions,
         RenditionFormat,
         RenditionType,
         RenditionIntent,
@@ -823,6 +829,11 @@ declare interface Document_2 {
      */
     id(): Promise<string | undefined>;
     /**
+     * @experimental - Experimental API
+     * Get document Link
+     */
+    link(options: LinkOptions): Promise<string | undefined>;
+    /**
      * Get document name/title
      */
     title(): Promise<string>;
@@ -847,6 +858,13 @@ export { Document_2 as Document };
  */
 declare interface DocumentIdAvailableEventData {
     documentId: string | undefined;
+}
+
+/**
+ * The payload data sent to the document link available event handler.
+ */
+declare interface DocumentLinkAvailableEventData {
+    documentLink: string | undefined;
 }
 
 /**
@@ -1050,6 +1068,17 @@ export declare interface JpgRenditionOptions extends RenditionOptions {
         width?: number;
         height?: number;
     };
+}
+
+/**
+ * @experimental - Experimental API
+ * Link options for document link
+ */
+export declare enum LinkOptions {
+    /**
+     * Link to the current document
+     */
+    document = "document"
 }
 
 /**
