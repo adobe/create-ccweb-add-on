@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-sdk-types",
+      "comment": "Renamed enum TextType to TextLayout, ColorPickerEvent enum to ColorPickerEvents, updated TextAlignment enum, stabilized ColorPicker API, exported payload types ",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-sdk-types"
+}

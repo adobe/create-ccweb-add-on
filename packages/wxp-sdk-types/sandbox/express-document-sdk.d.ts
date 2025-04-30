@@ -81,7 +81,7 @@ declare namespace ApiConstants {
         StrokePosition,
         StrokeType,
         TextAlignment,
-        TextType,
+        TextLayout,
         EditorEvent,
         VisualEffectType,
         ParagraphListType,
@@ -105,7 +105,7 @@ declare interface ApiModuleExport {
  * @experimental
  */
 export declare interface AreaTextLayout {
-    type: TextType.area;
+    type: TextLayout.area;
     /**
      * The width of the text node in pixels.
      */
@@ -120,6 +120,11 @@ export declare interface AreaTextLayout {
  * <InlineAlert slots="text" variant="warning"/>
  *
  * *Do not depend on the literal numeric values of these constants*, as they may change. Always reference the enum identifiers in your code.
+ *
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * *Additional arrowhead types may be added in the future.* If your code has different branches or cases depending on arrow type,
+ * always have a default/fallback case to handle any unknown values you may encounter.
  */
 declare enum ArrowHeadType {
     none = 0,
@@ -201,7 +206,7 @@ export declare class ArtboardNode extends VisualNode implements IRectangularNode
  * @experimental
  */
 export declare interface AutoHeightTextLayout {
-    type: TextType.autoHeight;
+    type: TextLayout.autoHeight;
     /**
      * The width of the text node in pixels.
      */
@@ -1477,7 +1482,7 @@ export declare interface Point {
  * @experimental
  */
 export declare interface PointTextLayout {
-    type: TextType.autoWidth;
+    type: TextLayout.autoWidth;
 }
 
 /**
@@ -1799,11 +1804,17 @@ declare interface StyleRange {
  * <InlineAlert slots="text" variant="warning"/>
  *
  * *Do not depend on the literal numeric values of these constants*, as they may change. Always reference the enum identifiers in your code.
+ *
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * *Additional alignment types may be added in the future.* If your code has different branches or cases depending on text alignment,
+ * always have a default/fallback case to handle any unknown values you may encounter.
  */
 declare enum TextAlignment {
     left = 1,
     right = 2,
-    center = 3
+    center = 3,
+    justifyLeft = 4
 }
 
 /**
@@ -1918,6 +1929,43 @@ export declare class TextContentModel {
 }
 
 /**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * *Do not depend on the literal numeric values of these constants*, as they may change. Always reference the enum identifiers in your code.
+ *
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * *Additional text layout types may be added in the future.* If your code has different branches or cases depending on layout type,
+ * always have a default/fallback case to handle any unknown values you may encounter.
+ */
+declare enum TextLayout {
+    /**
+     * Area text: both width and height are explicitly set. If text content is too long to fit, the end of the text will be
+     * clipped. If text content is short, the frame's bounds will occupy extra height that is just blank space.
+     */
+    area = 1,
+    /**
+     * Auto-height text: Width is explicitly set, and text wraps to use as much vertical space as necessary to display the
+     * full content.
+     */
+    autoHeight = 2,
+    /**
+     * Auto-width, aka point text: both width and height are automatically determined based on the content. There is no
+     * automatic line wrapping, so the text will all be on one line unless the text contains explicit newlines.
+     */
+    autoWidth = 3,
+    /**
+     * Text is arranged in a circle or arc. The API does not yet support setting or reading the details of this layout style.
+     */
+    circular = 4,
+    /**
+     * Aka "Dynamic" layout in the UI: text size and styles are automatically varied to create an attractive multi-line layout.
+     * The API does not yet support setting or reading the details of this layout style.
+     */
+    magicFit = 5
+}
+
+/**
  * A TextNode represents a text display frame in the scenegraph. It may display an entire piece of text, or sometimes just
  * a subset of longer text that flows across multiple TextNode "frames". Because of this, the TextNode does not directly hold
  * the text content and styles – instead it refers to a {@link TextContentModel}, which may be shared across multiple TextNode frames.
@@ -2006,7 +2054,7 @@ export declare class TextNode extends Node {
      * If this TextNode is part of a multi-frame text content flow, it must be configured to use {@link AreaTextLayout}. Other
      * layout modes, except for {@link AreaTextLayout}, are only available for single-frame text.
      *
-     * @throws if changing text layout to/from {@link TextType.magicFit} or {@link TextType.circular} layout when the text contains font(s) unavailable to the current user.
+     * @throws if changing text layout to/from {@link TextLayout.magicFit} or {@link TextLayout.circular} layout when the text contains font(s) unavailable to the current user.
      * @throws if {@link TextNode} is part of a multi-frame text content flow and the layout is not {@link AreaTextLayout}.
      * @throws if {@link TextNode} is not a part of a multi-frame text content flow and the layout is {@link AreaTextLayout}.
      */
@@ -2019,25 +2067,6 @@ export declare class TextNode extends Node {
 declare interface TextRange {
     start: number;
     length: number;
-}
-
-/**
- * <InlineAlert slots="text" variant="warning"/>
- *
- * *Do not depend on the literal numeric values of these constants*, as they may change. Always reference the enum identifiers in your code.
- */
-declare enum TextType {
-    area = 1,
-    /**
-     * Soft bottom
-     */
-    autoHeight = 2,
-    /**
-     * Point text
-     */
-    autoWidth = 3,
-    circular = 4,
-    magicFit = 5
 }
 
 /**
@@ -2091,7 +2120,7 @@ export declare interface UnorderedListStyleInput extends BaseParagraphListStyle 
  * @experimental
  */
 export declare interface UnsupportedTextLayout {
-    type: TextType.magicFit | TextType.circular;
+    type: TextLayout.magicFit | TextLayout.circular;
 }
 
 /**

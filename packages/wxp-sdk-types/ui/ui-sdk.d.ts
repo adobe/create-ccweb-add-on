@@ -258,17 +258,15 @@ declare interface ApplicationBase {
     showModalDialog(dialogOptions: CustomDialogOptions): Promise<CustomDialogResult>;
 
     /**
-     * @experimental - Experimental API
      * Shows a color picker popover anchored to the specified element.
      * The anchor element must be an instance of HTMLElement.
      * Custom DOM events are dispatched on the anchor element when the color changes or the color picker closes.
-     * See {@link ColorPickerEvents} for more details.
+     * See {@link ColorPickerEvent} for more details.
      * @param anchorElement - The HTML element to anchor the color picker to.
      * @param options - Optional configuration options for customizing the color picker behavior and appearance.
      */
     showColorPicker(anchorElement: HTMLElement, options?: ColorPickerOptions): Promise<void>;
     /**
-     * @experimental - Experimental API
      * Hides the color picker popover if it is currently visible.
      */
     hideColorPicker(): Promise<void>;
@@ -538,10 +536,9 @@ export declare interface ClientStorage {
 }
 
 /**
- * @experimental - Experimental API
  * Custom DOM events dispatched on the anchor element passed to `showColorPicker()` API.
  */
-export declare enum ColorPickerEvents {
+export declare enum ColorPickerEvent {
     /**
      * Color change event dispatched when a color is selected.
      * The event detail will contain a 'color' property of type string.
@@ -554,7 +551,6 @@ export declare enum ColorPickerEvents {
 }
 
 /**
- * @experimental - Experimental API
  * Options that can be passed to the `showColorPicker` API to customize the color picker's behavior and appearance.
  */
 export declare interface ColorPickerOptions {
@@ -564,10 +560,12 @@ export declare interface ColorPickerOptions {
      */
     title?: string;
     /**
-     * Initial color for the color picker, in 0xRRGGBB format.
+     * Initial color for the color picker, in hex format.
+     * Can provide either as a number in 0xRRGGBB or 0xRRGGBBAA format,
+     * or as a string in "#RRGGBB" or "#RRGGBBAA" format.
      * Default color is 0xFFFFFF (white).
      */
-    initialColor?: number;
+    initialColor?: number | string;
     /**
      * Placement of the color picker popover relative to the anchor element.
      * Default placement is ColorPickerPlacement.left.
@@ -586,7 +584,6 @@ export declare interface ColorPickerOptions {
 }
 
 /**
- * @experimental - Experimental API
  * Denotes the placement of the color picker popover relative to its anchor element.
  * Used in the placement option of `showColorPicker()` API.
  */
@@ -631,7 +628,6 @@ declare namespace Constants {
         DeviceClass,
         PlatformType,
         ColorPickerPlacement,
-        ColorPickerEvents,
         AuthorizationStatus
     };
 }
@@ -856,21 +852,21 @@ export { Document_2 as Document };
 /**
  * The payload data sent to the document id available event handler.
  */
-declare interface DocumentIdAvailableEventData {
+export declare interface DocumentIdAvailableEventData {
     documentId: string | undefined;
 }
 
 /**
  * The payload data sent to the document link available event handler.
  */
-declare interface DocumentLinkAvailableEventData {
+export declare interface DocumentLinkAvailableEventData {
     documentLink: string | undefined;
 }
 
 /**
  * The payload data sent to the document title change event handler.
  */
-declare interface DocumentTitleChangeEventData {
+export declare interface DocumentTitleChangeEventData {
     documentTitle: string;
 }
 
@@ -907,7 +903,7 @@ export declare interface DragCompletionData {
 /**
  * Interface to provide drag options which can be passed to enableDragToDocument to change the drag behavior.
  */
-declare interface DragOptions {
+export declare interface DragOptions {
     /**
      * Use preview size for the drag image instead of the element size
      */
@@ -1778,7 +1774,7 @@ declare type UnproxyOrClone<T> = T extends RemoteObject<ProxyMarked> ? Local<T> 
 /**
  * Callback to unregister iframe from the add-on SDK.
  */
-declare type UnregisterIframe = () => void;
+export declare type UnregisterIframe = () => void;
 
 /**
  * Types of dialog variants supported.

@@ -27,8 +27,8 @@ To quickly get started building an Adobe Express add-on, follow these steps, or 
 
 You'll need:
 
--   Node 16 or better
--   NPM 8 or better
+-   Node 18 or better
+-   NPM 10 or better
 -   A text editor
 -   A free Adobe account — don't have one? Get one [here](https://www.adobe.com/express/)
 
