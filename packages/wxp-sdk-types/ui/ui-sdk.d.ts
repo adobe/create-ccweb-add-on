@@ -156,6 +156,10 @@ export declare enum AppEvent {
      */
     documentLinkAvailable = "documentLinkAvailable",
     /**
+     * triggered when the published document link is available in the application.
+     */
+    documentPublishedLinkAvailable = "documentPublishedLinkAvailable",
+    /**
      * triggered when the document title is changed in the application.
      */
     documentTitleChange = "documentTitleChange"
@@ -176,6 +180,7 @@ declare interface AppEventsTypeMap {
 
     [AppEvent.documentIdAvailable]: DocumentIdAvailableEventData;
     [AppEvent.documentLinkAvailable]: DocumentLinkAvailableEventData;
+    [AppEvent.documentPublishedLinkAvailable]: DocumentPublishedLinkAvailableEventData;
     [AppEvent.documentTitleChange]: DocumentTitleChangeEventData;
 }
 
@@ -806,7 +811,7 @@ declare interface Document_2 {
     /**
      * Add video to the current page
      */
-    addVideo(blob: Blob): Promise<void>;
+    addVideo(blob: Blob, attributes?: MediaAttributes): Promise<void>;
     /**
      * Add audio to the current page
      */
@@ -826,7 +831,7 @@ declare interface Document_2 {
     id(): Promise<string | undefined>;
     /**
      * @experimental - Experimental API
-     * Get document Link
+     * Get document Link and Published document Link
      */
     link(options: LinkOptions): Promise<string | undefined>;
     /**
@@ -836,7 +841,7 @@ declare interface Document_2 {
     /**
      * Import a Pdf to the document.
      */
-    importPdf(blob: Blob, attributes: MediaAttributes): void;
+    importPdf(blob: Blob, attributes: MediaAttributes & SourceMimeTypeInfo): void;
     /**
      * Import a presentation to the document.
      */
@@ -861,6 +866,13 @@ export declare interface DocumentIdAvailableEventData {
  */
 export declare interface DocumentLinkAvailableEventData {
     documentLink: string | undefined;
+}
+
+/**
+ * The payload data sent to the published document link available event handler.
+ */
+declare interface DocumentPublishedLinkAvailableEventData {
+    documentPublishedLink: string | undefined;
 }
 
 /**
@@ -1074,7 +1086,11 @@ export declare enum LinkOptions {
     /**
      * Link to the current document
      */
-    document = "document"
+    document = "document",
+    /**
+     * Link to Published document link
+     */
+    published = "published"
 }
 
 /**
@@ -1713,6 +1729,21 @@ export declare interface SearchAction extends PanelAction {
 }
 
 export declare type SimpleDialogOptions = AlertDialogOptions | InputDialogOptions;
+
+/**
+ * Mime type details for importing media
+ */
+export declare interface SourceMimeTypeInfo {
+    /**
+     * Mime type of the source asset
+     */
+    sourceMimeType?: SupportedMimeTypes;
+}
+
+export declare enum SupportedMimeTypes {
+    docx = "docx",
+    gdoc = "gdoc"
+}
 
 /**
  * Represents template data for a page

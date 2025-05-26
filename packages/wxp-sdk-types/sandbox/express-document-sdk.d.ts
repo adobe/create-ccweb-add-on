@@ -164,7 +164,7 @@ export declare class ArtboardList extends RestrictedItemList<ArtboardNode> {
  *
  * Please note that creating and deleting an artboard in a single frame will crash the editor.
  */
-export declare class ArtboardNode extends VisualNode implements IRectangularNode, ContainerNode {
+export declare class ArtboardNode extends VisualNode implements Readonly<IRectangularNode>, ContainerNode {
     /**
      * Returns a read-only list of all children of the node. General-purpose content containers such as ArtboardNode or
      * GroupNode also provide a mutable {@link ContainerNode.children} list. Other nodes with a more specific structure can
@@ -190,10 +190,12 @@ export declare class ArtboardNode extends VisualNode implements IRectangularNode
     get parent(): PageNode | undefined;
     /**
      * The width of the artboard.
+     * Shares the same dimensions as the parent page and other artboards within the parent page.
      */
     get width(): number;
     /**
      * The height of the artboard.
+     * Shares the same dimensions as the parent page and other artboards within the parent page.
      */
     get height(): number;
 }
@@ -211,6 +213,17 @@ export declare interface AutoHeightTextLayout {
      * The width of the text node in pixels.
      */
     width: number;
+}
+
+/**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ */
+export declare interface AutoWidthTextLayout {
+    type: TextLayout.autoWidth;
 }
 
 /**
@@ -656,6 +669,22 @@ export declare class Editor {
      */
     queueAsyncEdit(lambda: () => void): Promise<void>;
     /**
+     * @returns a text node with default styles. The text content is initially empty, so the text node will be
+     * invisible until its `fullContent` property's `text` is set. Creates auto-width text, so the node's width will
+     * automatically adjust to accommodate whatever text is set.
+     * @deprecated - Initial text content is always expected so please use `createText(textContent: string): StandaloneTextNode`.
+     */
+    createText(): StandaloneTextNode;
+    /**
+     * @param textContent - the initial string to show.
+     * @returns a text node with default styles. Creates auto-width text, so the node's width will automatically adjust
+     * to accommodate the given text content.
+     *
+     * Note: the registration point of this text node is not guaranteed to be at the top-left of the bounding box of its
+     * insertion parent. Recommend using `setPositionInParent` over `translation` to set the position.
+     */
+    createText(textContent: string): StandaloneTextNode;
+    /**
      * User's current selection context
      */
     get context(): Context;
@@ -740,15 +769,6 @@ export declare class Editor {
      * @returns a stroke configured with the given options.
      */
     makeStroke(options?: Partial<SolidColorStroke>): SolidColorStroke;
-    /**
-     * @returns a text node with default styles. The text content is initially empty, so the text node will be
-     * invisible until its `fullContent` property's `text` is set. Creates point text, so the node's width will automatically
-     * adjust to accommodate whatever text is set.
-     *
-     * Note: the registration point of this text node is not guaranteed to be at the top-left of the bounding box of its
-     * insertion parent. Recommend using `setPositionInParent` over `translation` to set the position.
-     */
-    createText(): TextNode;
     /**
      * @returns a path node with a default stroke and no initial fill.
      * @param path - a string representing any [SVG path element](https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths).
@@ -918,7 +938,7 @@ export declare class GridCellNode extends MediaContainerNode {}
  *
  * APIs to create a new grid layout are not yet available.
  */
-export declare class GridLayoutNode extends Node implements Readonly<IRectangularNode> {
+export declare class GridLayoutNode extends Node implements IRectangularNode {
     /**
      * The Grid's regular children. Does not include rectangles and skips over media constainer nodes to return fill grandchildren.
      * Grid Cells are ordered by the y and then x position of their top left corner, i.e. left to right and top to bottom.
@@ -932,12 +952,16 @@ export declare class GridLayoutNode extends Node implements Readonly<IRectangula
     get fill(): Readonly<Fill>;
     /**
      * The width of the node.
+     * Must be at least {@link MIN_DIMENSION}.
      */
     get width(): number;
+    set width(value: number);
     /**
      * The height of the node.
+     * Must be at least {@link MIN_DIMENSION}.
      */
     get height(): number;
+    set height(value: number);
 }
 
 /**
@@ -1035,7 +1059,7 @@ export declare class ItemList<T extends ListItem> extends RestrictedItemList<T> 
      * Add one or more items to the end of the list. The last argument will become the last item in this list. Items are
      * removed from their previous parent, if any – or if an item is already in *this* list, its index is simply changed.
      *
-     * @throws - if item has a different parent and item is a {@link TextNode} that's a part of a Text Flow, or if item's children subtree contains a TextNode who is a part of a Text Flow.
+     * @throws - if item has a different parent and item is a {@link ThreadedTextNode}, or if item's children subtree contains a {@link ThreadedTextNode}.
      */
     append(...items: T[]): void;
     /**
@@ -1047,7 +1071,7 @@ export declare class ItemList<T extends ListItem> extends RestrictedItemList<T> 
      * `newItem` is removed from its previous parent, if any – or if it's already in *this* list, its index is simply
      * changed. No-op if both arguments are the same item.
      *
-     * @throws - if newItem has a different parent and newItem is a {@link TextNode} that's a part of a Text Flow, or if newItem's children subtree contains a TextNode who is a part of a Text Flow.
+     * @throws - if newItem has a different parent and newItem is a {@link ThreadedTextNode}, or if newItem's children subtree contains a {@link ThreadedTextNode}.
      */
     replace(oldItem: T, newItem: T): void;
     /**
@@ -1055,7 +1079,7 @@ export declare class ItemList<T extends ListItem> extends RestrictedItemList<T> 
      * to occupy, shifting `before` and all later items to higher indices. `newItem` is removed from its previous parent,
      * if any – or if it's already in *this* list, its index is simply changed. No-op if both arguments are the same item.
      *
-     * @throws - if newItem has a different parent and it is a {@link TextNode} that's a part of a Text Flow, or if newItem's children subtree contains a TextNode who is a part of a Text Flow.
+     * @throws - if newItem has a different parent and it is a {@link ThreadedTextNode}, or if newItem's children subtree contains a {@link ThreadedTextNode}.
      */
     insertBefore(newItem: T, before: T): void;
     /**
@@ -1063,7 +1087,7 @@ export declare class ItemList<T extends ListItem> extends RestrictedItemList<T> 
      * shifting all later items to higher indices (the index of `after` remains unchanged). `newItem` is removed from its previous parent,
      * if any – or if it's already in *this* list, its index is simply changed. No-op if both arguments are the same item.
      *
-     * @throws - if newItem has a different parent and it is a {@link TextNode} that's a part of a Text Flow, or if newItem's children subtree contains a TextNode who is a part of a Text Flow.
+     * @throws - if newItem has a different parent and it is a {@link ThreadedTextNode}, or if newItem's children subtree contains a {@link ThreadedTextNode}.
      */
     insertAfter(newItem: T, after: T): void;
 }
@@ -1270,6 +1294,46 @@ declare class Node extends VisualNode {
      */
     get blendMode(): BlendMode;
     set blendMode(value: BlendMode);
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Changes the width to the given value and the height to the given width multiplied by the aspect ratio.
+     */
+    rescaleProportionalToWidth(width: number): void;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Changes the height to the given value and the width to the given height multiplied by the aspect ratio.
+     */
+    rescaleProportionalToHeight(height: number): void;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Resizes the node to fit within a box with the given dimensions.
+     *
+     * If the node doesn't have a fixed aspect ratio then this will resize the node to the given width and height.
+     */
+    resizeToFitWithin(width: number, height: number): void;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Resizes the node to cover a box with the given dimensions.
+     *
+     * If the node doesn't have a fixed aspect ratio then this will resize the node to the given width and height.
+     */
+    resizeToCover(width: number, height: number): void;
 }
 export { Node as Node };
 
@@ -1350,7 +1414,7 @@ export declare class PageList extends RestrictedItemList<PageNode> {
  *
  * To create new pages, see {@link PageList.addPage}.
  */
-export declare class PageNode extends BaseNode implements Readonly<IRectangularNode> {
+export declare class PageNode extends BaseNode implements IRectangularNode {
     /**
      * The artboards or "scenes" of a page, ordered by timeline sequence.
      * To create new artboards, see {@link ArtboardList.addArtboard}.
@@ -1359,13 +1423,17 @@ export declare class PageNode extends BaseNode implements Readonly<IRectangularN
     /**
      * The width of the node.
      * All Artboards within a page share the same dimensions.
+     * Must be at least {@link MIN_PAGE_DIMENSION} and no larger than {@link MAX_PAGE_DIMENSION}.
      */
     get width(): number;
+    set width(value: number);
     /**
      * The height of the node.
      * All Artboards within a page share the same dimensions.
+     * Must be at least {@link MIN_PAGE_DIMENSION} and no larger than {@link MAX_PAGE_DIMENSION}.
      */
     get height(): number;
+    set height(value: number);
     /**
      * The page's name. Displayed as a user-editable label above the current artboard in the UI.
      */
@@ -1475,17 +1543,6 @@ export declare interface Point {
 }
 
 /**
- * <InlineAlert slots="text" variant="warning"/>
- *
- * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
- *
- * @experimental
- */
-export declare interface PointTextLayout {
-    type: TextLayout.autoWidth;
-}
-
-/**
  * ReadOnlyItemList represents an ordered list of API objects, representing items that are all children of the
  * same parent node. (The reverse is not necessarily true, however: this list might not include all
  * children that exist in the parent node. See {@link Node.allChildren} for details).
@@ -1525,7 +1582,7 @@ export declare class ReadOnlyItemList<T extends ListItem> {
     toArray(): readonly T[];
 }
 
-declare interface Rect {
+export declare interface Rect {
     x: number;
     y: number;
     width: number;
@@ -1731,6 +1788,31 @@ export declare type SolidColorStrokeWithOptionalType = Omit<SolidColorStroke, "t
     Partial<Pick<SolidColorStroke, "type">>;
 
 /**
+ * A StandaloneTextNode represents a text display frame in the scenegraph. It displays an entire piece of text.
+ * The StandaloneTextNode does not directly hold the text content and styles – instead it refers to a {@link TextContentModel}.
+ *
+ * To create new a single-frame piece of text, see {@link Editor.createText}.
+ */
+export declare class StandaloneTextNode extends TextNode {
+    get nextTextNode(): undefined;
+    get layout(): Readonly<AutoWidthTextLayout | AutoHeightTextLayout | UnsupportedTextLayout>;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Sets the layout mode of the TextNode "frame."
+     *
+     * {@link AreaTextLayout} is not supported by single-frame text.
+     *
+     * @throws if changing text layout to/from {@link TextLayout.magicFit} or {@link TextLayout.circular} layout when the text contains font(s) unavailable to the current user.
+     * @throws if {@link StandaloneTextNode} is not a part of a multi-frame text content flow and the layout is {@link AreaTextLayout}.
+     */
+    set layout(layout: AutoWidthTextLayout | AutoHeightTextLayout);
+}
+
+/**
  * Base class for a Node that can have its own stroke.
  */
 export declare class StrokableNode extends Node implements IStrokableNode {
@@ -1818,7 +1900,8 @@ declare enum TextAlignment {
 }
 
 /**
- * Represents a complete piece of text content flow, which may be split across multiple {@link TextNode} frames for display.
+ * Represents a complete piece of text content, which may be contained within a single {@link StandaloneTextNode} *or*
+ * split across multiple {@link ThreadedTextNode} frames for display.
  * Use this model to get or modify the text string and the style ranges applied to it.
  */
 export declare class TextContentModel {
@@ -1838,14 +1921,14 @@ export declare class TextContentModel {
     get id(): string;
     /**
      * Get ordered list of all {@link TextNode}s that display this text content in the scenegraph. The text content
-     * starts in the first  {@link TextNode} "frame", and then flows into the second node once it has filled the first one. The ending of the
-     * text content may not be visible at all, if the last {@link TextNode} "frame" is not large enough to accommodate it.
+     * starts in the first  {@link ThreadedTextNode} "frame", and then flows into the second node once it has filled the first one. The ending of the
+     * text content may not be visible at all, if the last {@link ThreadedTextNode} "frame" is not large enough to accommodate it.
      *
-     * If there are multiple {@link TextNode}s, all of them must be configured to use {@link AreaTextLayout}.
+     * If there are multiple {@link ThreadedTextNode}s, all of them must be configured to use {@link AreaTextLayout}.
      */
     get allTextNodes(): Readonly<Iterable<TextNode>>;
     /**
-     * The complete text string, which may span multiple {@link TextNode} "frames" in the scenegraph.
+     * The complete text string, which may span multiple {@link ThreadedTextNode} "frames" in the scenegraph.
      */
     get text(): string;
     set text(textContent: string);
@@ -1966,14 +2049,21 @@ declare enum TextLayout {
 }
 
 /**
- * A TextNode represents a text display frame in the scenegraph. It may display an entire piece of text, or sometimes just
- * a subset of longer text that flows across multiple TextNode "frames". Because of this, the TextNode does not directly hold
- * the text content and styles – instead it refers to a {@link TextContentModel}, which may be shared across multiple TextNode frames.
- *
- * To create new a single-frame piece of text, see {@link Editor.createText}. APIs are not yet available to create
- * multi-frame text flows.
+ * TextNode is an abstract base class representing text displayed in the scenegraph, regardless of whether it's a fully
+ * self-contained {@link StandaloneTextNode} or one {@link ThreadedTextNode} "frame" of multiple in a larger flow. The
+ * APIs on TextNode and its {@link TextContentModel} allow you to generically work with text without needing to know
+ * which of those subtypes you are dealing with.
  */
-export declare class TextNode extends Node {
+export declare abstract class TextNode extends Node {
+    /**
+     * {@inheritDoc VisualNode.boundsLocal}
+     *
+     * @returns
+     * Note: The bounding box of the orphaned TextNode may be different from the bounding box of the node placed on a
+     * page. It is recommended to use this property only when the node is placed on a page.
+     *
+     */
+    get boundsLocal(): Readonly<Rect>;
     /**
      * {@inheritDoc VisualNode.centerPointLocal}
      *
@@ -1993,6 +2083,22 @@ export declare class TextNode extends Node {
      */
     get topLeftLocal(): Readonly<Point>;
     /**
+     * {@inheritDoc Node.boundsInParent}
+     *
+     * @returns
+     * Note: The bounding box of an orphaned TextNode may become different after it is placed on a
+     * page. It is recommended to use this property only when the node is placed on a page.
+     */
+    get boundsInParent(): Readonly<Rect>;
+    /**
+     * {@inheritDoc Node.boundsInNode}
+     *
+     * @returns
+     * Note: The bounding box of an orphaned TextNode may become different after it is placed on a
+     * page. It is recommended to use this method only when the node is placed on a page.
+     */
+    boundsInNode(targetNode: VisualNode): Readonly<Rect>;
+    /**
      * The model containing the complete text string and its styles, only part of which may be visible within the bounds of
      * this specific TextNode "frame." The full text content flow may be split across multiple frames, and/or it may be clipped if a
      * fixed-size frame using {@link AreaTextLayout} does not fit all the (remaining) text.
@@ -2005,12 +2111,20 @@ export declare class TextNode extends Node {
      */
     get fullContent(): TextContentModel;
     /**
+     * Helper method to determine if the text is standalone.
+     */
+    isStandaloneText(): this is StandaloneTextNode;
+    /**
+     * Helper method to determine if the text is in a flow.
+     */
+    isThreadedText(): this is ThreadedTextNode;
+    /**
      * The next TextNode that text overflowing this node will spill into, if any. If undefined and this TextNode is fixed size
      * ({@link AreaTextLayout}), any text content that does not fit within this node's area will be clipped.
      *
      * To get *all* TextNodes that the text content may be split across, use `TextNode.fullContent.allTextNodes`.
      */
-    get nextTextNode(): TextNode | undefined;
+    abstract get nextTextNode(): ThreadedTextNode | undefined;
     /**
      * The text string content which is partially *or* fully displayed in this TextNode "frame."
      * WARNING: If a piece of text content flows across several TextNodes, *each* TextNode's `text` getter will return
@@ -2042,23 +2156,7 @@ export declare class TextNode extends Node {
      * @experimental
      * @returns The layout mode of the TextNode "frame."
      */
-    get layout(): Readonly<PointTextLayout | AutoHeightTextLayout | AreaTextLayout | UnsupportedTextLayout>;
-    /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
-     * Sets the layout mode of the TextNode "frame."
-     *
-     * If this TextNode is part of a multi-frame text content flow, it must be configured to use {@link AreaTextLayout}. Other
-     * layout modes, except for {@link AreaTextLayout}, are only available for single-frame text.
-     *
-     * @throws if changing text layout to/from {@link TextLayout.magicFit} or {@link TextLayout.circular} layout when the text contains font(s) unavailable to the current user.
-     * @throws if {@link TextNode} is part of a multi-frame text content flow and the layout is not {@link AreaTextLayout}.
-     * @throws if {@link TextNode} is not a part of a multi-frame text content flow and the layout is {@link AreaTextLayout}.
-     */
-    set layout(layout: PointTextLayout | AutoHeightTextLayout | AreaTextLayout);
+    get layout(): Readonly<AutoWidthTextLayout | AutoHeightTextLayout | AreaTextLayout | UnsupportedTextLayout>;
 }
 
 /**
@@ -2067,6 +2165,31 @@ export declare class TextNode extends Node {
 declare interface TextRange {
     start: number;
     length: number;
+}
+
+/**
+ * A ThreadedTextNode represents a text display frame in the scenegraph. It is a subset of longer text that flows across
+ * multiple TextNode "frames". Because of this, the TextNode does not directly hold the text content and styles –
+ * instead it refers to a {@link TextContentModel}, which may be shared across multiple ThreadedTextNode frames.
+ *
+ * APIs are not yet available to create multi-frame text flows.
+ */
+export declare class ThreadedTextNode extends TextNode {
+    get nextTextNode(): ThreadedTextNode | undefined;
+    get layout(): Readonly<AreaTextLayout>;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Sets the layout mode of the TextNode "frame."
+     *
+     * Only {@link AreaTextLayout}, with fully fixed bounds, is currently supported by threaded text.
+     *
+     * @throws if {@link ThreadedTextNode} is part of a multi-frame text content flow and the layout is not {@link AreaTextLayout}.
+     */
+    set layout(layout: AreaTextLayout);
 }
 
 /**
