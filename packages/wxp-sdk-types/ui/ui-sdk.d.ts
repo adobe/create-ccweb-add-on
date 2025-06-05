@@ -844,12 +844,7 @@ declare interface Document_2 {
      */
     title(): Promise<string>;
     /**
-     * Determines if the document can be exported based on its review status in review and approval workflow.
-     * Returns false if:
-     * - The document requires review but hasn't been approved
-     * - There are pending changes awaiting review.
-     *
-     * @returns Promise<boolean> - True if export is permitted, false otherwise
+     * Returns whether the document can be exported based on its review status in the review and approval workflow.
      */
     exportAllowed(): Promise<boolean>;
     /**
