@@ -162,7 +162,11 @@ export declare enum AppEvent {
     /**
      * triggered when the document title is changed in the application.
      */
-    documentTitleChange = "documentTitleChange"
+    documentTitleChange = "documentTitleChange",
+    /**
+     * triggered when the document's export permission status changes in review and approval workflow.
+     */
+    documentExportAllowedChange = "documentExportAllowedChange"
 }
 
 export declare type AppEventHandlerType<Event extends AppEventType> = (data: AppEventsTypeMap[Event]) => void;
@@ -182,6 +186,7 @@ declare interface AppEventsTypeMap {
     [AppEvent.documentLinkAvailable]: DocumentLinkAvailableEventData;
     [AppEvent.documentPublishedLinkAvailable]: DocumentPublishedLinkAvailableEventData;
     [AppEvent.documentTitleChange]: DocumentTitleChangeEventData;
+    [AppEvent.documentExportAllowedChange]: DocumentExportAllowedChangeEventData;
 }
 
 export declare type AppEventType = keyof AppEventsTypeMap & string;
@@ -839,6 +844,10 @@ declare interface Document_2 {
      */
     title(): Promise<string>;
     /**
+     * Returns whether the document can be exported based on its review status in the review and approval workflow.
+     */
+    exportAllowed(): Promise<boolean>;
+    /**
      * Import a Pdf to the document.
      */
     importPdf(blob: Blob, attributes: MediaAttributes & SourceMimeTypeInfo): void;
@@ -853,6 +862,13 @@ declare interface Document_2 {
     runPrintQualityCheck(options: PrintQualityCheckOptions): void;
 }
 export { Document_2 as Document };
+
+/**
+ * The payload data sent when the document's export permission status changes in review and approval workflow.
+ */
+export declare interface DocumentExportAllowedChangeEventData {
+    documentExportAllowed: boolean;
+}
 
 /**
  * The payload data sent to the document id available event handler.
@@ -909,7 +925,7 @@ export declare interface DragCompletionData {
     /**
      * Media info
      */
-    attributes?: MediaAttributes;
+    attributes?: MediaAttributes & SourceMimeTypeInfo;
 }
 
 /**
@@ -1268,6 +1284,22 @@ export declare interface PageMetadata {
      * Whether page contains timelines
      */
     hasTemporalContent: boolean;
+    /**
+     * Duration of the temporal content in seconds. Applicable only if hasTemporalContent is true.
+     */
+    temporalContentDuration?: number;
+    /**
+     * Whether the page contains audio content
+     */
+    hasAudioContent: boolean;
+    /**
+     * Whether the page contains video content
+     */
+    hasVideoContent: boolean;
+    /**
+     * Whether the page contains animated content
+     */
+    hasAnimatedContent: boolean;
     /**
      * Whether the page is blank
      */
