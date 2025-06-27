@@ -1,6 +1,6 @@
 {
     "name": "@adobe/ccweb-add-on-ssl",
-    "version": "3.0.0",
+    "version": "3.0.1",
     "author": "Adobe",
     "license": "MIT",
     "description": "SSL scripts for Adobe Creative Cloud Web Add-on.",
@@ -37,7 +37,7 @@
     "dependencies": {
         "@adobe/ccweb-add-on-analytics": "workspace:*",
         "@adobe/ccweb-add-on-core": "workspace:*",
-        "@adobe/ccweb-add-on-devcert": "0.2.1",
+        "@adobe/ccweb-add-on-devcert": "0.2.2",
         "@oclif/core": "4.2.8",
         "@swc/helpers": "0.5.12",
         "chalk": "4.1.1",

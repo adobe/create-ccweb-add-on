@@ -605,8 +605,8 @@ importers:
         specifier: workspace:*
         version: link:../wxp-core
       '@adobe/ccweb-add-on-devcert':
-        specifier: 0.2.1
-        version: 0.2.1
+        specifier: 0.2.2
+        version: 0.2.2
       '@oclif/core':
         specifier: 4.2.8
         version: 4.2.8
@@ -701,8 +701,8 @@ importers:
 
 packages:
 
-  /@adobe/ccweb-add-on-devcert@0.2.1:
-    resolution: {integrity: sha512-EDXqaglnpOKTc8y/aR6iP0YMyyFWZUMFm2IoTtwNSjzX1tE0zVekqCb+6ucmq2xS8L/+3G5hWRlYZ3ZquhoeEg==}
+  /@adobe/ccweb-add-on-devcert@0.2.2:
+    resolution: {integrity: sha512-u+t/TNYA3sBM06SFz5qq8BOhhzunlrOjNGopZGKCjpFnugbxgaqDSVc2uFQ4EIAWJ+zvxxJgdhAqWvei1ccwXw==}
     dependencies:
       '@types/configstore': 2.1.1
       '@types/debug': 0.0.30
