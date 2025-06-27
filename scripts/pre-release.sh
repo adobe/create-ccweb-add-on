@@ -5,6 +5,8 @@ find -E ./ -type f -regex '.*package\.json' -exec sed -i '.bak' '/"@hz\//d' {} \
 find . -name '*.bak' -type f -delete
 find . -name 'owners.yml' -type f -delete
 find . -name 'BUILD.bazel' -type f -delete
+find . -name '.mocharc.unit.json' -type f -delete
+find . -name '.c8rc.unit.json' -type f -delete
 rm -rf add-on-manifest/config
 rm -rf wxp-core/config
 rm -rf wxp-ssl/config
@@ -68,4 +70,5 @@ echo 'Removing eslint configurations ...'
 find . -name '.eslintignore' -type f -delete
 find . -name '.eslintrc' -type f -delete
 find . -name '.eslintcache' -type f -delete
+find . -name 'tsconfig.eslint.json' -type f -delete
 echo $'Done!\n'
