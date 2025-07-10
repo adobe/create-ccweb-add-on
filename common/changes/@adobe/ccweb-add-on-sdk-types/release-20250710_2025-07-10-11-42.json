@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-sdk-types",
+      "comment": "Exposed Hyperlinks, Clone Node, Sub/SuperScript HLAPI. Added new isAnonymousUser iframe API",
+      "type": "major"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-sdk-types"
+}

@@ -49,7 +49,7 @@
             "packageName": "@adobe/ccweb-add-on-ssl",
             "projectFolder": "packages/wxp-ssl",
             "reviewCategory": "production",
-            "shouldPublish": true
+            "shouldPublish": false
         },
         {
             "packageName": "@adobe/ccweb-add-on-analytics",
@@ -61,7 +61,7 @@
             "packageName": "@adobe/ccweb-add-on-sdk-types",
             "projectFolder": "packages/wxp-sdk-types",
             "reviewCategory": "production",
-            "shouldPublish": false
+            "shouldPublish": true
         }
     ]
 }
