@@ -38,6 +38,11 @@ export declare interface AddOn extends AddOnBase {
      * Local-persisted storage per user per addon.
      */
     readonly clientStorage: ClientStorage;
+
+    /**
+     * Current active entrypoint that the add-on is loaded in.
+     */
+    readonly entrypointType: EntrypointType;
 }
 
 /**
@@ -678,6 +683,10 @@ export declare interface CurrentUser {
      * @returns if the current user is a premium user
      */
     isPremiumUser(): Promise<boolean>;
+    /**
+     * @returns if the current user is an anonymous (guest) user
+     */
+    isAnonymousUser(): Promise<boolean>;
 }
 
 /**
@@ -1006,6 +1015,61 @@ export declare enum ElementsTabs {
      * Charts tab.
      */
     charts = "charts"
+}
+
+/**
+ * Types of entrypoints that add-ons support.
+ */
+export declare enum EntrypointType {
+    /**
+     * Widget entrypoint type.
+     */
+    WIDGET = "widget",
+    /**
+     * Script entrypoint type.
+     * add-ons with script entrypoint type can use only the document sandbox APIs.
+     */
+    SCRIPT = "script",
+    /**
+     * Panel entrypoint type.
+     */
+    PANEL = "panel",
+    /**
+     * Share entrypoint type.
+     */
+    SHARE = "share",
+    /**
+     * Content hub entrypoint type.
+     */
+    CONTENT_HUB = "content-hub",
+    /**
+     * Mobile media audio entrypoint type.
+     */
+    MOBILE_MEDIA_AUDIO = "mobile.media.audio",
+    /**
+     * Mobile your stuff files entrypoint type.
+     */
+    MOBILE_YOUR_STUFF_FILES = "mobile.your-stuff.files",
+    /**
+     * Mobile more entrypoint type.
+     */
+    MOBILE_MORE = "mobile.more",
+    /**
+     * Schedule entrypoint type.
+     */
+    SCHEDULE = "schedule",
+    /**
+     * Contextual replace entrypoint type.
+     */
+    CONTEXTUAL_REPLACE = "contextual.replace",
+    /**
+     * Contextual upload entrypoint type.
+     */
+    CONTEXTUAL_UPLOAD = "contextual.upload",
+    /**
+     * Contextual bulk create entrypoint type.
+     */
+    CONTEXTUAL_BULK_CREATE = "contextual.bulk-create"
 }
 
 export declare interface Field {

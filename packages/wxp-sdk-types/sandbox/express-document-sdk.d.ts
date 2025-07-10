@@ -82,6 +82,7 @@ declare namespace ApiConstants {
         StrokeType,
         TextAlignment,
         TextLayout,
+        TextScriptStyle,
         EditorEvent,
         VisualEffectType,
         ParagraphListType,
@@ -190,12 +191,14 @@ export declare class ArtboardNode extends VisualNode implements Readonly<IRectan
     get parent(): PageNode | undefined;
     /**
      * The width of the artboard.
-     * Shares the same dimensions as the parent page and other artboards within the parent page.
+     * Shares the same dimensions as the parent {@link PageNode} and other artboards within the parent {@link PageNode}.
+     * To resize an artboard, resize the parent {@link PageNode}.
      */
     get width(): number;
     /**
      * The height of the artboard.
-     * Shares the same dimensions as the parent page and other artboards within the parent page.
+     * Shares the same dimensions as the parent {@link PageNode} and other artboards within the parent {@link PageNode}.
+     * To resize an artboard, resize the parent {@link PageNode}.
      */
     get height(): number;
 }
@@ -261,6 +264,15 @@ declare interface BaseCharacterStyles {
      * Adds an underline to text.
      */
     underline: boolean;
+    /**
+     * URL for the hyperlink.
+     * A link can be removed by setting it to undefined
+     */
+    link: string | undefined;
+    /**
+     * Sets a superscript or subscript style.
+     */
+    baselineShift: TextScriptStyle;
 }
 
 /**
@@ -930,7 +942,19 @@ export declare const fonts: ExpressFonts;
  * GridCellNodes cannot be translated or rotated directly. This implementation translates and rotates the
  * MediaRectangle child of the GridCellNode when those actions are applied.
  */
-export declare class GridCellNode extends MediaContainerNode {}
+export declare class GridCellNode extends MediaContainerNode {
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Always throws as it's not possible to clone a single grid slot.
+     * Use the parent grid container instead.
+     *
+     */
+    clone(): never;
+}
 
 /**
  * A GridLayoutNode represents a grid layout in the scenegraph. The GridLayoutNode is used to create
@@ -1007,27 +1031,14 @@ declare interface IFillableNode {
 }
 
 /**
- * ImageRectangleNode is a rectangular node that displays the image media part of a MediaContainerNode. It can only exist
- * within that container parent. Cropping can be adjusted by changing this media's position/rotation (as well as its mask
- * shape sibling node).
+ * ImageRectangleNode is a rectangular node that displays the image media part of a {@link MediaContainerNode}. It can only
+ * exist within that container parent. Cropping can be adjusted by changing this rectangle's position/rotation (as well as
+ * its maskShape sibling node).
  *
  * ImageRectangleNodes cannot be created directly; use {@link Editor.createImageContainer} to create the entire
  * container structure together.
  */
-export declare class ImageRectangleNode extends Node implements Readonly<IRectangularNode> {
-    /**
-     * Current width of the "full frame" image rectangle, which may not be fully visible due to cropping/clipping by the
-     * enclosing media container's maskShape. This size may be different from the original bitmap's size in pixels, but
-     * will always match its aspect ratio.
-     */
-    get width(): number;
-    /**
-     * Current height of the "full frame" image rectangle, which may not be fully visible due to cropping/clipping by the
-     * enclosing media container's maskShape. This size may be different from the original bitmap's size in pixels, but
-     * will always match its aspect ratio.
-     */
-    get height(): number;
-}
+export declare class ImageRectangleNode extends MediaRectangleNode {}
 
 /**
  * Interface for nodes with width and height properties.
@@ -1173,10 +1184,10 @@ export declare interface ListItem {}
 export declare class MediaContainerNode extends Node {
     /**
      * The rectangular node representing the entire, uncropped bounds of the media (e.g. image, GIFs, or video). The media's position and
-     * rotation can be changed, but it cannot be resized yet via this API. Media types other than images will yield a plain Node object
-     * for now.
+     * rotation can be changed, but it cannot be resized yet via this API. Media types other than images will yield an UnknownMediaRectangleNode
+     * object for now.
      */
-    get mediaRectangle(): ImageRectangleNode | Node;
+    get mediaRectangle(): ImageRectangleNode | UnknownMediaRectangleNode;
     /**
      * The mask used for cropping/clipping the media. The bounds of this shape are entire visible bounds of the container.
      * The shape's geometric properties (position, rotation, size, etc.) can be changed, but it cannot be replaced by a
@@ -1191,6 +1202,38 @@ export declare class MediaContainerNode extends Node {
      * @param media - New content to display. Currently must be a {@link BitmapImage}.
      */
     replaceMedia(media: BitmapImage): void;
+}
+
+/**
+ * MediaRectangleNode is the base class for a rectangular node that represents the *uncropped* media within a
+ * {@link MediaContainerNode}. Specific subclasses such as {@link ImageRectangleNode} exist for each media type and
+ * may provide additional media-specific APIs. Cropping can be adjusted by changing this rectangle's position/rotation
+ * (as well as its maskShape sibling node).
+ */
+export declare abstract class MediaRectangleNode extends Node implements Readonly<IRectangularNode> {
+    /**
+     * Current width of the "full frame" uncropped media, which may not be fully visible due to cropping/clipping by the
+     * enclosing media container's maskShape. This size may be different from the original image/video size in pixels, but
+     * will always match its aspect ratio.
+     */
+    get width(): number;
+    /**
+     * Current height of the "full frame" uncropped media, which may not be fully visible due to cropping/clipping by the
+     * enclosing media container's maskShape. This size may be different from the original image/video size in pixels, but
+     * will always match its aspect ratio.
+     */
+    get height(): number;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Always throws as it's not possible to clone just the media rectangle alone.
+     * Clone the entire parent MediaContainerNode instead.
+     *
+     */
+    clone(): never;
 }
 
 /**
@@ -1334,6 +1377,15 @@ declare class Node extends VisualNode {
      * If the node doesn't have a fixed aspect ratio then this will resize the node to the given width and height.
      */
     resizeToCover(width: number, height: number): void;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Creates an orphaned copy of this node, including all persistent attributes and descendants.
+     */
+    clone(): typeof this;
 }
 export { Node as Node };
 
@@ -1422,14 +1474,30 @@ export declare class PageNode extends BaseNode implements IRectangularNode {
     get artboards(): ArtboardList;
     /**
      * The width of the node.
-     * All Artboards within a page share the same dimensions.
+     *
+     * All Artboards within a page share the same dimensions, so changing this value will also automatically adjust the
+     * size of every child {@link ArtboardNode}.
+     *
+     * Note: changing the page's size does not adjust the size or position of any of visual content inside any child
+     * {@link ArtboardNode}. Callers should use their own layout logic to update the content for the new bounds as
+     * desired. For example, making the size smaller could result in content being clipped and hard to access if it is
+     * not adjusted to be visible again.
+     *
      * Must be at least {@link MIN_PAGE_DIMENSION} and no larger than {@link MAX_PAGE_DIMENSION}.
      */
     get width(): number;
     set width(value: number);
     /**
      * The height of the node.
-     * All Artboards within a page share the same dimensions.
+     *
+     * All Artboards within a page share the same dimensions, so changing this value will also automatically adjust the
+     * size of every child {@link ArtboardNode}.
+     *
+     * Note: changing the page's size does not adjust the size or position of any of visual content inside any child
+     * {@link ArtboardNode}. Callers should use their own layout logic to update the content for the new bounds as
+     * desired. For example, making the size smaller could result in content being clipped and hard to access if it is
+     * not adjusted to be visible again.
+     *
      * Must be at least {@link MIN_PAGE_DIMENSION} and no larger than {@link MAX_PAGE_DIMENSION}.
      */
     get height(): number;
@@ -2168,6 +2236,18 @@ declare interface TextRange {
 }
 
 /**
+ * Represents a text script style.
+ */
+export declare enum TextScriptStyle {
+    /** text appears at the standard baseline */
+    none = 0,
+    /** text appears above the baseline */
+    superscript = 1,
+    /** text appears below the baseline */
+    subscript = 2
+}
+
+/**
  * A ThreadedTextNode represents a text display frame in the scenegraph. It is a subset of longer text that flows across
  * multiple TextNode "frames". Because of this, the TextNode does not directly hold the text content and styles –
  * instead it refers to a {@link TextContentModel}, which may be shared across multiple ThreadedTextNode frames.
@@ -2175,6 +2255,15 @@ declare interface TextRange {
  * APIs are not yet available to create multi-frame text flows.
  */
 export declare class ThreadedTextNode extends TextNode {
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Always throws as it's not possible to clone only a single "frame" of threaded text.
+     */
+    clone(): never;
     get nextTextNode(): ThreadedTextNode | undefined;
     get layout(): Readonly<AreaTextLayout>;
     /**
@@ -2198,6 +2287,13 @@ export declare class ThreadedTextNode extends TextNode {
 export declare class UnavailableFont extends BaseFont {
     get availableForEditing(): false;
 }
+
+/**
+ * UnknownMediaRectangleNode is a rectangular node that represents the *uncropped* media within a {@link MediaContainerNode}
+ * for cases where the media type is not yet supported by this API. Cropping can still be adjusted by changing this
+ * rectangle's position/rotation (as well as its maskShape sibling node).
+ */
+export declare class UnknownMediaRectangleNode extends MediaRectangleNode {}
 
 /**
  * An UnknownNode is a node with limited support and therefore treated as a leaf node.
