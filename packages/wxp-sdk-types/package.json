@@ -1,6 +1,6 @@
 {
     "name": "@adobe/ccweb-add-on-sdk-types",
-    "version": "1.19.0",
+    "version": "1.0.0",
     "author": "Adobe",
     "license": "MIT",
     "description": "Type definitions for Adobe Creative Cloud Web Add-on SDK.",
@@ -47,7 +47,7 @@
     "dependencies": {
         "tslib": "2.7.0",
         "gl-matrix": "3.3.0",
-        "@swc/helpers": "0.5.12"
+        "@swc/helpers": "0.5.17"
     },
     "devDependencies": {
         "@types/node": "18.18.2",

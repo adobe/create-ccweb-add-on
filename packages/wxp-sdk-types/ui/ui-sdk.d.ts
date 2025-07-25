@@ -216,6 +216,11 @@ export declare interface Application extends ApplicationBase {
      */
     readonly document: Document_2;
     /**
+     * @experimental - Experimental API
+     * Invoke command/actions in an add-on and handle response.
+     */
+    readonly command: Command;
+    /**
      * OAuth 2.0 middleware for handling user authorization.
      */
     readonly oauth: OAuth;
@@ -452,6 +457,40 @@ export declare type AuthorizeWithOwnRedirectRequest = AuthorizationRequest & {
 };
 
 /**
+ * Bit rate in bits per second
+ */
+export declare enum BitRate {
+    /**
+     * 4 Mbps
+     */
+    mbps4 = 4000000,
+    /**
+     * 8 Mbps
+     */
+    mbps8 = 8000000,
+    /**
+     * 10 Mbps
+     */
+    mbps10 = 10000000,
+    /**
+     * 12 Mbps
+     */
+    mbps12 = 12000000,
+    /**
+     * 15 Mbps
+     */
+    mbps15 = 15000000,
+    /**
+     * 25 Mbps
+     */
+    mbps25 = 25000000,
+    /**
+     * 50 Mbps
+     */
+    mbps50 = 50000000
+}
+
+/**
  * Bleed for the page.
  * In printing, bleed is printing that goes beyond the edge of where the sheet will be trimmed.
  * In other words, the bleed is the area to be trimmed off.
@@ -621,6 +660,25 @@ export declare enum ColorPickerPlacement {
     right = "right"
 }
 
+/**
+ * @experimental - Experimental API
+ * Provides APIs to handle command execution in the add-on.
+ */
+export declare interface Command {
+    /**
+     * @experimental - Experimental API
+     * Register a handler for handling command execution in the add-on.
+     *
+     * _Note:_ This is similar to a JavaScript event handler.
+     * If there are multiple handlers registered for a command,
+     * each will be invoked when the host application triggers the command.
+     * In most of the cases, one handler per command is the way to go.
+     * @param command - Command triggered from the host application.
+     * @param handler - Handler for command execution.
+     */
+    register(command: string, handler: (params: Record<string, unknown>) => unknown): void;
+}
+
 declare namespace Constants {
     export {
         Range_2 as Range,
@@ -635,6 +693,8 @@ declare namespace Constants {
         RuntimeType,
         BleedUnit,
         VideoResolution,
+        FrameRate,
+        BitRate,
         EditorPanel,
         MediaTabs,
         ElementsTabs,
@@ -643,6 +703,7 @@ declare namespace Constants {
         DeviceClass,
         PlatformType,
         ColorPickerPlacement,
+        FileSizeLimitUnit,
         AuthorizationStatus
     };
 }
@@ -1026,6 +1087,10 @@ export declare enum EntrypointType {
      */
     WIDGET = "widget",
     /**
+     * Command entrypoint type.
+     */
+    COMMAND = "command",
+    /**
      * Script entrypoint type.
      * add-ons with script entrypoint type can use only the document sandbox APIs.
      */
@@ -1099,6 +1164,50 @@ export declare enum FieldType {
      * One-line text input field
      */
     text = "text"
+}
+
+/**
+ * Units for the file size limit.
+ */
+export declare enum FileSizeLimitUnit {
+    /**
+     * Kilobyte
+     */
+    KB = "KB",
+    /**
+     * Megabyte
+     */
+    MB = "MB"
+}
+
+/**
+ * Frame rate in frames per second
+ */
+export declare enum FrameRate {
+    /**
+     * 23.976 frames per second
+     */
+    fps23_976 = 23.976,
+    /**
+     * 24 frames per second
+     */
+    fps24 = 24,
+    /**
+     * 25 frames per second
+     */
+    fps25 = 25,
+    /**
+     * 29.97 frames per second
+     */
+    fps29_97 = 29.97,
+    /**
+     * 30 frames per second
+     */
+    fps30 = 30,
+    /**
+     * 60 frames per second
+     */
+    fps60 = 60
 }
 
 /**
@@ -1276,6 +1385,15 @@ export declare interface Mp4RenditionOptions extends RenditionOptions {
      * Custom Resolution (in pixel)
      */
     customResolution?: number;
+
+    /**
+     * Frame rate in frames per second
+     */
+    frameRate?: FrameRate;
+    /**
+     * Bit rate in mbps
+     */
+    bitRate?: BitRate;
 }
 
 /**
@@ -1578,6 +1696,15 @@ export declare interface PngRenditionOptions extends RenditionOptions {
         width?: number;
         height?: number;
     };
+
+    /**
+     * File size limit for the rendition
+     */
+    fileSizeLimit?: number;
+    /**
+     * Unit of the file size limit
+     */
+    fileSizeLimitUnit?: FileSizeLimitUnit;
 }
 
 /**
@@ -1807,7 +1934,11 @@ export declare enum RuntimeType {
     /**
      * Add-On's document model sandbox - JS runtime that hosts add-on code that has direct access to the full model.
      */
-    documentSandbox = "documentSandbox"
+    documentSandbox = "documentSandbox",
+    /**
+     * Runtime that hosts the add-on command logic.
+     */
+    command = "command"
 }
 
 /**
@@ -1953,6 +2084,14 @@ export declare enum VideoResolution {
      * FHD 1080p video resolution
      */
     fhd1080p = "1080p",
+    /**
+     * QHD 1440p video resolution
+     */
+    qhd1440p = "1440p",
+    /**
+     * UHD 4K video resolution
+     */
+    uhd2160p = "2160p",
     /**
      * Custom video resolution
      */
