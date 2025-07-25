@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-sdk-types",
+      "comment": "Frame Rate and Bit Rate options in Video Export, Higher Resolution Support in Video Export, File Size Limit in PNG Export",
+      "type": "major"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-sdk-types"
+}
