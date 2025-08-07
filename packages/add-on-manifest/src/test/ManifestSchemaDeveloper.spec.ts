@@ -26,8 +26,8 @@ import { assert } from "chai";
 import "mocha";
 import { OTHER_MANIFEST_ERRORS } from "../AddOnManifestTypes.js";
 import { AddOnManifestValidator } from "../AddOnManifestValidator.js";
+import type { AddOnManifestDeveloper } from "./utils/TestManifests.js";
 import {
-    AddOnManifestDeveloper,
     getTestDeveloperManifestV1,
     getTestDeveloperManifestV2,
     getTestManifestV1,

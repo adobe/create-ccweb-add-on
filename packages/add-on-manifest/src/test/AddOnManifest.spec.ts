@@ -26,8 +26,10 @@ import { assert } from "chai";
 import "mocha";
 import sinon from "sinon";
 import { AddOnManifest, ManifestVersion } from "../AddOnManifest.js";
-import { AddOnLogAction, AddOnLogLevel, OTHER_MANIFEST_ERRORS } from "../AddOnManifestTypes.js";
-import { AddOnManifestApp, DEFAULT_SUPPORTED_DEVICE_CLASS } from "../manifest-field/AddOnManifestApp.js";
+import type { AddOnLogAction } from "../AddOnManifestTypes.js";
+import { AddOnLogLevel, OTHER_MANIFEST_ERRORS } from "../AddOnManifestTypes.js";
+import type { AddOnManifestApp } from "../manifest-field/AddOnManifestApp.js";
+import { DEFAULT_SUPPORTED_DEVICE_CLASS } from "../manifest-field/AddOnManifestApp.js";
 import {
     getTestDeveloperManifestV1,
     getTestManifestV1,

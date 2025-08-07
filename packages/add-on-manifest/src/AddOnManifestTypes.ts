@@ -139,19 +139,62 @@ export enum Allow {
     microphone = "microphone",
     clipboard = "clipboard"
 }
-
+/**
+ * Types of entrypoints that add-ons support.
+ */
 export enum EntrypointType {
+    /**
+     * Widget entrypoint type.
+     */
     WIDGET = "widget",
+    /**
+     * Command entrypoint type.
+     */
     COMMAND = "command",
+    /**
+     * Script entrypoint type.
+     * add-ons with script entrypoint type can use only the document sandbox APIs.
+     */
+    SCRIPT = "script",
+    /**
+     * Panel entrypoint type.
+     */
     PANEL = "panel",
+    /**
+     * Share entrypoint type.
+     */
     SHARE = "share",
+    /**
+     * Content hub entrypoint type.
+     */
     CONTENT_HUB = "content-hub",
+    /**
+     * Mobile media audio entrypoint type.
+     */
     MOBILE_MEDIA_AUDIO = "mobile.media.audio",
+    /**
+     * Mobile your stuff files entrypoint type.
+     */
     MOBILE_YOUR_STUFF_FILES = "mobile.your-stuff.files",
+    /**
+     * Mobile more entrypoint type.
+     */
     MOBILE_MORE = "mobile.more",
+    /**
+     * Schedule entrypoint type.
+     */
     SCHEDULE = "schedule",
+    /**
+     * Contextual replace entrypoint type.
+     */
     CONTEXTUAL_REPLACE = "contextual.replace",
+    /**
+     * Contextual upload entrypoint type.
+     */
     CONTEXTUAL_UPLOAD = "contextual.upload",
+    /**
+     * Contextual bulk create entrypoint type.
+     */
     CONTEXTUAL_BULK_CREATE = "contextual.bulk-create"
 }
 
@@ -232,6 +275,10 @@ export const OTHER_MANIFEST_ERRORS: ManifestErrorType = {
     RestrictedFormsSandboxProperty: {
         instancePath: "/entryPoints/permissions/sandbox",
         message: `Sandbox property "allow-forms" is not allowed for this AddOn`
+    },
+    RestrictedScriptEntrypoint: {
+        instancePath: "/entryPoints/type",
+        message: "Entrypoint type 'script' is allowed only for add-ons created in the code-playground"
     }
 };
 
@@ -270,5 +317,5 @@ export enum AddOnLogLevel {
 export type AddOnLogAction = (...args: unknown[]) => unknown;
 
 export function isIframeEntryPointType(entryPointType: EntrypointType): boolean {
-    return entryPointType !== EntrypointType.COMMAND;
+    return entryPointType !== EntrypointType.SCRIPT;
 }

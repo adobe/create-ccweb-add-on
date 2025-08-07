@@ -23,7 +23,7 @@
  ********************************************************************************/
 
 import { ManifestVersion } from "../AddOnManifest.js";
-import {
+import type {
     Command,
     EntrypointV1,
     EntrypointV2,
@@ -31,7 +31,8 @@ import {
     LocalisedStrings,
     ManifestEntrypoint,
     Permissions,
-    Size
+    Size,
+    EntrypointType
 } from "../AddOnManifestTypes.js";
 
 interface ManifestEntrypointTypeMap {
@@ -57,8 +58,8 @@ export class AddOnManifestEntrypoint {
         }
     }
 
-    get type(): Readonly<string> {
-        return this._entrypoint.type;
+    get type(): Readonly<EntrypointType> {
+        return this._entrypoint.type as EntrypointType;
     }
 
     get id(): Readonly<string> {

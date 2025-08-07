@@ -23,7 +23,7 @@
  ********************************************************************************/
 
 import { ManifestVersion } from "../AddOnManifest.js";
-import {
+import type {
     App,
     ManifestRequirements,
     RequirementsV1,

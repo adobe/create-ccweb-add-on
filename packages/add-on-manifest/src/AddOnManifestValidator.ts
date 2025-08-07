@@ -24,17 +24,15 @@
 
 import type { ValidateFunction } from "ajv";
 import { ManifestVersion } from "./AddOnManifest.js";
-import {
+import type {
     AddOnLogAction,
-    AddOnLogLevel,
     AdditionalAddOnInfo,
     ManifestError,
     ManifestValidationResult,
-    OTHER_MANIFEST_ERRORS,
     ManifestEntrypoint,
-    EntrypointV2,
-    EntrypointType
+    EntrypointV2
 } from "./AddOnManifestTypes.js";
+import { AddOnLogLevel, OTHER_MANIFEST_ERRORS, EntrypointType } from "./AddOnManifestTypes.js";
 import { developerVersionValidation, getManifestVersion, getValidationErrors } from "./ValidationUtils.js";
 import { validateSchemaV1, validateSchemaV2 } from "./generated/validateManifestSchema.mjs";
 
@@ -76,6 +74,11 @@ export class AddOnManifestValidator {
                 this._logError("Entrypoint type 'content-hub' is allowed only for privileged add-ons");
                 isValidSchema = false;
                 validationErrors.push(OTHER_MANIFEST_ERRORS.RestrictedContentHubEntrypoint);
+            }
+            if (entryPoint.type === EntrypointType.SCRIPT && additionalInfo.sourceId !== "playgroundSource") {
+                this._logError("Entrypoint type 'script' is allowed only for add-ons created in the code-playground");
+                isValidSchema = false;
+                validationErrors.push(OTHER_MANIFEST_ERRORS.RestrictedScriptEntrypoint);
             }
         });
 

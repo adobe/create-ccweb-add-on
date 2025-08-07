@@ -22,15 +22,15 @@
  * SOFTWARE.
  ********************************************************************************/
 
-import { AddOnManifestV1, AddOnManifestV2 } from "../../AddOnManifest.js";
-import {
+import type { AddOnManifestV1, AddOnManifestV2 } from "../../AddOnManifest.js";
+import type {
     AuthorInfo,
-    EntrypointType,
     IconType,
     LocalisedStrings,
     ManifestEntrypoint,
     RequirementsV1
 } from "../../AddOnManifestTypes.js";
+import { EntrypointType } from "../../AddOnManifestTypes.js";
 
 let count = 0;
 
@@ -213,21 +213,6 @@ export function getTestManifestV2(privileged?: boolean): AddOnManifestV2 {
                 defaultSize: { width: 100 + count, height: 100 + count },
                 discoverable: true,
                 hostDomain: "https://localhost.adobe.com"
-            },
-            {
-                type: EntrypointType.COMMAND,
-                id: "assetProvider",
-                main: "command.html",
-                commands: [
-                    {
-                        name: "assetProvider.getAssets",
-                        supportedMimeTypes: ["image/jpeg", "image/png", "image/bmp"],
-                        discoverable: true
-                    }
-                ],
-                permissions: {
-                    oauth: ["accounts.google.com"]
-                }
             },
             {
                 type: EntrypointType.MOBILE_MEDIA_AUDIO,
