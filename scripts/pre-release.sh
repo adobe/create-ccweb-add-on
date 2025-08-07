@@ -5,6 +5,7 @@ find -E ./ -type f -regex '.*package\.json' -exec sed -i '.bak' '/"@hz\//d' {} \
 find . -name '*.bak' -type f -delete
 find . -name 'owners.yml' -type f -delete
 find . -name 'BUILD.bazel' -type f -delete
+find . -name 'node_modules' -delete
 find . -name '.mocharc.unit.json' -type f -delete
 find . -name '.c8rc.unit.json' -type f -delete
 rm -rf add-on-manifest/config
