@@ -29,29 +29,29 @@ find . -name '*.bak' -type f -delete
 echo $'Done!\n'
 
 echo 'Fixing package.json ...'
-find -E ./add-on-manifest -type f -regex '.*package\.json' -exec sed -i '.bak' 's/branches 100",/branches 100"/g' {} \;
+find -E ./add-on-manifest -type f -regex '.*package\.json' -exec sed -i '.bak' 's/check-coverage",/check-coverage"/g' {} \;
 find ./add-on-manifest -name '*.bak' -type f -delete
 
-find -E ./create-ccweb-add-on -type f -regex '.*package\.json' -exec sed -i '.bak' 's/branches 100",/branches 100"/g' {} \;
+find -E ./create-ccweb-add-on -type f -regex '.*package\.json' -exec sed -i '.bak' 's/check-coverage",/check-coverage"/g' {} \;
 find ./create-ccweb-add-on -name '*.bak' -type f -delete
 find -E ./create-ccweb-add-on -type f -regex '.*package\.json' -exec sed -i '.bak' 's/"copy-assets": "copy-files -a -s \\"templates\/\*\*\/\*\\" -d dist"/"_postbuild": "cp -R templates\/ dist\/templates"/g' {} \;
 find ./create-ccweb-add-on -name '*.bak' -type f -delete
 find -E ./create-ccweb-add-on -type f -regex '.*package\.json' -exec sed -i '.bak' 's/rushx copy-assets/rushx _postbuild/g' {} \;
 find ./create-ccweb-add-on -name '*.bak' -type f -delete
 
-find -E ./wxp-analytics -type f -regex '.*package\.json' -exec sed -i '.bak' 's/branches 100",/branches 100"/g' {} \;
+find -E ./wxp-analytics -type f -regex '.*package\.json' -exec sed -i '.bak' 's/check-coverage",/check-coverage"/g' {} \;
 find ./wxp-analytics -name '*.bak' -type f -delete
 
-find -E ./wxp-add-on-scaffolder -type f -regex '.*package\.json' -exec sed -i '.bak' 's/branches 100",/branches 100"/g' {} \;
+find -E ./wxp-add-on-scaffolder -type f -regex '.*package\.json' -exec sed -i '.bak' 's/check-coverage",/check-coverage"/g' {} \;
 find ./wxp-add-on-scaffolder -name '*.bak' -type f -delete
 
-find -E ./wxp-core -type f -regex '.*package\.json' -exec sed -i '.bak' 's/branches 100",/branches 100"/g' {} \;
+find -E ./wxp-core -type f -regex '.*package\.json' -exec sed -i '.bak' 's/check-coverage",/check-coverage"/g' {} \;
 find ./wxp-core -name '*.bak' -type f -delete
 
-find -E ./wxp-scripts -type f -regex '.*package\.json' -exec sed -i '.bak' 's/branches 100",/branches 100"/g' {} \;
+find -E ./wxp-scripts -type f -regex '.*package\.json' -exec sed -i '.bak' 's/check-coverage",/check-coverage"/g' {} \;
 find ./wxp-scripts -name '*.bak' -type f -delete
 
-find -E ./wxp-ssl -type f -regex '.*package\.json' -exec sed -i '.bak' 's/branches 100",/branches 100"/g' {} \;
+find -E ./wxp-ssl -type f -regex '.*package\.json' -exec sed -i '.bak' 's/check-coverage",/check-coverage"/g' {} \;
 find ./wxp-ssl -name '*.bak' -type f -delete
 
 find -E ./wxp-sdk-types -type f -regex '.*package\.json' -exec sed -i '.bak' 's/"test": "",/"test": ""/g' {} \;

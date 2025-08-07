@@ -37,7 +37,7 @@ import type { Preferences } from "./Preferences.js";
  * Implementation class for configuring CCWeb Add-on CLI related preferences.
  */
 @injectable()
-export class CLIPreferences implements Preferences {
+export class UserPreferences implements Preferences {
     private _cachedPreference?: PreferenceJson;
 
     /**

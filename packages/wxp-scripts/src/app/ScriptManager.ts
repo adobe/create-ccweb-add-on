@@ -22,16 +22,39 @@
  * SOFTWARE.
  ********************************************************************************/
 
+import type { Process } from "@adobe/ccweb-add-on-core";
+import { ITypes as ICoreTypes } from "@adobe/ccweb-add-on-core";
+import fs from "fs-extra";
+import { inject, injectable } from "inversify";
+import path from "path";
+import "reflect-metadata";
+import { EXTENSIONS_TO_TRANSPILE, MANIFEST_JSON } from "../constants.js";
+
 /**
- * Script manager interface to manage the Add-On script requirements.
+ * Script manager implementation class to manage the Add-On script requirements.
  */
-export interface ScriptManager {
+@injectable()
+export class ScriptManager {
+    private readonly _process: Process;
+
+    /**
+     * Instantiate {@link ScriptManager}.
+     * @param cliProcess - {@link Process} reference.
+     * @returns Reference to a new {@link ScriptManager} instance.
+     */
+    constructor(@inject(ICoreTypes.Process) cliProcess: Process) {
+        this._process = cliProcess;
+    }
+
     /**
      * Clean directory.
      * @param directory - Directory to clean.
      * @returns Promise.
      */
-    cleanDirectory(directory: string): Promise<void>;
+    async cleanDirectory(directory: string): Promise<void> {
+        fs.removeSync(directory);
+        fs.ensureDirSync(directory);
+    }
 
     /**
      * Clean directory and add manifest.
@@ -39,20 +62,32 @@ export interface ScriptManager {
      * @param manifestJsonPath - Path to manifest.json.
      * @returns Promise.
      */
-    cleanDirectoryAndAddManifest(directory: string, manifestJsonPath: string): Promise<void>;
+    async cleanDirectoryAndAddManifest(directory: string, manifestJsonPath: string): Promise<void> {
+        await this.cleanDirectory(directory);
+        fs.copyFileSync(manifestJsonPath, path.join(directory, MANIFEST_JSON), fs.constants.COPYFILE_EXCL);
+    }
 
     /**
      * Transpile necessary files in a directory.
      * @param transpiler - Command to use for transpilation.
      * @returns Whether the transpilation was successful.
      */
-    transpile(transpiler: string): Promise<boolean>;
+    async transpile(transpiler: string): Promise<boolean> {
+        const result = await this._process.execute(transpiler, [], { stdio: "inherit" });
+        return result.isSuccessful;
+    }
 
+    /* c8 ignore start */
     /**
      * Copy static files.
      * @param sourceDirectory - Directory containing static files.
      * @param destinationDirectory - Directory where the static files need to be copied into.
      * @returns Promise.
      */
-    copyStaticFiles(sourceDirectory: string, destinationDirectory: string): Promise<void>;
+    async copyStaticFiles(sourceDirectory: string, destinationDirectory: string): Promise<void> {
+        await fs.copy(sourceDirectory, destinationDirectory, {
+            filter: src => !EXTENSIONS_TO_TRANSPILE.has(path.extname(src))
+        });
+    }
+    /* c8 ignore stop */
 }

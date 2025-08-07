@@ -51,8 +51,8 @@ describe("start", () => {
 
     let expressApp: StubbedInstance<Express>;
 
-    let commandExecutor: StubbedInstance<CommandExecutor>;
-    let commandValidator: StubbedInstance<CommandValidator>;
+    let commandExecutor: StubbedInstance<CommandExecutor<StartCommandOptions>>;
+    let commandValidator: StubbedInstance<CommandValidator<StartCommandOptions>>;
 
     let analyticsConsent: StubbedInstance<AnalyticsConsent>;
     let analyticsService: StubbedInstance<AnalyticsService>;

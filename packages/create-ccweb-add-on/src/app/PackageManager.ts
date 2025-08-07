@@ -28,7 +28,7 @@ import type { EntrypointType } from "@adobe/ccweb-add-on-manifest";
 /**
  * Class to manage the Add-on project requirements.
  */
-export class AddOnPackageManager {
+export class PackageManager {
     /**
      * Get package.json for the Add-on project.
      * @param entrypointType - Entrypoint type of Add-on. For example: panel, command, etc.

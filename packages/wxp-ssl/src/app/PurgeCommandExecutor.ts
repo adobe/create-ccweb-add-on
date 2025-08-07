@@ -33,7 +33,7 @@ import { inject, injectable } from "inversify";
 import prompts from "prompts";
 import "reflect-metadata";
 import { AnalyticsErrorMarkers, AnalyticsSuccessMarkers } from "../AnalyticsMarkers.js";
-import { SSLRemoveOption } from "../models/Types.js";
+import { SSLRemoveOption } from "../models/SSLTypes.js";
 import type { CommandExecutor } from "./CommandExecutor.js";
 
 /**
@@ -79,7 +79,7 @@ export class PurgeCommandExecutor implements CommandExecutor {
         });
 
         if (!response || !response.purgeConfirmation) {
-            this._analyticsService.postEvent(
+            void this._analyticsService.postEvent(
                 AnalyticsErrorMarkers.ERROR_SSL_PURGE,
                 LOGS.sslPurgeOptionNotSpecified,
                 false
@@ -109,14 +109,14 @@ export class PurgeCommandExecutor implements CommandExecutor {
             userPreference.ssl = undefined;
             this._preferences.set(userPreference);
 
-            this._analyticsService.postEvent(AnalyticsSuccessMarkers.SUCCESSFUL_SSL_MANUAL_PURGE, "", true);
+            void this._analyticsService.postEvent(AnalyticsSuccessMarkers.SUCCESSFUL_SSL_MANUAL_PURGE, "", true);
         }
     }
 
     private _purgeWxpSSL(): void {
         if (fs.existsSync(devcert.location())) {
             devcert.removeAll();
-            this._analyticsService.postEvent(AnalyticsSuccessMarkers.SUCCESSFUL_SSL_AUTOMATIC_PURGE, "", true);
+            void this._analyticsService.postEvent(AnalyticsSuccessMarkers.SUCCESSFUL_SSL_AUTOMATIC_PURGE, "", true);
         }
     }
 

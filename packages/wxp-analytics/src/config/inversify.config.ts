@@ -23,16 +23,16 @@
  ********************************************************************************/
 
 import { IContainer as ICoreContainer } from "@adobe/ccweb-add-on-core";
+import type { Container } from "inversify";
 import "reflect-metadata";
-import type { AnalyticsConsent, AnalyticsService } from "../app/index.js";
-import { WxpAnalyticsConsent, WxpAnalyticsService } from "../app/index.js";
+import { AnalyticsConsent } from "../app/AnalyticsConsent.js";
+import { AnalyticsService } from "../app/AnalyticsService.js";
 import { ITypes } from "./inversify.types.js";
-import { Container } from "inversify";
 
 const container: Container = ICoreContainer;
 
-container.bind<AnalyticsConsent>(ITypes.AnalyticsConsent).to(WxpAnalyticsConsent).inSingletonScope();
+container.bind<AnalyticsConsent>(ITypes.AnalyticsConsent).to(AnalyticsConsent).inSingletonScope();
 
-container.bind<AnalyticsService>(ITypes.AnalyticsService).to(WxpAnalyticsService).inSingletonScope();
+container.bind<AnalyticsService>(ITypes.AnalyticsService).to(AnalyticsService).inSingletonScope();
 
 export { container as IContainer };

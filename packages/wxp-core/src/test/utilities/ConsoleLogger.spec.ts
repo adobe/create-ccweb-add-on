@@ -27,8 +27,8 @@ import chalk from "chalk";
 import "mocha";
 import type { SinonSandbox } from "sinon";
 import sinon from "sinon";
-import type { Logger } from "../../utilities/index.js";
-import { ConsoleLogger } from "../../utilities/index.js";
+import { ConsoleLogger } from "../../utilities/ConsoleLogger.js";
+import type { Logger } from "../../utilities/Logger.js";
 
 describe("ConsoleLogger", () => {
     let sandbox: SinonSandbox;

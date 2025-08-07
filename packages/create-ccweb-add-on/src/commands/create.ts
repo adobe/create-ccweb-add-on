@@ -27,7 +27,7 @@ import { UncaughtExceptionHandler } from "@adobe/ccweb-add-on-core";
 import { EntrypointType } from "@adobe/ccweb-add-on-manifest";
 import type { Config } from "@oclif/core";
 import { Args, Flags } from "@oclif/core";
-import { Arg, CustomOptions, OptionFlag } from "@oclif/core/lib/interfaces/parser.js";
+import type { Arg, CustomOptions, OptionFlag } from "@oclif/core/lib/interfaces/parser.js";
 import "reflect-metadata";
 import { AnalyticsErrorMarkers } from "../AnalyticsMarkers.js";
 import type { AddOnFactory } from "../app/AddOnFactory.js";

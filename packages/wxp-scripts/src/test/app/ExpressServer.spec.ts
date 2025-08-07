@@ -32,14 +32,14 @@ import type { SinonSandbox } from "sinon";
 import sinon from "sinon";
 import type { StubbedInstance } from "ts-sinon";
 import { stubInterface } from "ts-sinon";
-import type { ExpressServer } from "../../app/index.js";
-import { WxpExpressServer } from "../../app/index.js";
+import { ExpressServer } from "../../app/ExpressServer.js";
 import { HTTPS } from "../../constants.js";
-import { AddOnDirectory, StartCommandOptions } from "../../models/index.js";
+import { AddOnDirectory } from "../../models/AddOnDirectory.js";
+import { StartCommandOptions } from "../../models/StartCommandOptions.js";
 import type { AddOnManifestReader } from "../../utilities/AddOnManifestReader.js";
 import { createManifest } from "../test-utilities.js";
 
-describe("WxpExpressServer", () => {
+describe("ExpressServer", () => {
     let sandbox: SinonSandbox;
 
     let manifestReader: AddOnManifestReader;
@@ -51,7 +51,7 @@ describe("WxpExpressServer", () => {
 
         manifestReader = stubInterface<AddOnManifestReader>();
         logger = stubInterface<Logger>();
-        expressServer = new WxpExpressServer(manifestReader, logger);
+        expressServer = new ExpressServer(manifestReader, logger);
     });
 
     afterEach(() => {

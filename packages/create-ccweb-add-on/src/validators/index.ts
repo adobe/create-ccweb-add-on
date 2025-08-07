@@ -22,7 +22,5 @@
  * SOFTWARE.
  ********************************************************************************/
 
-export * from "./AddOnDirectoryValidator.js";
 export * from "./DirectoryValidator.js";
 export * from "./EnvironmentValidator.js";
-export * from "./NodeEnvironmentValidator.js";

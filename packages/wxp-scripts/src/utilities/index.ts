@@ -24,6 +24,5 @@
 
 export * from "./AddOnManifestReader.js";
 export * from "./AddOnResourceUtils.js";
-export * from "./EntityTracker.js";
 export * from "./FileChangeTracker.js";
 export * from "./PackageManager.js";

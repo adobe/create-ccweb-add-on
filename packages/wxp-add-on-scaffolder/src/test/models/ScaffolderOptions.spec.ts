@@ -25,7 +25,7 @@
 import { EntrypointType } from "@adobe/ccweb-add-on-manifest";
 import { assert } from "chai";
 import "mocha";
-import { ScaffolderOptions } from "../../models/index.js";
+import { ScaffolderOptions } from "../../models/ScaffolderOptions.js";
 
 describe("ScaffolderOptions", () => {
     describe("constructor", () => {

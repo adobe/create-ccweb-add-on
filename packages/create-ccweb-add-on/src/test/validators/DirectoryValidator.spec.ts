@@ -37,10 +37,9 @@ import { stubInterface } from "ts-sinon";
 import { AnalyticsErrorMarkers } from "../../AnalyticsMarkers.js";
 import { PROGRAM_NAME } from "../../constants.js";
 import { CLIOptions } from "../../models/CLIOptions.js";
-import type { DirectoryValidator } from "../../validators/index.js";
-import { AddOnDirectoryValidator } from "../../validators/index.js";
+import { DirectoryValidator } from "../../validators/DirectoryValidator.js";
 
-describe("AddOnDirectoryValidator", () => {
+describe("DirectoryValidator", () => {
     let sandbox: SinonSandbox;
 
     let analyticsService: StubbedInstance<AnalyticsService>;
@@ -54,7 +53,7 @@ describe("AddOnDirectoryValidator", () => {
         analyticsService = stubInterface<AnalyticsService>();
         logger = stubInterface<Logger>();
 
-        validator = new AddOnDirectoryValidator(logger, analyticsService);
+        validator = new DirectoryValidator(logger, analyticsService);
     });
 
     afterEach(() => {
@@ -65,7 +64,7 @@ describe("AddOnDirectoryValidator", () => {
         let runs = [{ addOnName: "" }, { addOnName: " " }];
         runs.forEach(run => {
             it(`should exit for empty addOn name: ${run.addOnName}.`, async () => {
-                const validator: DirectoryValidator = new AddOnDirectoryValidator(logger, analyticsService);
+                const validator: DirectoryValidator = new DirectoryValidator(logger, analyticsService);
                 const processExitStub = sandbox.stub(process, "exit");
 
                 await validator.validateAddOnName(run.addOnName);
@@ -239,7 +238,7 @@ describe("AddOnDirectoryValidator", () => {
 
             analyticsService.postEvent.resolves();
 
-            const validator: DirectoryValidator = new AddOnDirectoryValidator(logger, analyticsService);
+            const validator: DirectoryValidator = new DirectoryValidator(logger, analyticsService);
 
             const cliOptions = new CLIOptions(EntrypointType.PANEL, "test-add-on", "javascript", false);
             await validator.validateAddOnName(cliOptions.addOnName);

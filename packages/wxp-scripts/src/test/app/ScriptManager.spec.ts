@@ -31,11 +31,10 @@ import type { SinonSandbox } from "sinon";
 import sinon from "sinon";
 import type { StubbedInstance } from "ts-sinon";
 import { stubInterface } from "ts-sinon";
-import type { ScriptManager } from "../../app/index.js";
-import { WxpScriptManager } from "../../app/index.js";
+import { ScriptManager } from "../../app/ScriptManager.js";
 import { MANIFEST_JSON } from "../../constants.js";
 
-describe("WxpScriptManager", () => {
+describe("ScriptManager", () => {
     let sandbox: SinonSandbox;
 
     let cliProcess: StubbedInstance<Process>;
@@ -45,7 +44,7 @@ describe("WxpScriptManager", () => {
         sandbox = sinon.createSandbox();
 
         cliProcess = stubInterface<Process>();
-        scriptManager = new WxpScriptManager(cliProcess);
+        scriptManager = new ScriptManager(cliProcess);
     });
 
     afterEach(() => {

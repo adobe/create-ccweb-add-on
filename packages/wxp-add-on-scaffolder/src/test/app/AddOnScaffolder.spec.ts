@@ -25,7 +25,8 @@
 import type { Logger, Process } from "@adobe/ccweb-add-on-core";
 import { DEFAULT_HOST_NAME, PackageJson, TemplateJson } from "@adobe/ccweb-add-on-core";
 import { EntrypointType } from "@adobe/ccweb-add-on-manifest";
-import { SetupCommandOptions, type CommandExecutor as SSLCommandExecutor } from "@adobe/ccweb-add-on-ssl";
+import type { CommandExecutor as SSLCommandExecutor } from "@adobe/ccweb-add-on-ssl";
+import { SetupCommandOptions as SSLSetupCommandOptions } from "@adobe/ccweb-add-on-ssl";
 import { assert } from "chai";
 import "mocha";
 import path from "path";
@@ -34,18 +35,15 @@ import sinon from "sinon";
 import type { StubbedInstance } from "ts-sinon";
 import { stubInterface } from "ts-sinon";
 import { fileURLToPath } from "url";
-import type {
-    AddOnBuilder,
-    AddOnBuilderFactory,
-    AddOnScaffolder,
-    PackageBuilder,
-    PackageBuilderFactory
-} from "../../app/index.js";
-import { TemplateAddOnScaffolder } from "../../app/index.js";
+import type { AddOnBuilderFactory } from "../../app/AddOnBuilder.js";
+import type { AddOnBuilder } from "../../app/AddOnBuilder.js";
+import { AddOnScaffolder } from "../../app/AddOnScaffolder.js";
+import type { PackageBuilderFactory } from "../../app/PackageBuilder.js";
+import type { PackageBuilder } from "../../app/PackageBuilder.js";
 import { ScaffolderOptions } from "../../models/ScaffolderOptions.js";
 import type { TemplateValidator } from "../../validators/TemplateValidator.js";
 
-describe("TemplateAddOnScaffolder", () => {
+describe("AddOnScaffolder", () => {
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
 
@@ -60,7 +58,7 @@ describe("TemplateAddOnScaffolder", () => {
         let addOnBuilder: StubbedInstance<AddOnBuilder>;
         let addOnBuilderFactory: AddOnBuilderFactory;
 
-        let sslCommandExecutor: StubbedInstance<SSLCommandExecutor>;
+        let sslCommandExecutor: StubbedInstance<SSLCommandExecutor<SSLSetupCommandOptions>>;
 
         let cliProcess: StubbedInstance<Process>;
         let logger: StubbedInstance<Logger>;
@@ -83,7 +81,7 @@ describe("TemplateAddOnScaffolder", () => {
             cliProcess = stubInterface();
             logger = stubInterface();
 
-            addOnScaffolder = new TemplateAddOnScaffolder(
+            addOnScaffolder = new AddOnScaffolder(
                 addOnBuilderFactory,
                 packageBuilderFactory,
                 templateValidator,
@@ -235,7 +233,7 @@ describe("TemplateAddOnScaffolder", () => {
                     .withArgs("npm", expectedDependenciesArgs, { stdio: "inherit" })
                     .returns(Promise.resolve(installDependenciesResult));
 
-                const setupCommandOptions = new SetupCommandOptions(DEFAULT_HOST_NAME, true, run.verbose);
+                const setupCommandOptions = new SSLSetupCommandOptions(DEFAULT_HOST_NAME, true, run.verbose);
                 sslCommandExecutor.execute.withArgs(setupCommandOptions).resolves();
 
                 addOnBuilder.displaySuccess.returns();

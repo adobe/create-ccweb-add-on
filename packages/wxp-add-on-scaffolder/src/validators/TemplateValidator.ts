@@ -22,14 +22,57 @@
  * SOFTWARE.
  ********************************************************************************/
 
+import type { Logger } from "@adobe/ccweb-add-on-core";
+import { ITypes as ICoreTypes, isNullOrWhiteSpace } from "@adobe/ccweb-add-on-core";
+import { inject, injectable } from "inversify";
+import process from "process";
+import "reflect-metadata";
+import format from "string-template";
+import { PROGRAM_NAME } from "../constants.js";
+
 /**
- * Template validator interface to validate user selected template.
+ * Validator class to validate user selected template..
  */
-export interface TemplateValidator {
+@injectable()
+export class TemplateValidator {
+    private readonly _logger: Logger;
+
+    /**
+     * Instantiate {@link TemplateValidator}.
+     *
+     * @param logger - {@link Logger} reference.
+     * @returns Reference to a new {@link TemplateValidator} instance.
+     */
+    constructor(@inject(ICoreTypes.Logger) logger: Logger) {
+        this._logger = logger;
+    }
+
     /**
      * Validate the template.
      *
      * @param templateName - Name of the template.
      */
-    validateTemplate(templateName: string): void;
+    validateTemplate(templateName: string): void {
+        if (isNullOrWhiteSpace(templateName)) {
+            this._logger.warning(LOGS.specifyValidTemplateName);
+            this._logger.warning(format(LOGS.executeProgram, { PROGRAM_NAME }), {
+                prefix: LOGS.tab
+            });
+            this._logger.message(LOGS.forExample, { prefix: LOGS.newLine });
+            this._logger.information(format(LOGS.executeProgramExample, { PROGRAM_NAME }), {
+                prefix: LOGS.tab
+            });
+
+            process.exit(1);
+        }
+    }
 }
+
+const LOGS = {
+    newLine: "\n",
+    tab: "  ",
+    specifyValidTemplateName: "Please specify a valid template name:",
+    executeProgram: "{PROGRAM_NAME} --template <template-name>",
+    executeProgramExample: "{PROGRAM_NAME} --template javascript",
+    forExample: "For example:"
+};

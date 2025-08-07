@@ -34,12 +34,17 @@ import "reflect-metadata";
 import { WebSocketServer } from "ws";
 import { BuildCommandExecutor } from "../app/BuildCommandExecutor.js";
 import { CleanCommandExecutor } from "../app/CleanCommandExecutor.js";
+import type { CommandExecutor } from "../app/CommandExecutor.js";
+import { ExpressServer } from "../app/ExpressServer.js";
 import { PackageCommandExecutor } from "../app/PackageCommandExecutor.js";
+import { ScriptManager } from "../app/ScriptManager.js";
+import { SocketServer } from "../app/SocketServer.js";
 import { StartCommandExecutor } from "../app/StartCommandExecutor.js";
-import type { CommandExecutor, ExpressServer, ScriptManager, SocketServer } from "../app/index.js";
-import { WxpExpressServer, WxpScriptManager, WxpSocketServer } from "../app/index.js";
-import type { EntityTracker } from "../utilities/index.js";
-import { AddOnManifestReader, FileChangeTracker } from "../utilities/index.js";
+import type { BuildCommandOptions } from "../models/BuildCommandOptions.js";
+import type { PackageCommandOptions } from "../models/PackageCommandOptions.js";
+import type { StartCommandOptions } from "../models/StartCommandOptions.js";
+import { AddOnManifestReader } from "../utilities/AddOnManifestReader.js";
+import { FileChangeTracker } from "../utilities/FileChangeTracker.js";
 import type { CommandValidator } from "../validators/CommandValidator.js";
 import { StartCommandValidator } from "../validators/StartCommandValidator.js";
 import { ITypes } from "./inversify.types.js";
@@ -76,13 +81,13 @@ container.bind<interfaces.Factory<WebSocketServer>>(ITypes.SocketApp).toFactory<
     };
 });
 
-container.bind<ExpressServer>(ITypes.ExpressServer).to(WxpExpressServer).inSingletonScope();
+container.bind<ExpressServer>(ITypes.ExpressServer).to(ExpressServer).inSingletonScope();
 
-container.bind<SocketServer>(ITypes.SocketServer).to(WxpSocketServer).inSingletonScope();
+container.bind<SocketServer>(ITypes.SocketServer).to(SocketServer).inSingletonScope();
 
-container.bind<ScriptManager>(ITypes.ScriptManager).to(WxpScriptManager).inSingletonScope();
+container.bind<ScriptManager>(ITypes.ScriptManager).to(ScriptManager).inSingletonScope();
 
-container.bind<EntityTracker>(ITypes.EntityTracker).to(FileChangeTracker).inSingletonScope();
+container.bind<FileChangeTracker>(ITypes.FileChangeTracker).to(FileChangeTracker).inSingletonScope();
 
 container.bind<AddOnManifestReader>(ITypes.AddOnManifestReader).to(AddOnManifestReader).inSingletonScope();
 
@@ -93,25 +98,25 @@ container
     .whenTargetNamed("clean");
 
 container
-    .bind<CommandExecutor>(ITypes.CommandExecutor)
+    .bind<CommandExecutor<BuildCommandOptions>>(ITypes.CommandExecutor)
     .to(BuildCommandExecutor)
     .inSingletonScope()
     .whenTargetNamed("build");
 
 container
-    .bind<CommandValidator>(ITypes.CommandValidator)
+    .bind<CommandValidator<StartCommandOptions>>(ITypes.CommandValidator)
     .to(StartCommandValidator)
     .inSingletonScope()
     .whenTargetNamed("start");
 
 container
-    .bind<CommandExecutor>(ITypes.CommandExecutor)
+    .bind<CommandExecutor<StartCommandOptions>>(ITypes.CommandExecutor)
     .to(StartCommandExecutor)
     .inSingletonScope()
     .whenTargetNamed("start");
 
 container
-    .bind<CommandExecutor>(ITypes.CommandExecutor)
+    .bind<CommandExecutor<PackageCommandOptions>>(ITypes.CommandExecutor)
     .to(PackageCommandExecutor)
     .inSingletonScope()
     .whenTargetNamed("package");

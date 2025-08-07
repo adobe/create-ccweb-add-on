@@ -39,7 +39,7 @@
         "build:release": "rushx _prebuild && tsc",
         "build:watch": "rushx _prebuild && tsc --watch",
         "clean": "rimraf coverage dist src/generated",
-        "test": "c8 mocha && c8 check-coverage --lines 100 --functions 100 --branches 100"
+        "test": "c8 mocha && c8 check-coverage"
     },
     "dependencies": {
         "tslib": "2.7.0",

@@ -33,12 +33,11 @@ import "mocha";
 import sinon from "sinon";
 import type { StubbedInstance } from "ts-sinon";
 import { stubInterface } from "ts-sinon";
-import type { SSLReader } from "../../app/index.js";
-import { WxpSSLReader } from "../../app/index.js";
+import { SSLReader } from "../../app/SSLReader.js";
 
 chai.use(chaiAsPromised);
 
-describe("WxpSSLReader", () => {
+describe("SSLReader", () => {
     let sandbox: sinon.SinonSandbox;
 
     let preferences: StubbedInstance<Preferences>;
@@ -53,7 +52,7 @@ describe("WxpSSLReader", () => {
 
         preferences = stubInterface();
         logger = stubInterface();
-        sslReader = new WxpSSLReader(preferences, logger);
+        sslReader = new SSLReader(preferences, logger);
     });
 
     afterEach(() => {

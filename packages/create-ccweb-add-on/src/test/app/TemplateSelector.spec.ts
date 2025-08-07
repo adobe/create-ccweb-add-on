@@ -34,12 +34,11 @@ import sinon from "sinon";
 import type { StubbedInstance } from "ts-sinon";
 import { stubInterface } from "ts-sinon";
 import { AnalyticsErrorMarkers } from "../../AnalyticsMarkers.js";
-import { AddOnTemplateSelector } from "../../app/AddOnTemplateSelector.js";
-import type { TemplateSelector } from "../../app/TemplateSelector.js";
+import { TemplateSelector } from "../../app/TemplateSelector.js";
 import { ADD_ON_TEMPLATES, PROGRAM_NAME, WITH_DOCUMENT_SANDBOX } from "../../constants.js";
-import { CLIOptions } from "../../models/index.js";
+import { CLIOptions } from "../../models/CLIOptions.js";
 
-describe("AddOnTemplateSelector", () => {
+describe("TemplateSelector", () => {
     let sandbox: SinonSandbox;
 
     let logger: StubbedInstance<Logger>;
@@ -79,7 +78,7 @@ describe("AddOnTemplateSelector", () => {
                 false
             );
 
-            const templateSelector: TemplateSelector = new AddOnTemplateSelector(logger, analyticsService);
+            const templateSelector: TemplateSelector = new TemplateSelector(logger, analyticsService);
 
             await templateSelector.setupTemplate(options);
 
@@ -128,7 +127,7 @@ describe("AddOnTemplateSelector", () => {
                 false
             );
 
-            const templateSelector: TemplateSelector = new AddOnTemplateSelector(logger, analyticsService);
+            const templateSelector: TemplateSelector = new TemplateSelector(logger, analyticsService);
             await templateSelector.setupTemplate(cliOptions);
 
             assert.equal(logger.warning.callCount, 2);
@@ -169,7 +168,7 @@ describe("AddOnTemplateSelector", () => {
         it("should return the passed template name if present in CLIOptions and is a valid one.", async () => {
             const cliOptions = new CLIOptions(EntrypointType.PANEL, "test-app", templateName, false);
 
-            const templateSelector: TemplateSelector = new AddOnTemplateSelector(logger, analyticsService);
+            const templateSelector: TemplateSelector = new TemplateSelector(logger, analyticsService);
             const template = await templateSelector.setupTemplate(cliOptions);
 
             assert.equal(analyticsService.postEvent.callCount, 0);
@@ -196,7 +195,7 @@ describe("AddOnTemplateSelector", () => {
 
             const cliOptions = new CLIOptions(EntrypointType.PANEL, "test-app", "incorrect-template", false);
 
-            const templateSelector: TemplateSelector = new AddOnTemplateSelector(logger, analyticsService);
+            const templateSelector: TemplateSelector = new TemplateSelector(logger, analyticsService);
             const template = await templateSelector.setupTemplate(cliOptions);
 
             assert.equal(template, templateChoices[1].value);
@@ -224,7 +223,7 @@ describe("AddOnTemplateSelector", () => {
             });
 
             const cliOptions = new CLIOptions(EntrypointType.PANEL, "test-app", "", false);
-            const templateSelector: TemplateSelector = new AddOnTemplateSelector(logger, analyticsService);
+            const templateSelector: TemplateSelector = new TemplateSelector(logger, analyticsService);
             const template = await templateSelector.setupTemplate(cliOptions);
 
             assert.equal(logger.warning.callCount, 0);
@@ -252,7 +251,7 @@ describe("AddOnTemplateSelector", () => {
 
             const cliOptions = new CLIOptions(EntrypointType.PANEL, "test-app", "", false);
 
-            const templateSelector: TemplateSelector = new AddOnTemplateSelector(logger, analyticsService);
+            const templateSelector: TemplateSelector = new TemplateSelector(logger, analyticsService);
             const template = await templateSelector.setupTemplate(cliOptions);
 
             assert.equal(logger.warning.callCount, 0);
@@ -260,14 +259,28 @@ describe("AddOnTemplateSelector", () => {
             assert.equal(analyticsService.postEvent.callCount, 0);
         });
 
-        it("should exit if user doesnt select any prompted value and template is not passed.", async () => {
+        it("should return the custom template if the variant is not available.", async () => {
+            const customTemplate = "custom-template";
+            const promptsStub = sandbox.stub(prompts, "prompt");
+            promptsStub.resolves({ selectedTemplate: customTemplate });
+
+            const cliOptions = new CLIOptions(EntrypointType.PANEL, "test-app", "", false);
+            const templateSelector: TemplateSelector = new TemplateSelector(logger, analyticsService);
+            const template = await templateSelector.setupTemplate(cliOptions);
+
+            assert.equal(template, customTemplate);
+            assert.equal(logger.warning.callCount, 0);
+            assert.equal(analyticsService.postEvent.callCount, 0);
+        });
+
+        it("should exit if user does not select any prompted value and template is not passed.", async () => {
             const promptsStub = sandbox.stub(prompts, "prompt");
             const exitProcessStub = sandbox.stub(process, "exit");
             promptsStub.resolves({ selectedTemplate: undefined });
 
             const cliOptions = new CLIOptions(EntrypointType.PANEL, "test-app", "", false);
 
-            const templateSelector: TemplateSelector = new AddOnTemplateSelector(logger, analyticsService);
+            const templateSelector: TemplateSelector = new TemplateSelector(logger, analyticsService);
             await templateSelector.setupTemplate(cliOptions);
 
             assert.equal(logger.warning.callCount, 0);
@@ -275,14 +288,14 @@ describe("AddOnTemplateSelector", () => {
             assert.equal(analyticsService.postEvent.callCount, 0);
         });
 
-        it("should exit if user doesnt select any option in document sandbox prompt.", async () => {
+        it("should exit if user does not select any option in document sandbox prompt.", async () => {
             const promptsStub = sandbox.stub(prompts, "prompt");
             const exitProcessStub = sandbox.stub(process, "exit");
             promptsStub.resolves({ selectedTemplate: templateChoices[1].value, includeDocumentSandbox: undefined });
 
             const cliOptions = new CLIOptions(EntrypointType.PANEL, "test-app", "", false);
 
-            const templateSelector: TemplateSelector = new AddOnTemplateSelector(logger, analyticsService);
+            const templateSelector: TemplateSelector = new TemplateSelector(logger, analyticsService);
             await templateSelector.setupTemplate(cliOptions);
 
             assert.equal(logger.warning.callCount, 0);

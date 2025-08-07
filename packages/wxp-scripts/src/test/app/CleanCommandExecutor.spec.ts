@@ -32,8 +32,8 @@ import sinon from "sinon";
 import type { StubbedInstance } from "ts-sinon";
 import { stubInterface } from "ts-sinon";
 import { AnalyticsSuccessMarkers } from "../../AnalyticsMarkers.js";
-import type { ScriptManager } from "../../app/index.js";
-import { CleanCommandExecutor } from "../../app/index.js";
+import { CleanCommandExecutor } from "../../app/CleanCommandExecutor.js";
+import type { ScriptManager } from "../../app/ScriptManager.js";
 
 describe("CleanCommandExecutor", () => {
     let sandbox: SinonSandbox;

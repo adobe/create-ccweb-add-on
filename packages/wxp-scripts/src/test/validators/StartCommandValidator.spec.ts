@@ -33,8 +33,8 @@ import type { StubbedInstance } from "ts-sinon";
 import { stubInterface } from "ts-sinon";
 import { AnalyticsErrorMarkers } from "../../AnalyticsMarkers.js";
 import { StartCommandOptions } from "../../models/StartCommandOptions.js";
-import type { CommandValidator } from "../../validators/index.js";
-import { StartCommandValidator } from "../../validators/index.js";
+import type { CommandValidator } from "../../validators/CommandValidator.js";
+import { StartCommandValidator } from "../../validators/StartCommandValidator.js";
 
 chai.use(chaiAsPromised);
 
@@ -46,7 +46,7 @@ describe("StartCommandValidator", () => {
     let analyticsService: StubbedInstance<AnalyticsService>;
     let logger: StubbedInstance<Logger>;
 
-    let commandValidator: CommandValidator;
+    let commandValidator: CommandValidator<StartCommandOptions>;
 
     beforeEach(() => {
         sandbox = sinon.createSandbox();

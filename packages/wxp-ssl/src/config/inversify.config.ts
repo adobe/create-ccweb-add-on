@@ -23,18 +23,21 @@
  ********************************************************************************/
 
 import { IContainer as ICoreContainer } from "@adobe/ccweb-add-on-core";
-import { Container } from "inversify";
+import type { Container } from "inversify";
 import "reflect-metadata";
-import type { CommandExecutor, SSLReader } from "../app/index.js";
-import { PurgeCommandExecutor, SetupCommandExecutor, WxpSSLReader } from "../app/index.js";
-import type { CommandValidator } from "../validators/index.js";
-import { SetupCommandValidator } from "../validators/index.js";
+import type { CommandExecutor } from "../app/CommandExecutor.js";
+import { PurgeCommandExecutor } from "../app/PurgeCommandExecutor.js";
+import { SetupCommandExecutor } from "../app/SetupCommandExecutor.js";
+import { SSLReader } from "../app/SSLReader.js";
+import type { SetupCommandOptions } from "../models/SetupCommandOptions.js";
+import type { CommandValidator } from "../validators/CommandValidator.js";
+import { SetupCommandValidator } from "../validators/SetupCommandValidator.js";
 import { ITypes } from "./inversify.types.js";
 
 const container: Container = ICoreContainer;
 
 container
-    .bind<CommandExecutor>(ITypes.CommandExecutor)
+    .bind<CommandExecutor<SetupCommandOptions>>(ITypes.CommandExecutor)
     .to(SetupCommandExecutor)
     .inSingletonScope()
     .whenTargetNamed("setup");
@@ -46,11 +49,11 @@ container
     .whenTargetNamed("purge");
 
 container
-    .bind<CommandValidator>(ITypes.CommandValidator)
+    .bind<CommandValidator<SetupCommandOptions>>(ITypes.CommandValidator)
     .to(SetupCommandValidator)
     .inSingletonScope()
     .whenTargetNamed("setup");
 
-container.bind<SSLReader>(ITypes.SSLReader).to(WxpSSLReader).inSingletonScope();
+container.bind<SSLReader>(ITypes.SSLReader).to(SSLReader).inSingletonScope();
 
 export { container as IContainer };

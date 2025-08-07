@@ -41,9 +41,11 @@ import format from "string-template";
 import type { StubbedInstance } from "ts-sinon";
 import { stubInterface } from "ts-sinon";
 import { AnalyticsErrorMarkers, AnalyticsSuccessMarkers } from "../../AnalyticsMarkers.js";
-import type { CommandExecutor, SSLReader } from "../../app/index.js";
-import { SetupCommandExecutor } from "../../app/index.js";
-import { SSLRemoveOption, SSLSetupOption, SetupCommandOptions } from "../../models/index.js";
+import type { CommandExecutor } from "../../app/CommandExecutor.js";
+import { SetupCommandExecutor } from "../../app/SetupCommandExecutor.js";
+import type { SSLReader } from "../../app/SSLReader.js";
+import { SetupCommandOptions } from "../../models/SetupCommandOptions.js";
+import { SSLRemoveOption, SSLSetupOption } from "../../models/SSLTypes.js";
 
 chai.use(chaiAsPromised);
 
@@ -55,7 +57,7 @@ describe("SetupCommandExecutor", () => {
     let analyticsService: StubbedInstance<AnalyticsService>;
     let logger: StubbedInstance<Logger>;
 
-    let commandExecutor: CommandExecutor;
+    let commandExecutor: CommandExecutor<SetupCommandOptions>;
 
     beforeEach(() => {
         sandbox = sinon.createSandbox();

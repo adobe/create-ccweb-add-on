@@ -24,7 +24,7 @@
 
 import { assert } from "chai";
 import "mocha";
-import { CLIProgram } from "../../models/index.js";
+import { CLIProgram } from "../../models/CLIProgram.js";
 
 describe("CLIProgram", () => {
     describe("constructor", () => {

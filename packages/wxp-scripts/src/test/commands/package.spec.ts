@@ -47,7 +47,7 @@ describe("package", () => {
     let container: sinon.SinonStub;
     let namedContainer: sinon.SinonStub;
 
-    let commandExecutor: StubbedInstance<CommandExecutor>;
+    let commandExecutor: StubbedInstance<CommandExecutor<PackageCommandOptions>>;
 
     let analyticsConsent: StubbedInstance<AnalyticsConsent>;
     let analyticsService: StubbedInstance<AnalyticsService>;

@@ -25,6 +25,3 @@
 export * from "./AddOnBuilder.js";
 export * from "./AddOnScaffolder.js";
 export * from "./PackageBuilder.js";
-export * from "./TemplateAddOnBuilder.js";
-export * from "./TemplateAddOnScaffolder.js";
-export * from "./TemplatePackageBuilder.js";

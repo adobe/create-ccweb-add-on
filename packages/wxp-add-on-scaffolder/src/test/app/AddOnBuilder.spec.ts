@@ -37,14 +37,13 @@ import sinon from "sinon";
 import type { StubbedInstance } from "ts-sinon";
 import { stubInterface } from "ts-sinon";
 import { fileURLToPath } from "url";
-import type { AddOnBuilder } from "../../app/index.js";
-import { TemplateAddOnBuilder } from "../../app/index.js";
+import { AddOnBuilder } from "../../app/AddOnBuilder.js";
 import { MANIFEST_JSON, PACKAGE_JSON } from "../../constants.js";
 import { ScaffolderOptions } from "../../models/ScaffolderOptions.js";
 
 chai.use(chaiAsPromised);
 
-describe("TemplateAddOnBuilder", () => {
+describe("AddOnBuilder", () => {
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
     const __require = createRequire(import.meta.url);
@@ -70,7 +69,7 @@ describe("TemplateAddOnBuilder", () => {
 
             const expectedPacakgeJson = new PackageJson(testAppPackageJson);
 
-            const addOnBuilder: AddOnBuilder = new TemplateAddOnBuilder(options, logger);
+            const addOnBuilder = new AddOnBuilder(options, logger);
             const packageJson = addOnBuilder.getPackageJson();
 
             assert.deepEqual(packageJson, expectedPacakgeJson);
@@ -99,7 +98,7 @@ describe("TemplateAddOnBuilder", () => {
 
             const expectedTemplateJson = new TemplateJson({});
 
-            const addOnBuilder: AddOnBuilder = new TemplateAddOnBuilder(options, logger);
+            const addOnBuilder = new AddOnBuilder(options, logger);
             const templateJson = addOnBuilder.getTemplateJson();
 
             assert.deepEqual(templateJson, expectedTemplateJson);
@@ -128,7 +127,7 @@ describe("TemplateAddOnBuilder", () => {
                 }
             });
 
-            const addOnBuilder: AddOnBuilder = new TemplateAddOnBuilder(options, logger);
+            const addOnBuilder = new AddOnBuilder(options, logger);
             const templateJson = addOnBuilder.getTemplateJson();
 
             assert.deepEqual(templateJson, expectedTemplateJson);
@@ -146,7 +145,7 @@ describe("TemplateAddOnBuilder", () => {
                 false
             );
 
-            const addOnBuilder: AddOnBuilder = new TemplateAddOnBuilder(options, logger);
+            const addOnBuilder = new AddOnBuilder(options, logger);
             const devDependencies = addOnBuilder.getDevDependenciesToInstall(new TemplateJson({}));
 
             assert.equal(devDependencies.size, 0);
@@ -172,7 +171,7 @@ describe("TemplateAddOnBuilder", () => {
 
             const expectedDevDependencies = new Set(["a@1.0.0", "b@2.0.0", "c@3.0.0"]);
 
-            const addOnBuilder: AddOnBuilder = new TemplateAddOnBuilder(options, logger);
+            const addOnBuilder = new AddOnBuilder(options, logger);
             const devDependencies = addOnBuilder.getDevDependenciesToInstall(templateJson);
 
             assert.deepEqual(devDependencies, expectedDevDependencies);
@@ -190,7 +189,7 @@ describe("TemplateAddOnBuilder", () => {
                 false
             );
 
-            const addOnBuilder: AddOnBuilder = new TemplateAddOnBuilder(options, logger);
+            const addOnBuilder = new AddOnBuilder(options, logger);
             const dependencies = addOnBuilder.getDependenciesToInstall(new TemplateJson({}));
 
             assert.equal(dependencies.size, 0);
@@ -216,14 +215,14 @@ describe("TemplateAddOnBuilder", () => {
 
             const expectedDependencies = new Set(["a@1.0.0", "b@2.0.0", "c@3.0.0"]);
 
-            const addOnBuilder: AddOnBuilder = new TemplateAddOnBuilder(options, logger);
+            const addOnBuilder = new AddOnBuilder(options, logger);
             const dependencies = addOnBuilder.getDependenciesToInstall(templateJson);
 
             assert.deepEqual(dependencies, expectedDependencies);
         });
     });
 
-    describe("build()", () => {
+    describe("build", () => {
         const additionalInfo = {
             sourceId: "fakeAddOnSource",
             privileged: true,
@@ -315,7 +314,7 @@ describe("TemplateAddOnBuilder", () => {
                     .withArgs(manifestJsonPath, getJSONString(manifest!.manifestProperties) + os.EOL)
                     .returns();
 
-                const addOnBuilder: AddOnBuilder = new TemplateAddOnBuilder(options, logger);
+                const addOnBuilder = new AddOnBuilder(options, logger);
                 addOnBuilder.build(packageJson);
 
                 assert.equal(renameSpy.callCount, 0);
@@ -399,7 +398,7 @@ describe("TemplateAddOnBuilder", () => {
                     .withArgs(manifestJsonPath, getJSONString(manifest!.manifestProperties) + os.EOL)
                     .returns();
 
-                const addOnBuilder: AddOnBuilder = new TemplateAddOnBuilder(options, logger);
+                const addOnBuilder = new AddOnBuilder(options, logger);
                 addOnBuilder.build(packageJson);
 
                 assert.equal(renameStub.callCount, 1);
@@ -499,7 +498,7 @@ describe("TemplateAddOnBuilder", () => {
                     .withArgs(manifestJsonPath, getJSONString(manifest!.manifestProperties) + os.EOL)
                     .returns();
 
-                const addOnBuilder: AddOnBuilder = new TemplateAddOnBuilder(options, logger);
+                const addOnBuilder = new AddOnBuilder(options, logger);
                 addOnBuilder.build(packageJson);
 
                 assert.equal(logger.warning.callCount, 1);
@@ -584,7 +583,7 @@ describe("TemplateAddOnBuilder", () => {
                     .withArgs(manifestJsonPath, getJSONString(manifest!.manifestProperties) + os.EOL)
                     .returns();
 
-                const addOnBuilder: AddOnBuilder = new TemplateAddOnBuilder(options, logger);
+                const addOnBuilder = new AddOnBuilder(options, logger);
                 addOnBuilder.build(packageJson);
 
                 assert.equal(copyStub.callCount, 1);
@@ -678,7 +677,7 @@ describe("TemplateAddOnBuilder", () => {
                     .withArgs(manifestJsonPath, getJSONString(manifest!.manifestProperties) + os.EOL)
                     .returns();
 
-                const addOnBuilder: AddOnBuilder = new TemplateAddOnBuilder(options, logger);
+                const addOnBuilder = new AddOnBuilder(options, logger);
                 addOnBuilder.build(packageJson);
 
                 assert.equal(moveStub.callCount, 1);
@@ -767,7 +766,7 @@ describe("TemplateAddOnBuilder", () => {
                     .withArgs(manifestJsonPath, getJSONString(manifest!.manifestProperties) + os.EOL)
                     .returns();
 
-                const addOnBuilder: AddOnBuilder = new TemplateAddOnBuilder(options, logger);
+                const addOnBuilder = new AddOnBuilder(options, logger);
                 addOnBuilder.build(packageJson);
 
                 assert.equal(readFileStub.callCount, 1);
@@ -868,7 +867,7 @@ describe("TemplateAddOnBuilder", () => {
                     .withArgs(manifestJsonPath, getJSONString(manifest!.manifestProperties) + os.EOL)
                     .returns();
 
-                const addOnBuilder: AddOnBuilder = new TemplateAddOnBuilder(options, logger);
+                const addOnBuilder = new AddOnBuilder(options, logger);
                 addOnBuilder.build(packageJson);
 
                 assert.equal(writeFileStub.callCount, 2);
@@ -952,7 +951,7 @@ describe("TemplateAddOnBuilder", () => {
                     .withArgs(manifestJsonPath, getJSONString(manifest!.manifestProperties) + os.EOL)
                     .returns();
 
-                const addOnBuilder: AddOnBuilder = new TemplateAddOnBuilder(options, logger);
+                const addOnBuilder = new AddOnBuilder(options, logger);
                 addOnBuilder.build(packageJson);
 
                 assert.equal(unlinkStub.callCount, 1);
@@ -1015,7 +1014,7 @@ describe("TemplateAddOnBuilder", () => {
                 // _removeTemplateTempFiles() stubs.
                 sandbox.stub(fs, "removeSync").returns();
 
-                const addOnBuilder: AddOnBuilder = new TemplateAddOnBuilder(options, logger);
+                const addOnBuilder = new AddOnBuilder(options, logger);
                 addOnBuilder.build(thirdPackageJson);
 
                 assert.equal(writeFileStub.callCount, 1);
@@ -1120,7 +1119,7 @@ describe("TemplateAddOnBuilder", () => {
 
             writeFileStub.withArgs(manifestJsonPath, getJSONString(manifest!.manifestProperties) + os.EOL).returns();
 
-            const addOnBuilder: AddOnBuilder = new TemplateAddOnBuilder(options, logger);
+            const addOnBuilder = new AddOnBuilder(options, logger);
             addOnBuilder.build(packageJson);
             addOnBuilder.displaySuccess();
             assert.equal(logger.message.callCount, 3);
@@ -1292,7 +1291,7 @@ describe("TemplateAddOnBuilder", () => {
 
             writeFileStub.withArgs(manifestJsonPath, getJSONString(manifest!.manifestProperties) + os.EOL).returns();
 
-            const addOnBuilder: AddOnBuilder = new TemplateAddOnBuilder(options, logger);
+            const addOnBuilder = new AddOnBuilder(options, logger);
             addOnBuilder.build(packageJson);
             addOnBuilder.displaySuccess();
 

@@ -36,9 +36,9 @@ import sinon from "sinon";
 import type { StubbedInstance } from "ts-sinon";
 import { stubInterface } from "ts-sinon";
 import { AnalyticsErrorMarkers, AnalyticsSuccessMarkers } from "../../AnalyticsMarkers.js";
-import type { CommandExecutor } from "../../app/index.js";
-import { PurgeCommandExecutor } from "../../app/index.js";
-import { SSLRemoveOption } from "../../models/index.js";
+import type { CommandExecutor } from "../../app/CommandExecutor.js";
+import { PurgeCommandExecutor } from "../../app/PurgeCommandExecutor.js";
+import { SSLRemoveOption } from "../../models/SSLTypes.js";
 
 describe("PurgeCommandExecutor", () => {
     describe("execute", () => {

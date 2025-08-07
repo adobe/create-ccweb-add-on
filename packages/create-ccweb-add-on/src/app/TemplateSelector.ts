@@ -22,17 +22,169 @@
  * SOFTWARE.
  ********************************************************************************/
 
+import type { AnalyticsService } from "@adobe/ccweb-add-on-analytics";
+import { ITypes as IAnalyticsTypes } from "@adobe/ccweb-add-on-analytics";
+import type { Logger } from "@adobe/ccweb-add-on-core";
+import { ITypes as ICoreTypes, isNullOrWhiteSpace } from "@adobe/ccweb-add-on-core";
+import { EntrypointType } from "@adobe/ccweb-add-on-manifest";
+import chalk from "chalk";
+import { inject, injectable } from "inversify";
+import prompts from "prompts";
+import "reflect-metadata";
+import format from "string-template";
+import { AnalyticsErrorMarkers } from "../AnalyticsMarkers.js";
+import { ADD_ON_TEMPLATES, AVAILABLE_ADD_ON_TEMPLATES, PROGRAM_NAME, WITH_DOCUMENT_SANDBOX } from "../constants.js";
 import type { CLIOptions } from "../models/CLIOptions.js";
 
-/**
- * Template Selector interface.
- */
-export interface TemplateSelector {
+@injectable()
+export class TemplateSelector {
+    private readonly _logger: Logger;
+    private readonly _analyticsService: AnalyticsService;
+
+    /**
+     * Instantiate {@link TemplateSelector}.
+     * @param logger - {@link Logger} reference.
+     * @param analyticsService - {@link AnalyticsService} reference.
+     * @returns Reference to a new {@link TemplateSelector} instance.
+     */
+    constructor(
+        @inject(ICoreTypes.Logger) logger: Logger,
+        @inject(IAnalyticsTypes.AnalyticsService) analyticsService: AnalyticsService
+    ) {
+        this._logger = logger;
+        this._analyticsService = analyticsService;
+    }
+
     /**
      * Sets up a template, as selected/provided by the user
      * for scaffolding the add-on project.
      * @param options - {@link CLIOptions}.
      * @returns User selected/provided template name.
      */
-    setupTemplate(options: CLIOptions): Promise<string>;
+    async setupTemplate(options: CLIOptions): Promise<string> {
+        await this._validateAddOnEntrypoint(options.entrypointType);
+
+        if (!isNullOrWhiteSpace(options.templateName)) {
+            if (AVAILABLE_ADD_ON_TEMPLATES.includes(options.templateName)) {
+                return options.templateName;
+            } else {
+                this._logger.warning(LOGS.chooseValidTemplate, { prefix: LOGS.newLine });
+            }
+        }
+
+        // Add a line break for better log readability.
+        console.log();
+
+        const templateChoices = [];
+        for (const [templateName, description] of ADD_ON_TEMPLATES.entries()) {
+            templateChoices.push({
+                title: this._promptMessageOption(templateName, description),
+                value: templateName
+            });
+        }
+
+        const templateResponse = await prompts.prompt({
+            type: "select",
+            name: "selectedTemplate",
+            message: this._promptMessage(LOGS.setupTemplate),
+            choices: templateChoices,
+            initial: 0
+        });
+
+        if (!templateResponse || !templateResponse.selectedTemplate) {
+            console.log();
+            return process.exit(0);
+        }
+
+        if (!AVAILABLE_ADD_ON_TEMPLATES.includes(`${templateResponse.selectedTemplate}-${WITH_DOCUMENT_SANDBOX}`)) {
+            return templateResponse.selectedTemplate;
+        }
+
+        const documentSandboxChoices = [
+            {
+                title: this._promptMessageOption(LOGS.no),
+                value: false
+            },
+            {
+                title: this._promptMessageOption(LOGS.yes),
+                value: true
+            }
+        ];
+        const documentSandboxResponse = await prompts.prompt({
+            type: "select",
+            name: "includeDocumentSandbox",
+            message: this._promptMessage(LOGS.includeDocumentSandbox),
+            choices: documentSandboxChoices,
+            initial: 0
+        });
+
+        if (!documentSandboxResponse || documentSandboxResponse.includeDocumentSandbox === undefined) {
+            console.log();
+            return process.exit(0);
+        }
+
+        // Append `with-document-sandbox` to the template name if user wants to include document sandbox
+        return documentSandboxResponse.includeDocumentSandbox
+            ? `${templateResponse.selectedTemplate}-${WITH_DOCUMENT_SANDBOX}`
+            : templateResponse.selectedTemplate;
+    }
+
+    private _promptMessage(message: string): string {
+        return chalk.cyan(message);
+    }
+
+    private _promptMessageOption(option: string, description?: string): string {
+        if (description) {
+            return `${chalk.hex("#E59400").bold(`[${option}]:`)} ${chalk.green(description)}`;
+        }
+        return chalk.green.bold(option);
+    }
+
+    /**
+     * Validate whether entrypointType is valid or not.
+     * @param entrypointType - Add-on entrypoint. For example: panel.
+     */
+    private async _validateAddOnEntrypoint(entrypointType: EntrypointType): Promise<void> {
+        if (entrypointType !== EntrypointType.PANEL) {
+            this._logger.warning(LOGS.chooseValidEntrypointType);
+            this._logger.warning(
+                format(LOGS.executeProgramWithValidEntrypointType, {
+                    PROGRAM_NAME
+                }),
+                {
+                    prefix: LOGS.tab
+                }
+            );
+            this._logger.message(LOGS.forExample, { prefix: LOGS.newLine });
+            this._logger.information(
+                format(LOGS.executeProgramWithValidEntrypointTypeExample, {
+                    PROGRAM_NAME
+                }),
+                {
+                    prefix: LOGS.tab
+                }
+            );
+
+            await this._analyticsService.postEvent(
+                AnalyticsErrorMarkers.ERROR_INVALID_KIND,
+                LOGS.analyticsInvalidEntrypointType,
+                false
+            );
+            return process.exit(0);
+        }
+    }
 }
+const LOGS = {
+    newLine: "\n",
+    tab: "  ",
+    setupTemplate: "Please select a template which you want to scaffold the Add-on project with",
+    chooseValidEntrypointType: "Please choose a valid Add-on entrypoint (valid entrypoint: panel)",
+    executeProgramWithValidEntrypointType: "{PROGRAM_NAME} <add-on-name> --entrypoint <panel>",
+    executeProgramWithValidEntrypointTypeExample: "{PROGRAM_NAME} my-add-on --entrypoint panel",
+    chooseValidTemplate: "You have chosen an invalid template.",
+    forExample: "For example:",
+    analyticsInvalidEntrypointType: "Invalid Add-on entrypoint specified",
+    includeDocumentSandbox: "Do you want to include document sandbox runtime?",
+    yes: "Yes",
+    no: "No"
+};

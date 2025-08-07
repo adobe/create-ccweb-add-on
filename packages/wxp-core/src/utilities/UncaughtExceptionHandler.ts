@@ -24,7 +24,7 @@
 
 import process from "process";
 import { IContainer, ITypes } from "../config/index.js";
-import { type Logger } from "./Logger.js";
+import type { Logger } from "./Logger.js";
 
 /**
  * Uncaught exception handler.

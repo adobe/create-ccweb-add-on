@@ -22,7 +22,7 @@
  * SOFTWARE.
  ********************************************************************************/
 
-import { ManifestEntrypoint } from "@adobe/ccweb-add-on-manifest";
+import type { ManifestEntrypoint } from "@adobe/ccweb-add-on-manifest";
 
 export interface AddOnMetaData {
     name: string;

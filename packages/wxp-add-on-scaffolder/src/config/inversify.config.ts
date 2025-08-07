@@ -26,11 +26,11 @@ import type { Logger, PackageJson, TemplateJson } from "@adobe/ccweb-add-on-core
 import { IContainer as ICoreContainer, ITypes as ICoreTypes } from "@adobe/ccweb-add-on-core";
 import type { Container, interfaces } from "inversify";
 import "reflect-metadata";
-import type { AddOnBuilder, AddOnScaffolder, PackageBuilder } from "../app/index.js";
-import { TemplateAddOnBuilder, TemplateAddOnScaffolder, TemplatePackageBuilder } from "../app/index.js";
+import { AddOnBuilder } from "../app/AddOnBuilder.js";
+import { AddOnScaffolder } from "../app/AddOnScaffolder.js";
+import { PackageBuilder } from "../app/PackageBuilder.js";
 import type { ScaffolderOptions } from "../models/ScaffolderOptions.js";
-import type { TemplateValidator } from "../validators/index.js";
-import { AddOnTemplateValidator } from "../validators/index.js";
+import { TemplateValidator } from "../validators/TemplateValidator.js";
 import { ITypes } from "./inversify.types.js";
 
 const container: Container = ICoreContainer;
@@ -39,7 +39,7 @@ container
     .bind<interfaces.Factory<AddOnBuilder>>(ITypes.AddOnBuilder)
     .toFactory<AddOnBuilder, [ScaffolderOptions]>(context => {
         return (options: ScaffolderOptions) => {
-            return new TemplateAddOnBuilder(options, context.container.get<Logger>(ICoreTypes.Logger));
+            return new AddOnBuilder(options, context.container.get<Logger>(ICoreTypes.Logger));
         };
     });
 
@@ -47,12 +47,12 @@ container
     .bind<interfaces.Factory<PackageBuilder>>(ITypes.PackageBuilder)
     .toFactory<PackageBuilder, [PackageJson], [TemplateJson]>(() => {
         return (packageJson: PackageJson) => (templateJson: TemplateJson) => {
-            return new TemplatePackageBuilder(packageJson, templateJson);
+            return new PackageBuilder(packageJson, templateJson);
         };
     });
 
-container.bind<TemplateValidator>(ITypes.TemplateValidator).to(AddOnTemplateValidator).inSingletonScope();
+container.bind<AddOnScaffolder>(ITypes.AddOnScaffolder).to(AddOnScaffolder).inSingletonScope();
 
-container.bind<AddOnScaffolder>(ITypes.AddOnScaffolder).to(TemplateAddOnScaffolder).inSingletonScope();
+container.bind<TemplateValidator>(ITypes.TemplateValidator).to(TemplateValidator).inSingletonScope();
 
 export { container as IContainer };

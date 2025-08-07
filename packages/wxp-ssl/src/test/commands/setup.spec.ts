@@ -32,7 +32,7 @@ import sinon from "sinon";
 import type { StubbedInstance } from "ts-sinon";
 import { stubInterface } from "ts-sinon";
 import { AnalyticsErrorMarkers } from "../../AnalyticsMarkers.js";
-import type { SetupCommandExecutor } from "../../app/index.js";
+import type { SetupCommandExecutor } from "../../app/SetupCommandExecutor.js";
 import { Setup } from "../../commands/setup.js";
 import { IContainer, ITypes } from "../../config/index.js";
 import { PROGRAM_NAME } from "../../constants.js";

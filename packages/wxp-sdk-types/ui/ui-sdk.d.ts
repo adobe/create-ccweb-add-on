@@ -151,6 +151,10 @@ export declare enum AppEvent {
      * triggered when drag is complete on the currently dragged element.
      */
     dragend = "dragend",
+    /**
+     * triggered when drag is cancelled on the currently dragged element.
+     */
+    dragcancel = "dragcancel",
 
     /**
      * triggered when the document id is available in the application.
@@ -186,6 +190,7 @@ declare interface AppEventsTypeMap {
     [AppEvent.reset]: undefined;
     [AppEvent.dragstart]: AppDragStartEventData;
     [AppEvent.dragend]: AppDragEndEventData;
+    [AppEvent.dragcancel]: undefined;
 
     [AppEvent.documentIdAvailable]: DocumentIdAvailableEventData;
     [AppEvent.documentLinkAvailable]: DocumentLinkAvailableEventData;
@@ -215,6 +220,11 @@ export declare interface Application extends ApplicationBase {
      * Represents the active document of the host application
      */
     readonly document: Document_2;
+    /**
+     * @experimental - Experimental API
+     * Invoke command/actions in an add-on and handle response.
+     */
+    readonly command: Command;
     /**
      * OAuth 2.0 middleware for handling user authorization.
      */
@@ -661,6 +671,25 @@ export declare enum ColorPickerPlacement {
     right = "right"
 }
 
+/**
+ * @experimental - Experimental API
+ * Provides APIs to handle command execution in the add-on.
+ */
+export declare interface Command {
+    /**
+     * @experimental - Experimental API
+     * Register a handler for handling command execution in the add-on.
+     *
+     * _Note:_ This is similar to a JavaScript event handler.
+     * If there are multiple handlers registered for a command,
+     * each will be invoked when the host application triggers the command.
+     * In most of the cases, one handler per command is the way to go.
+     * @param command - Command triggered from the host application.
+     * @param handler - Handler for command execution.
+     */
+    register(command: string, handler: (params: Record<string, unknown>) => unknown): void;
+}
+
 declare namespace Constants {
     export {
         Range_2 as Range,
@@ -860,15 +889,15 @@ declare interface Document_2 {
     /**
      * Add image/Ps/Ai files to the current page
      */
-    addImage(blob: Blob, attributes?: MediaAttributes): Promise<void>;
+    addImage(blob: Blob, attributes?: MediaAttributes, importAddOnData?: ImportAddOnData): Promise<void>;
     /**
      * Add GIF files to the current page
      */
-    addAnimatedImage(blob: Blob, attributes?: MediaAttributes): Promise<void>;
+    addAnimatedImage(blob: Blob, attributes?: MediaAttributes, importAddOnData?: ImportAddOnData): Promise<void>;
     /**
      * Add video to the current page
      */
-    addVideo(blob: Blob, attributes?: MediaAttributes): Promise<void>;
+    addVideo(blob: Blob, attributes?: MediaAttributes, importAddOnData?: ImportAddOnData): Promise<void>;
     /**
      * Add audio to the current page
      */
@@ -882,6 +911,11 @@ declare interface Document_2 {
      * Get metadata of all or range of pages of the document
      */
     getPagesMetadata(options: PageMetadataOptions): Promise<PageMetadata[]>;
+    /**
+     * @experimental - Experimental API
+     * Get the currently selected page ids.
+     */
+    getSelectedPageIds(): Promise<string[]>;
     /**
      * Get document id
      */
@@ -1069,6 +1103,10 @@ export declare enum EntrypointType {
      */
     WIDGET = "widget",
     /**
+     * Command entrypoint type.
+     */
+    COMMAND = "command",
+    /**
      * Script entrypoint type.
      * add-ons with script entrypoint type can use only the document sandbox APIs.
      */
@@ -1186,6 +1224,24 @@ export declare enum FrameRate {
      * 60 frames per second
      */
     fps60 = 60
+}
+
+/**
+ * Represents the add-on data for a node.
+ * Note: This support is not present for PSD/AI assets.
+ */
+export declare interface ImportAddOnData {
+    /**
+     * The node add-on data which will persist on the image frame even if the image content is replaced with a
+     * different one. This data can be accessed later via the MediaContainerNode.addOnData API.
+     */
+    nodeAddOnData?: Record<string, string>;
+    /**
+     * The media add-on data which will reset if the image is replaced with a different one. All copies of the
+     * same image in the document will share the same mediaAddOnData. This data can be accessed later via the
+     * MediaRectangleNode.mediaAddOnData API.
+     */
+    mediaAddOnData?: Record<string, string>;
 }
 
 /**
@@ -1912,7 +1968,11 @@ export declare enum RuntimeType {
     /**
      * Add-On's document model sandbox - JS runtime that hosts add-on code that has direct access to the full model.
      */
-    documentSandbox = "documentSandbox"
+    documentSandbox = "documentSandbox",
+    /**
+     * Runtime that hosts the add-on command logic.
+     */
+    command = "command"
 }
 
 /**
@@ -2072,5 +2132,4 @@ export declare enum VideoResolution {
     custom = "custom"
 }
 
-export { };
-
+export {};

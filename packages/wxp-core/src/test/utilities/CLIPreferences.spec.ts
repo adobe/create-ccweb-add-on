@@ -32,16 +32,16 @@ import type { SinonSandbox } from "sinon";
 import sinon from "sinon";
 import { ADD_ON_PREFERENCES_FILE, CCWEB_ADDON_DIRECTORY } from "../../constants.js";
 import { PreferenceJson } from "../../models/PreferenceJson.js";
-import type { Preferences } from "../../utilities/index.js";
-import { CLIPreferences } from "../../utilities/index.js";
+import type { Preferences } from "../../utilities/Preferences.js";
+import { UserPreferences } from "../../utilities/UserPreferences.js";
 
-describe("CLIPreferences", () => {
+describe("UserPreferences", () => {
     let sandbox: SinonSandbox;
-    let cliPreferences: Preferences;
+    let preferences: Preferences;
 
     beforeEach(() => {
         sandbox = sinon.createSandbox();
-        cliPreferences = new CLIPreferences();
+        preferences = new UserPreferences();
     });
 
     afterEach(() => {
@@ -65,9 +65,9 @@ describe("CLIPreferences", () => {
             const writeFileStub = sandbox.stub(fs, "writeFileSync");
             writeFileStub.withArgs(preferenceFilePath, JSON.stringify({}, undefined, 4) + os.EOL).returns();
 
-            const preferences = cliPreferences.get();
+            const preferenceJson = preferences.get();
 
-            assert.deepEqual(new PreferenceJson({}), preferences);
+            assert.deepEqual(new PreferenceJson({}), preferenceJson);
             assert.equal(ensureFileStub.calledOnceWith(preferenceFilePath), true);
             assert.equal(
                 writeFileStub.calledOnceWith(preferenceFilePath, JSON.stringify({}, undefined, 4) + os.EOL),
@@ -87,8 +87,8 @@ describe("CLIPreferences", () => {
 
             sandbox.stub(fs, "readFileSync").withArgs(preferenceFilePath, "utf-8").returns("");
 
-            const preferences = cliPreferences.get();
-            assert.deepEqual(new PreferenceJson({}), preferences);
+            const preferenceJson = preferences.get();
+            assert.deepEqual(new PreferenceJson({}), preferenceJson);
         });
 
         it(`should return empty preferences if any error is encountered while reading '${ADD_ON_PREFERENCES_FILE}'.`, () => {
@@ -106,8 +106,8 @@ describe("CLIPreferences", () => {
                 .withArgs(preferenceFilePath, "utf-8")
                 .throws(new Error("Unexpected error"));
 
-            const preferences = cliPreferences.get();
-            assert.deepEqual(new PreferenceJson({}), preferences);
+            const preferenceJson = preferences.get();
+            assert.deepEqual(new PreferenceJson({}), preferenceJson);
         });
 
         it(`should return preferences with values if '${ADD_ON_PREFERENCES_FILE}' exits and has data.`, () => {
@@ -138,13 +138,13 @@ describe("CLIPreferences", () => {
             const readFileStub = sandbox.stub(fs, "readFileSync");
             readFileStub.withArgs(preferenceFilePath, "utf-8").returns(JSON.stringify(expectedPreference));
 
-            const actualPreference = cliPreferences.get();
+            const actualPreference = preferences.get();
 
             assert.equal(actualPreference.hasTelemetryConsent, expectedPreference.hasTelemetryConsent);
             assert.equal(actualPreference.clientId, expectedPreference.clientId);
             assert.deepEqual(actualPreference.ssl, new Map(Object.entries(expectedPreference.ssl)));
 
-            const cachedPreference = cliPreferences.get(true);
+            const cachedPreference = preferences.get(true);
 
             assert.deepEqual(cachedPreference, actualPreference);
             assert.equal(fileExistsStub.callCount, 1);
@@ -179,13 +179,13 @@ describe("CLIPreferences", () => {
 
             sandbox.stub(fs, "readFileSync").withArgs(preferenceFilePath, "utf-8").returns(JSON.stringify(preference));
 
-            const preferenceJson = cliPreferences.get();
+            const preferenceJson = preferences.get();
             preferenceJson.clientId = 123456789;
 
             const writeFileStub = sandbox.stub(fs, "writeFileSync");
             writeFileStub.withArgs(preferenceFilePath, preferenceJson.toJSON() + os.EOL).returns();
 
-            cliPreferences.set(preferenceJson);
+            preferences.set(preferenceJson);
 
             assert.equal(writeFileStub.calledOnceWith(preferenceFilePath, preferenceJson.toJSON() + os.EOL), true);
         });

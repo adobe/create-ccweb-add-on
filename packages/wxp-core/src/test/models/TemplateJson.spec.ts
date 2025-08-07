@@ -24,7 +24,7 @@
 
 import { assert } from "chai";
 import "mocha";
-import { TemplateJson } from "../../models/index.js";
+import { TemplateJson } from "../../models/TemplateJson.js";
 
 describe("TemplateJson", () => {
     describe("constructor ...", () => {

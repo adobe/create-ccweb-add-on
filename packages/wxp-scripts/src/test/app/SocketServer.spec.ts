@@ -40,15 +40,18 @@ import type { StubbedInstance } from "ts-sinon";
 import { stubInterface } from "ts-sinon";
 import type { WebSocket, WebSocketServer } from "ws";
 import { AnalyticsSuccessMarkers } from "../../AnalyticsMarkers.js";
-import type { ScriptManager, SocketAppFactory, SocketServer } from "../../app/index.js";
-import { WxpSocketServer } from "../../app/index.js";
+import type { ScriptManager } from "../../app/ScriptManager.js";
+import type { SocketAppFactory } from "../../app/SocketServer.js";
+import { SocketServer } from "../../app/SocketServer.js";
 import { MANIFEST_JSON, WSS } from "../../constants.js";
-import { AddOnActionV1, AddOnDirectory, StartCommandOptions } from "../../models/index.js";
-import type { EntityTracker } from "../../utilities/index.js";
-import { AddOnManifestReader, FileChangeTracker } from "../../utilities/index.js";
+import { AddOnDirectory } from "../../models/AddOnDirectory.js";
+import { AddOnActionV1 } from "../../models/CLIScriptMessageV1.js";
+import { StartCommandOptions } from "../../models/StartCommandOptions.js";
+import { AddOnManifestReader } from "../../utilities/AddOnManifestReader.js";
+import { FileChangeTracker } from "../../utilities/FileChangeTracker.js";
 import { createManifest } from "../test-utilities.js";
 
-describe("WxpSocketServer", () => {
+describe("SocketServer", () => {
     let sandbox: SinonSandbox;
 
     let server: StubbedInstance<Server>;
@@ -60,7 +63,7 @@ describe("WxpSocketServer", () => {
 
     let scriptManager: StubbedInstance<ScriptManager>;
 
-    let entityTracker: EntityTracker;
+    let fileChangeTracker: FileChangeTracker;
 
     let manifestReader: AddOnManifestReader;
 
@@ -82,16 +85,16 @@ describe("WxpSocketServer", () => {
         socketAppFactory = sandbox.stub().returns(socketApp);
 
         scriptManager = stubInterface();
-        entityTracker = new FileChangeTracker();
+        fileChangeTracker = new FileChangeTracker();
         manifestReader = new AddOnManifestReader();
         logger = stubInterface<Logger>();
 
         analyticsService = stubInterface<AnalyticsService>();
         analyticsService.postEvent.resolves();
 
-        socketServer = new WxpSocketServer(
+        socketServer = new SocketServer(
             socketAppFactory,
-            entityTracker,
+            fileChangeTracker,
             scriptManager,
             manifestReader,
             logger,
@@ -176,8 +179,8 @@ describe("WxpSocketServer", () => {
                     true
                 );
 
-                entityTracker.track("sample-add-on", "src/index.ts");
-                await sleep(entityTracker.throttleTime);
+                fileChangeTracker.track("sample-add-on", "src/index.ts");
+                await sleep(fileChangeTracker.throttleTime);
 
                 assert.equal(watcher.on.callCount, 3);
                 assert.equal(watcher.on.getCall(0).args[0], "add");
@@ -286,9 +289,9 @@ describe("WxpSocketServer", () => {
                 true
             );
 
-            entityTracker.track("sample-add-on", `src/${MANIFEST_JSON}`);
-            entityTracker.track("sample-add-on", `src/index.js`);
-            await sleep(entityTracker.throttleTime);
+            fileChangeTracker.track("sample-add-on", `src/${MANIFEST_JSON}`);
+            fileChangeTracker.track("sample-add-on", `src/index.js`);
+            await sleep(fileChangeTracker.throttleTime);
 
             assert.equal(watcher.on.callCount, 3);
             assert.equal(watcher.on.getCall(0).args[0], "add");
@@ -391,9 +394,9 @@ describe("WxpSocketServer", () => {
                 true
             );
 
-            entityTracker.track("sample-add-on", manifestJsonPath);
-            entityTracker.track("sample-add-on", `${sourceDirectory}/index.js`);
-            await sleep(entityTracker.throttleTime);
+            fileChangeTracker.track("sample-add-on", manifestJsonPath);
+            fileChangeTracker.track("sample-add-on", `${sourceDirectory}/index.js`);
+            await sleep(fileChangeTracker.throttleTime);
 
             assert.equal(watcher.on.callCount, 3);
             assert.equal(watcher.on.getCall(0).args[0], "add");
@@ -498,9 +501,9 @@ describe("WxpSocketServer", () => {
                 true
             );
 
-            entityTracker.track("sample-add-on", manifestJsonPath);
-            entityTracker.track("sample-add-on", `${sourceDirectory}/index.js`);
-            await sleep(entityTracker.throttleTime);
+            fileChangeTracker.track("sample-add-on", manifestJsonPath);
+            fileChangeTracker.track("sample-add-on", `${sourceDirectory}/index.js`);
+            await sleep(fileChangeTracker.throttleTime);
 
             assert.equal(watcher.on.callCount, 3);
             assert.equal(watcher.on.getCall(0).args[0], "add");
@@ -613,9 +616,9 @@ describe("WxpSocketServer", () => {
                 true
             );
 
-            entityTracker.track("sample-add-on", manifestJsonPath);
-            entityTracker.track("sample-add-on", `${sourceDirectory}/index.js`);
-            await sleep(entityTracker.throttleTime);
+            fileChangeTracker.track("sample-add-on", manifestJsonPath);
+            fileChangeTracker.track("sample-add-on", `${sourceDirectory}/index.js`);
+            await sleep(fileChangeTracker.throttleTime);
 
             assert.equal(watcher.on.callCount, 3);
             assert.equal(watcher.on.getCall(0).args[0], "add");

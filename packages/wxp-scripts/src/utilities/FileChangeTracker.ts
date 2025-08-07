@@ -23,13 +23,12 @@
  ********************************************************************************/
 
 import { injectable } from "inversify";
-import type { EntityTracker } from "./EntityTracker.js";
 
 /**
  * Class to track file changes and trigger a registered action.
  */
 @injectable()
-export class FileChangeTracker implements EntityTracker {
+export class FileChangeTracker {
     /**
      * Unique set of file changes per id.
      */

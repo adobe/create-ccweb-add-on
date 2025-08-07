@@ -23,22 +23,23 @@
  ********************************************************************************/
 
 import { IContainer as ICoreContainer } from "@adobe/ccweb-add-on-core";
+import type { Container } from "inversify";
 import "reflect-metadata";
-import type { AddOnFactory, TemplateSelector } from "../app/index.js";
-import { AddOnTemplateSelector, WxpAddOnFactory } from "../app/index.js";
-import type { DirectoryValidator, EnvironmentValidator } from "../validators/index.js";
-import { AddOnDirectoryValidator, NodeEnvironmentValidator } from "../validators/index.js";
+import { AddOnFactory } from "../app/AddOnFactory.js";
+import { TemplateSelector } from "../app/TemplateSelector.js";
+import { DirectoryValidator } from "../validators/DirectoryValidator.js";
+import { EnvironmentValidator } from "../validators/EnvironmentValidator.js";
+
 import { ITypes } from "./inversify.types.js";
-import { Container } from "inversify";
 
 const container: Container = ICoreContainer;
 
-container.bind<AddOnFactory>(ITypes.AddOnFactory).to(WxpAddOnFactory).inSingletonScope();
+container.bind<AddOnFactory>(ITypes.AddOnFactory).to(AddOnFactory).inSingletonScope();
 
-container.bind<DirectoryValidator>(ITypes.DirectoryValidator).to(AddOnDirectoryValidator).inSingletonScope();
+container.bind<DirectoryValidator>(ITypes.DirectoryValidator).to(DirectoryValidator).inSingletonScope();
 
-container.bind<EnvironmentValidator>(ITypes.EnvironmentValidator).to(NodeEnvironmentValidator).inSingletonScope();
+container.bind<EnvironmentValidator>(ITypes.EnvironmentValidator).to(EnvironmentValidator).inSingletonScope();
 
-container.bind<TemplateSelector>(ITypes.TemplateSelector).to(AddOnTemplateSelector).inSingletonScope();
+container.bind<TemplateSelector>(ITypes.TemplateSelector).to(TemplateSelector).inSingletonScope();
 
 export { container as IContainer };

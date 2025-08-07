@@ -38,12 +38,13 @@ import type { StubbedInstance } from "ts-sinon";
 import { stubInterface } from "ts-sinon";
 import url from "url";
 import { AnalyticsErrorMarkers, AnalyticsSuccessMarkers } from "../../AnalyticsMarkers.js";
-import type { AddOnFactory, TemplateSelector } from "../../app/index.js";
-import { WxpAddOnFactory } from "../../app/index.js";
-import { CLIOptions } from "../../models/index.js";
-import type { DirectoryValidator, EnvironmentValidator } from "../../validators/index.js";
+import { AddOnFactory } from "../../app/AddOnFactory.js";
+import type { TemplateSelector } from "../../app/TemplateSelector.js";
+import { CLIOptions } from "../../models/CLIOptions.js";
+import type { DirectoryValidator } from "../../validators/DirectoryValidator.js";
+import type { EnvironmentValidator } from "../../validators/EnvironmentValidator.js";
 
-describe("WxpAddOnFactory", () => {
+describe("AddOnFactory", () => {
     let sandbox: SinonSandbox;
 
     let directoryValidator: StubbedInstance<DirectoryValidator>;
@@ -74,7 +75,7 @@ describe("WxpAddOnFactory", () => {
         analyticsService = stubInterface();
         analyticsService.postEvent.resolves();
 
-        addOnFactory = new WxpAddOnFactory(
+        addOnFactory = new AddOnFactory(
             directoryValidator,
             environmentValidator,
             templateSelector,

@@ -40,8 +40,10 @@ import { ITypes } from "../config/inversify.types.js";
 import { AddOnDirectory } from "../models/AddOnDirectory.js";
 import type { StartCommandOptions } from "../models/StartCommandOptions.js";
 import type { AddOnManifestReader } from "../utilities/AddOnManifestReader.js";
+import type { BuildCommandExecutor } from "./BuildCommandExecutor.js";
 import type { CommandExecutor } from "./CommandExecutor.js";
-import type { ExpressServer, SocketServer } from "./index.js";
+import type { ExpressServer } from "./ExpressServer.js";
+import type { SocketServer } from "./SocketServer.js";
 
 /**
  * Server provider.
@@ -52,11 +54,11 @@ export type ServerProvider = (sslConfig: SSLData) => Promise<Server>;
  * Start command executor.
  */
 @injectable()
-export class StartCommandExecutor implements CommandExecutor {
+export class StartCommandExecutor implements CommandExecutor<StartCommandOptions> {
     private readonly _serverProvider: ServerProvider;
     private readonly _expressServer: ExpressServer;
     private readonly _socketServer: SocketServer;
-    private readonly _buildCommandExecutor: CommandExecutor;
+    private readonly _buildCommandExecutor: BuildCommandExecutor;
     private readonly _manifestReader: AddOnManifestReader;
     private readonly _sslReader: SSLReader;
     private readonly _logger: Logger;
@@ -67,7 +69,7 @@ export class StartCommandExecutor implements CommandExecutor {
      * @param serverProvider - {@link ServerProvider} reference.
      * @param expressServer - {@link ExpressServer} reference.
      * @param socketServer - {@link SocketServer} reference.
-     * @param buildCommandExecutor - {@link CommandExecutor} reference.
+     * @param buildCommandExecutor - {@link BuildCommandExecutor} reference.
      * @param manifestReader - {@link AddOnManifestReader} reference.
      * @param sslReader - {@link SSLReader} reference.
      * @param logger - {@link Logger} reference.
@@ -78,7 +80,7 @@ export class StartCommandExecutor implements CommandExecutor {
         @inject(ITypes.SecureServer) serverProvider: ServerProvider,
         @inject(ITypes.ExpressServer) expressServer: ExpressServer,
         @inject(ITypes.SocketServer) socketServer: SocketServer,
-        @inject(ITypes.CommandExecutor) @named("build") buildCommandExecutor: CommandExecutor,
+        @inject(ITypes.CommandExecutor) @named("build") buildCommandExecutor: BuildCommandExecutor,
         @inject(ITypes.AddOnManifestReader) manifestReader: AddOnManifestReader,
         @inject(ISSLTypes.SSLReader) sslReader: SSLReader,
         @inject(ICoreTypes.Logger) logger: Logger,
@@ -102,11 +104,19 @@ export class StartCommandExecutor implements CommandExecutor {
      * @returns Promise.
      */
     async execute(options: StartCommandOptions, expressApp: Express): Promise<void> {
-        const isBuildSuccessful = await this._buildCommandExecutor.execute(options);
+        const isBuildSuccessful = await this._buildCommandExecutor.execute({
+            srcDirectory: options.srcDirectory,
+            transpiler: options.transpiler,
+            verbose: options.verbose
+        });
         if (isBuildSuccessful) {
             await this._start(options, expressApp);
         } else {
-            this._analyticsService.postEvent(AnalyticsErrorMarkers.SCRIPTS_START_COMMAND_ERROR, LOGS.buildError, false);
+            void this._analyticsService.postEvent(
+                AnalyticsErrorMarkers.SCRIPTS_START_COMMAND_ERROR,
+                LOGS.buildError,
+                false
+            );
         }
     }
 
@@ -125,7 +135,7 @@ export class StartCommandExecutor implements CommandExecutor {
                     );
                 }
             });
-            this._analyticsService.postEvent(
+            void this._analyticsService.postEvent(
                 AnalyticsErrorMarkers.SCRIPTS_START_COMMAND_ERROR,
                 LOGS.manifestValidationFailed,
                 false
@@ -172,7 +182,7 @@ export class StartCommandExecutor implements CommandExecutor {
             "--port",
             options.port
         ];
-        this._analyticsService.postEvent(
+        void this._analyticsService.postEvent(
             AnalyticsSuccessMarkers.SCRIPTS_START_COMMAND_SUCCESS,
             analyticsEventData.join(" "),
             true

@@ -22,5 +22,5 @@
  * SOFTWARE.
  ********************************************************************************/
 
-export * from "./CommandValidator.js";
+export type * from "./CommandValidator.js";
 export * from "./SetupCommandValidator.js";

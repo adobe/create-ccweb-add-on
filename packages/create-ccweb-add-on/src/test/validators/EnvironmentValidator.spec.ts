@@ -33,10 +33,9 @@ import type { StubbedInstance } from "ts-sinon";
 import { stubInterface } from "ts-sinon";
 import { AnalyticsErrorMarkers } from "../../AnalyticsMarkers.js";
 import { PROGRAM_NAME } from "../../constants.js";
-import type { EnvironmentValidator } from "../../validators/index.js";
-import { NodeEnvironmentValidator } from "../../validators/index.js";
+import { EnvironmentValidator } from "../../validators/EnvironmentValidator.js";
 
-describe("NodeEnvironmentValidator", () => {
+describe("EnvironmentValidator", () => {
     let sandbox: SinonSandbox;
 
     let cliProcess: StubbedInstance<Process>;
@@ -55,7 +54,7 @@ describe("NodeEnvironmentValidator", () => {
 
         logger = stubInterface();
 
-        validator = new NodeEnvironmentValidator(cliProcess, logger, analyticsService);
+        validator = new EnvironmentValidator(cliProcess, logger, analyticsService);
     });
 
     afterEach(() => {
@@ -66,11 +65,7 @@ describe("NodeEnvironmentValidator", () => {
         const runs = [{ version: "10.0.0" }, { version: "17.9.9" }];
         runs.forEach(({ version }) => {
             it(`should exit for lower node version: ${version}.`, async () => {
-                const validator: EnvironmentValidator = new NodeEnvironmentValidator(
-                    cliProcess,
-                    logger,
-                    analyticsService
-                );
+                const validator: EnvironmentValidator = new EnvironmentValidator(cliProcess, logger, analyticsService);
                 const processExitStub = sandbox.stub(process, "exit");
 
                 cliProcess.executeSync
@@ -116,11 +111,7 @@ describe("NodeEnvironmentValidator", () => {
         const dataList = [{ data: undefined }, { data: "" }];
         dataList.forEach(({ data }) => {
             it("should exit for no npm version.", async () => {
-                const validator: EnvironmentValidator = new NodeEnvironmentValidator(
-                    cliProcess,
-                    logger,
-                    analyticsService
-                );
+                const validator: EnvironmentValidator = new EnvironmentValidator(cliProcess, logger, analyticsService);
                 const processExitStub = sandbox.stub(process, "exit");
 
                 cliProcess.executeSync
@@ -150,11 +141,7 @@ describe("NodeEnvironmentValidator", () => {
         const runs = [{ version: "3.0.0" }, { version: "9.9.9" }];
         runs.forEach(run => {
             it(`should exit for lower npm version: ${run.version}.`, async () => {
-                const validator: EnvironmentValidator = new NodeEnvironmentValidator(
-                    cliProcess,
-                    logger,
-                    analyticsService
-                );
+                const validator: EnvironmentValidator = new EnvironmentValidator(cliProcess, logger, analyticsService);
                 const processExitStub = sandbox.stub(process, "exit");
 
                 cliProcess.executeSync

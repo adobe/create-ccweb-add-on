@@ -22,7 +22,7 @@
  * SOFTWARE.
  ********************************************************************************/
 
-import { getJSONString } from "../utilities/index.js";
+import { getJSONString } from "../utilities/Extensions.js";
 import { TemplateJson } from "./TemplateJson.js";
 
 /**

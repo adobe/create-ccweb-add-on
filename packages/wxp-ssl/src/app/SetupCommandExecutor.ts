@@ -37,7 +37,7 @@ import format from "string-template";
 import { AnalyticsErrorMarkers, AnalyticsSuccessMarkers } from "../AnalyticsMarkers.js";
 import { ITypes } from "../config/inversify.types.js";
 import type { SetupCommandOptions } from "../models/SetupCommandOptions.js";
-import { SSLRemoveOption, SSLSetupOption } from "../models/Types.js";
+import { SSLRemoveOption, SSLSetupOption } from "../models/SSLTypes.js";
 import type { CommandExecutor } from "./CommandExecutor.js";
 import type { SSLReader } from "./SSLReader.js";
 
@@ -47,7 +47,7 @@ const MAX_PROMPT_RETRIES = 3;
  * Setup command execution implementation class.
  */
 @injectable()
-export class SetupCommandExecutor implements CommandExecutor {
+export class SetupCommandExecutor implements CommandExecutor<SetupCommandOptions> {
     private readonly _preferences: Preferences;
     private readonly _sslReader: SSLReader;
     private readonly _analyticsService: AnalyticsService;
@@ -98,7 +98,7 @@ export class SetupCommandExecutor implements CommandExecutor {
         });
 
         if (!response || !response.sslSetupType) {
-            this._analyticsService.postEvent(
+            void this._analyticsService.postEvent(
                 AnalyticsErrorMarkers.ERROR_SSL_SETUP,
                 LOGS.sslSetupOptionNotSpecified,
                 false
@@ -109,14 +109,14 @@ export class SetupCommandExecutor implements CommandExecutor {
 
         if (response.sslSetupType === SSLSetupOption.Manually) {
             await this._setupSSLManually(options.hostname);
-            this._analyticsService.postEvent(
+            void this._analyticsService.postEvent(
                 AnalyticsSuccessMarkers.SUCCESSFUL_SSL_MANUAL_SETUP,
                 options.hostname,
                 true
             );
         } else {
             await this._setupSSLAutomatically(options.hostname);
-            this._analyticsService.postEvent(
+            void this._analyticsService.postEvent(
                 AnalyticsSuccessMarkers.SUCCESSFUL_SSL_AUTOMATIC_SETUP,
                 options.hostname,
                 true
@@ -199,7 +199,7 @@ export class SetupCommandExecutor implements CommandExecutor {
 
         // If no response is obtained, which indicates something has gone wrong, then exit.
         if (!response || !response.shouldRemove) {
-            this._analyticsService.postEvent(
+            void this._analyticsService.postEvent(
                 AnalyticsErrorMarkers.ERROR_SSL_REMOVE,
                 LOGS.sslRemoveOptionNotSpecified,
                 false
@@ -219,7 +219,7 @@ export class SetupCommandExecutor implements CommandExecutor {
             userPreference.ssl!.delete(options.hostname);
             this._preferences.set(userPreference);
 
-            this._analyticsService.postEvent(
+            void this._analyticsService.postEvent(
                 AnalyticsSuccessMarkers.SUCCESSFUL_SSL_MANUAL_REMOVE,
                 options.hostname,
                 true
@@ -233,7 +233,7 @@ export class SetupCommandExecutor implements CommandExecutor {
                 await devcert.removeDomain(options.hostname);
             }
 
-            this._analyticsService.postEvent(
+            void this._analyticsService.postEvent(
                 AnalyticsSuccessMarkers.SUCCESSFUL_SSL_AUTOMATIC_REMOVE,
                 options.hostname,
                 true
@@ -270,7 +270,7 @@ export class SetupCommandExecutor implements CommandExecutor {
             this._logger.error(format(LOGS.invalidPathSpecified, { asset }));
         }
 
-        this._analyticsService.postEvent(
+        void this._analyticsService.postEvent(
             AnalyticsErrorMarkers.ERROR_SSL_SETUP,
             format(LOGS.invalidPathSpecified, { asset }),
             false

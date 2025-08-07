@@ -31,7 +31,7 @@ import "mocha";
 import sinon from "sinon";
 import type { StubbedInstance } from "ts-sinon";
 import { stubInterface } from "ts-sinon";
-import { AddOnFactory } from "../../app/AddOnFactory.js";
+import type { AddOnFactory } from "../../app/AddOnFactory.js";
 import { IContainer, ITypes } from "../../config/index.js";
 import { CLIOptions } from "../../models/CLIOptions.js";
 

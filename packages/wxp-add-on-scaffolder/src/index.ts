@@ -22,7 +22,7 @@
  * SOFTWARE.
  ********************************************************************************/
 
-export * from "./app/AddOnScaffolder.js";
+export type * from "./app/AddOnScaffolder.js";
 export * from "./config/index.js";
 export * from "./constants.js";
 export * from "./models/index.js";

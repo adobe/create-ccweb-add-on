@@ -23,41 +23,32 @@
  ********************************************************************************/
 
 /**
- * Execution result.
+ * SSL setup option.
  */
-export type ExecutionResult = {
-    /**
-     * Command which was executed.
-     */
-    command: string;
-
-    /**
-     * Whether the execution is successful.
-     */
-    isSuccessful: boolean;
-
-    /**
-     * Data returned from the execution, if any.
-     */
-    data?: string;
-
-    /**
-     * Error thrown during the execution, if any.
-     */
-    error?: unknown;
-};
+export enum SSLSetupOption {
+    Automatically = "automatically",
+    Manually = "manually"
+}
 
 /**
- * Logger options.
+ * SSL remove option.
  */
-export type LoggerOptions = {
+export enum SSLRemoveOption {
+    Remove = "remove",
+    Keep = "keep"
+}
+
+/**
+ * SSL artifacts data.
+ */
+export type SSLData = {
     /**
-     * Prefix string.
+     * SSL Certificate Data.
      */
-    prefix?: string;
+    cert: string | Buffer;
 
     /**
-     * Postfix string.
+     * SSL Key Data.
      */
-    postfix?: string;
+    key: string | Buffer;
 };

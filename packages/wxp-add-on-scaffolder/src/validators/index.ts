@@ -22,5 +22,4 @@
  * SOFTWARE.
  ********************************************************************************/
 
-export * from "./AddOnTemplateValidator.js";
 export * from "./TemplateValidator.js";

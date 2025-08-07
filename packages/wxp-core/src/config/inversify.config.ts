@@ -24,8 +24,12 @@
 
 import { Container } from "inversify";
 import "reflect-metadata";
-import type { Logger, Preferences, Process } from "../utilities/index.js";
-import { CLIPreferences, CLIProcess, ConsoleLogger } from "../utilities/index.js";
+import { CLIProcess } from "../utilities/CLIProcess.js";
+import { ConsoleLogger } from "../utilities/ConsoleLogger.js";
+import type { Logger } from "../utilities/Logger.js";
+import type { Preferences } from "../utilities/Preferences.js";
+import type { Process } from "../utilities/Process.js";
+import { UserPreferences } from "../utilities/UserPreferences.js";
 import { ITypes } from "./inversify.types.js";
 
 const container: Container = new Container();
@@ -34,6 +38,6 @@ container.bind<Logger>(ITypes.Logger).to(ConsoleLogger).inTransientScope();
 
 container.bind<Process>(ITypes.Process).to(CLIProcess).inSingletonScope();
 
-container.bind<Preferences>(ITypes.Preferences).to(CLIPreferences).inSingletonScope();
+container.bind<Preferences>(ITypes.Preferences).to(UserPreferences).inSingletonScope();
 
 export { container as IContainer };

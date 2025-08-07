@@ -31,20 +31,19 @@ import isValidDomain from "is-valid-domain";
 import process from "process";
 import "reflect-metadata";
 import { AnalyticsErrorMarkers } from "../AnalyticsMarkers.js";
-import type { SetupCommandOptions } from "../models/index.js";
+import type { SetupCommandOptions } from "../models/SetupCommandOptions.js";
 import type { CommandValidator } from "./CommandValidator.js";
 
 /**
  * Setup command validator implementation class.
  */
 @injectable()
-export class SetupCommandValidator implements CommandValidator {
+export class SetupCommandValidator implements CommandValidator<SetupCommandOptions> {
     private readonly _analyticsService: AnalyticsService;
     private readonly _logger: Logger;
 
     /**
      * Instantiate {@link SetupCommandValidator}.
-     * @param accountService - {@link AccountService} reference.
      * @param analyticsService - {@link AnalyticsService} reference.
      * @param logger - {@link Logger} reference.
      * @returns Reference to a new {@link SetupCommandValidator} instance.

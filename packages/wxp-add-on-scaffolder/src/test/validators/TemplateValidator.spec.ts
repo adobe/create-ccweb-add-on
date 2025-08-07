@@ -30,8 +30,7 @@ import sinon from "sinon";
 import type { StubbedInstance } from "ts-sinon";
 import { stubInterface } from "ts-sinon";
 import { PROGRAM_NAME } from "../../constants.js";
-import type { TemplateValidator } from "../../validators/index.js";
-import { AddOnTemplateValidator } from "../../validators/index.js";
+import { TemplateValidator } from "../../validators/TemplateValidator.js";
 
 describe("AddOnTemplateValidator", () => {
     describe("validateTemplate ...", () => {
@@ -42,7 +41,7 @@ describe("AddOnTemplateValidator", () => {
         beforeEach(() => {
             sandbox = sinon.createSandbox();
             logger = stubInterface<Logger>();
-            validator = new AddOnTemplateValidator(logger);
+            validator = new TemplateValidator(logger);
         });
 
         afterEach(() => {

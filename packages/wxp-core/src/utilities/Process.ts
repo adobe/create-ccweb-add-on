@@ -23,7 +23,31 @@
  ********************************************************************************/
 
 import type { ExecSyncOptions } from "child_process";
-import type { ExecutionResult } from "../models/index.js";
+
+/**
+ * Execution result.
+ */
+export type ExecutionResult = {
+    /**
+     * Command which was executed.
+     */
+    command: string;
+
+    /**
+     * Whether the execution is successful.
+     */
+    isSuccessful: boolean;
+
+    /**
+     * Data returned from the execution, if any.
+     */
+    data?: string;
+
+    /**
+     * Error thrown during the execution, if any.
+     */
+    error?: unknown;
+};
 
 /**
  * Process interface for managing execution of commands.

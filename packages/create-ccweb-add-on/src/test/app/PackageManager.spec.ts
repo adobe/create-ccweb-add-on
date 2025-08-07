@@ -22,40 +22,32 @@
  * SOFTWARE.
  ********************************************************************************/
 
-import type { SetupCommandOptions } from "./SetupCommandOptions.js";
+import { PackageJson } from "@adobe/ccweb-add-on-core";
+import { EntrypointType } from "@adobe/ccweb-add-on-manifest";
+import { assert } from "chai";
+import "mocha";
+import { PackageManager } from "../../app/PackageManager.js";
 
-/**
- * Union of supported command options.
- */
-export type CommandOptions = SetupCommandOptions;
+describe("PackageManager", () => {
+    describe("getPackageJson", () => {
+        const runs = [{ entrypointType: EntrypointType.PANEL, addOnName: "test-app" }];
+        runs.forEach(run => {
+            it("should return package.json.", async () => {
+                const packageJson = PackageManager.getPackageJson(run.entrypointType as EntrypointType, run.addOnName);
+                const expectedPackageJson = new PackageJson({
+                    name: run.addOnName,
+                    version: "1.0.0",
+                    description: "Adobe Creative Cloud Web Add-on.",
+                    keywords: ["Adobe", "Creative Cloud Web", "Add-on", run.entrypointType],
+                    scripts: {
+                        clean: "ccweb-add-on-scripts clean",
+                        build: "ccweb-add-on-scripts build",
+                        start: "ccweb-add-on-scripts start"
+                    }
+                });
 
-/**
- * SSL setup option.
- */
-export enum SSLSetupOption {
-    Automatically = "automatically",
-    Manually = "manually"
-}
-
-/**
- * SSL remove option.
- */
-export enum SSLRemoveOption {
-    Remove = "remove",
-    Keep = "keep"
-}
-
-/**
- * SSL artifacts data.
- */
-export type SSLData = {
-    /**
-     * SSL Certificate Data.
-     */
-    cert: string | Buffer;
-
-    /**
-     * SSL Key Data.
-     */
-    key: string | Buffer;
-};
+                assert.deepEqual(packageJson, expectedPackageJson);
+            });
+        });
+    });
+});

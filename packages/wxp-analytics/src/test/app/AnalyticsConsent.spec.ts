@@ -32,13 +32,12 @@ import type { SinonSandbox } from "sinon";
 import sinon from "sinon";
 import type { StubbedInstance } from "ts-sinon";
 import { stubInterface } from "ts-sinon";
-import type { AnalyticsConsent } from "../../app/index.js";
-import { WxpAnalyticsConsent } from "../../app/index.js";
+import { AnalyticsConsent } from "../../app/AnalyticsConsent.js";
 
-describe("WxpAnalyticsConsent", () => {
+describe("AnalyticsConsent", () => {
     let sandbox: SinonSandbox;
 
-    let cliPreferences: StubbedInstance<Preferences>;
+    let preferences: StubbedInstance<Preferences>;
     let logger: StubbedInstance<Logger>;
     let analyticsConsent: AnalyticsConsent;
 
@@ -55,12 +54,12 @@ describe("WxpAnalyticsConsent", () => {
     beforeEach(() => {
         sandbox = sinon.createSandbox();
 
-        cliPreferences = stubInterface<Preferences>();
+        preferences = stubInterface<Preferences>();
 
         logger = stubInterface<Logger>();
         logger.warning.returns();
 
-        analyticsConsent = new WxpAnalyticsConsent(cliPreferences, logger);
+        analyticsConsent = new AnalyticsConsent(preferences, logger);
     });
 
     afterEach(() => {
@@ -81,7 +80,7 @@ describe("WxpAnalyticsConsent", () => {
             promptsStub.resolves({ analyticsConsent: choices[0].value });
 
             const preferenceJson = new PreferenceJson({});
-            cliPreferences.get.returns(preferenceJson);
+            preferences.get.returns(preferenceJson);
 
             const userConsent = await analyticsConsent.get();
 
@@ -114,7 +113,7 @@ describe("WxpAnalyticsConsent", () => {
             promptsStub.resolves({ analyticsConsent: choices[0].value });
 
             const preferenceJson = new PreferenceJson({ hasTelemetryConsent: true });
-            cliPreferences.get.returns(preferenceJson);
+            preferences.get.returns(preferenceJson);
 
             const userConsent = await analyticsConsent.get();
 
@@ -128,7 +127,7 @@ describe("WxpAnalyticsConsent", () => {
             promptsStub.resolves({ analyticsConsent: undefined });
 
             const preferenceJson = new PreferenceJson({});
-            cliPreferences.get.returns(preferenceJson);
+            preferences.get.returns(preferenceJson);
 
             const userConsent = await analyticsConsent.get();
 
@@ -169,14 +168,14 @@ describe("WxpAnalyticsConsent", () => {
 
         it(`should set the user's analytics consent in ${ADD_ON_PREFERENCES_FILE}.`, async () => {
             const preferenceJson = new PreferenceJson({ hasTelemetryConsent: false });
-            cliPreferences.get.returns(preferenceJson);
+            preferences.get.returns(preferenceJson);
 
-            const analyticsConsent: AnalyticsConsent = new WxpAnalyticsConsent(cliPreferences, logger);
+            const analyticsConsent: AnalyticsConsent = new AnalyticsConsent(preferences, logger);
 
             await analyticsConsent.set(true);
 
-            assert.equal(cliPreferences.set.callCount, 1);
-            assert.equal(cliPreferences.set.calledWith(new PreferenceJson({ hasTelemetryConsent: true })), true);
+            assert.equal(preferences.set.callCount, 1);
+            assert.equal(preferences.set.calledWith(new PreferenceJson({ hasTelemetryConsent: true })), true);
         });
     });
 });

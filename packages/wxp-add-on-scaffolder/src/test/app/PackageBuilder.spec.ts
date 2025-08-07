@@ -25,11 +25,10 @@
 import { PackageJson, TemplateJson } from "@adobe/ccweb-add-on-core";
 import { assert } from "chai";
 import "mocha";
-import type { PackageBuilder } from "../../app/index.js";
-import { TemplatePackageBuilder } from "../../app/index.js";
+import { PackageBuilder } from "../../app/PackageBuilder.js";
 
-describe("TemplatePackageBuilder", () => {
-    describe("build()", () => {
+describe("PackageBuilder", () => {
+    describe("build", () => {
         describe("buildDevDependencies ...", () => {
             it("should combine devDependencies from package when template does not have devDependencies.", () => {
                 const packageJsonContent = {
@@ -52,7 +51,7 @@ describe("TemplatePackageBuilder", () => {
                     ...templateJsonContent
                 };
 
-                const packageBuilder: PackageBuilder = new TemplatePackageBuilder(packageJson, templateJson);
+                const packageBuilder = new PackageBuilder(packageJson, templateJson);
                 const combinedPackageJson = packageBuilder.build();
 
                 assert.deepEqual(combinedPackageJson, new PackageJson(expectedPackageJsonContent));
@@ -79,7 +78,7 @@ describe("TemplatePackageBuilder", () => {
                     ...templateJsonContent
                 };
 
-                const packageBuilder: PackageBuilder = new TemplatePackageBuilder(packageJson, templateJson);
+                const packageBuilder = new PackageBuilder(packageJson, templateJson);
                 const combinedPackageJson = packageBuilder.build();
 
                 assert.deepEqual(combinedPackageJson, new PackageJson(expectedPackageJsonContent));
@@ -111,7 +110,7 @@ describe("TemplatePackageBuilder", () => {
                     }
                 };
 
-                const packageBuilder: PackageBuilder = new TemplatePackageBuilder(packageJson, templateJson);
+                const packageBuilder = new PackageBuilder(packageJson, templateJson);
                 const combinedPackageJson = packageBuilder.build();
 
                 assert.deepEqual(combinedPackageJson, new PackageJson(expectedPackageJsonContent));
@@ -140,7 +139,7 @@ describe("TemplatePackageBuilder", () => {
                     ...templateJsonContent
                 };
 
-                const packageBuilder: PackageBuilder = new TemplatePackageBuilder(packageJson, templateJson);
+                const packageBuilder = new PackageBuilder(packageJson, templateJson);
                 const combinedPackageJson = packageBuilder.build();
 
                 assert.deepEqual(combinedPackageJson, new PackageJson(expectedPackageJsonContent));
@@ -167,7 +166,7 @@ describe("TemplatePackageBuilder", () => {
                     ...templateJsonContent
                 };
 
-                const packageBuilder: PackageBuilder = new TemplatePackageBuilder(packageJson, templateJson);
+                const packageBuilder = new PackageBuilder(packageJson, templateJson);
                 const combinedPackageJson = packageBuilder.build();
 
                 assert.deepEqual(combinedPackageJson, new PackageJson(expectedPackageJsonContent));
@@ -199,7 +198,7 @@ describe("TemplatePackageBuilder", () => {
                     }
                 };
 
-                const packageBuilder: PackageBuilder = new TemplatePackageBuilder(packageJson, templateJson);
+                const packageBuilder = new PackageBuilder(packageJson, templateJson);
                 const combinedPackageJson = packageBuilder.build();
 
                 assert.deepEqual(combinedPackageJson, new PackageJson(expectedPackageJsonContent));
@@ -228,7 +227,7 @@ describe("TemplatePackageBuilder", () => {
                     ...templateJsonContent
                 };
 
-                const packageBuilder: PackageBuilder = new TemplatePackageBuilder(packageJson, templateJson);
+                const packageBuilder = new PackageBuilder(packageJson, templateJson);
                 const combinedPackageJson = packageBuilder.build();
 
                 assert.deepEqual(combinedPackageJson, new PackageJson(expectedPackageJsonContent));
@@ -255,7 +254,7 @@ describe("TemplatePackageBuilder", () => {
                     ...templateJsonContent
                 };
 
-                const packageBuilder: PackageBuilder = new TemplatePackageBuilder(packageJson, templateJson);
+                const packageBuilder = new PackageBuilder(packageJson, templateJson);
                 const combinedPackageJson = packageBuilder.build();
 
                 assert.deepEqual(combinedPackageJson, new PackageJson(expectedPackageJsonContent));
@@ -284,7 +283,7 @@ describe("TemplatePackageBuilder", () => {
                     scripts: { ...packageJsonContent.scripts, ...templateJsonContent.scripts }
                 };
 
-                const packageBuilder: PackageBuilder = new TemplatePackageBuilder(packageJson, templateJson);
+                const packageBuilder = new PackageBuilder(packageJson, templateJson);
                 const combinedPackageJson = packageBuilder.build();
 
                 assert.deepEqual(combinedPackageJson, new PackageJson(expectedPackageJsonContent));
@@ -322,7 +321,7 @@ describe("TemplatePackageBuilder", () => {
                     scripts: { ...packageJsonContent.scripts, ...templateJsonContent.scripts }
                 };
 
-                const packageBuilder: PackageBuilder = new TemplatePackageBuilder(packageJson, templateJson);
+                const packageBuilder = new PackageBuilder(packageJson, templateJson);
                 const combinedPackageJson = packageBuilder.build();
 
                 assert.deepEqual(combinedPackageJson, new PackageJson(expectedPackageJsonContent));

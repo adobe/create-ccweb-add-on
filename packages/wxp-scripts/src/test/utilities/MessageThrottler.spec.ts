@@ -27,36 +27,35 @@ import { assert } from "chai";
 import "mocha";
 import type { StubbedInstance } from "ts-sinon";
 import { stubInterface } from "ts-sinon";
-import type { EntityTracker } from "../../utilities/index.js";
-import { FileChangeTracker } from "../../utilities/index.js";
+import { FileChangeTracker } from "../../utilities/FileChangeTracker.js";
 
 describe("FileChangeTracker", () => {
     describe("registerAction and track ...", () => {
         let logger: StubbedInstance<Logger>;
-        let entityTracker: EntityTracker;
+        let fileChangeTracker: FileChangeTracker;
 
         beforeEach(() => {
             logger = stubInterface<Logger>();
             logger.information.returns();
 
-            entityTracker = new FileChangeTracker();
+            fileChangeTracker = new FileChangeTracker();
         });
 
         it("should do nothing when no action is registered and a message is received.", async () => {
-            entityTracker.track("message1", "hello world!");
+            fileChangeTracker.track("message1", "hello world!");
 
-            await sleep(entityTracker.throttleTime);
+            await sleep(fileChangeTracker.throttleTime);
             assert.equal(logger.information.callCount, 0);
         });
 
         it("should trigger registered action when a message is received.", async () => {
-            entityTracker.registerAction(message => logger.information(`${message[0]} | Size: ${message[1].size}`));
+            fileChangeTracker.registerAction(message => logger.information(`${message[0]} | Size: ${message[1].size}`));
 
             const id = "message1";
             const message = "hello world!";
-            entityTracker.track(id, message);
+            fileChangeTracker.track(id, message);
 
-            await sleep(entityTracker.throttleTime);
+            await sleep(fileChangeTracker.throttleTime);
             assert.equal(logger.information.callCount, 1);
             assert.equal(logger.information.calledWith(`${id} | Size: 1`), true);
         });

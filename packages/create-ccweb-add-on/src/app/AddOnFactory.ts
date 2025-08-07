@@ -22,15 +22,175 @@
  * SOFTWARE.
  ********************************************************************************/
 
+import type { AnalyticsService } from "@adobe/ccweb-add-on-analytics";
+import { ITypes as IAnalyticsTypes } from "@adobe/ccweb-add-on-analytics";
+import type { Logger, Process } from "@adobe/ccweb-add-on-core";
+import { ITypes as ICoreTypes } from "@adobe/ccweb-add-on-core";
+import type { AddOnScaffolder } from "@adobe/ccweb-add-on-scaffolder";
+import { ITypes as IScaffolderTypes, PACKAGE_JSON, ScaffolderOptions } from "@adobe/ccweb-add-on-scaffolder";
+import fs from "fs-extra";
+import { inject, injectable } from "inversify";
+import os from "os";
+import path from "path";
+import process from "process";
+import "reflect-metadata";
+import format from "string-template";
+import url from "url";
+import { AnalyticsErrorMarkers, AnalyticsSuccessMarkers } from "../AnalyticsMarkers.js";
+import { ITypes } from "../config/inversify.types.js";
+import { TEMP_TEMPLATE_PATH } from "../constants.js";
 import type { CLIOptions } from "../models/CLIOptions.js";
+import { DirectoryValidator } from "../validators/DirectoryValidator.js";
+import { EnvironmentValidator } from "../validators/EnvironmentValidator.js";
+import { PackageManager } from "./PackageManager.js";
+import { TemplateSelector } from "./TemplateSelector.js";
 
 /**
- * Factory interface for creating the Add-on project.
+ * AddOn factory implementation class.
  */
-export interface AddOnFactory {
+@injectable()
+export class AddOnFactory {
+    private readonly _directoryValidator: DirectoryValidator;
+    private readonly _environmentValidator: EnvironmentValidator;
+    private readonly _templateSelector: TemplateSelector;
+
+    private readonly _scaffolder: AddOnScaffolder;
+
+    private readonly _process: Process;
+    private readonly _logger: Logger;
+
+    private readonly _analyticsService: AnalyticsService;
+
     /**
-     * Create the Add-on.
+     * Instantiate {@link AddOnFactory}.
+     * @param directoryValidator - {@link DirectoryValidator} reference.
+     * @param environmentValidator - {@link EnvironmentValidator} reference.
+     * @param templateSelector - {@link TemplateSelector} reference.
+     * @param scaffolder - {@link AddOnScaffolder} reference.
+     * @param cliProcess - {@link Process} reference.
+     * @param logger - {@link Logger} reference.
+     * @param analyticsService - {@link AnalyticsService} reference.
+     * @returns Reference to a new {@link AddOnFactory} instance.
+     */
+    constructor(
+        @inject(ITypes.DirectoryValidator) directoryValidator: DirectoryValidator,
+        @inject(ITypes.EnvironmentValidator) environmentValidator: EnvironmentValidator,
+        @inject(ITypes.TemplateSelector) templateSelector: TemplateSelector,
+        @inject(IScaffolderTypes.AddOnScaffolder) scaffolder: AddOnScaffolder,
+        @inject(ICoreTypes.Process) cliProcess: Process,
+        @inject(ICoreTypes.Logger) logger: Logger,
+        @inject(IAnalyticsTypes.AnalyticsService) analyticsService: AnalyticsService
+    ) {
+        this._directoryValidator = directoryValidator;
+        this._environmentValidator = environmentValidator;
+        this._templateSelector = templateSelector;
+
+        this._scaffolder = scaffolder;
+
+        this._process = cliProcess;
+        this._logger = logger;
+
+        this._analyticsService = analyticsService;
+    }
+
+    /**
+     * Create the Add-on project.
      * @param options - {@link CLIOptions}.
      */
-    create(options: CLIOptions): Promise<void>;
+    async create(options: CLIOptions): Promise<void> {
+        let addOnDirectory = "";
+
+        try {
+            await this._environmentValidator.validateNodeVersion();
+            await this._environmentValidator.validateNpmVersion();
+            await this._environmentValidator.validateNpmConfiguration();
+
+            await this._directoryValidator.validateAddOnName(options.addOnName);
+            addOnDirectory = path.resolve(options.addOnName);
+            await this._directoryValidator.validateAddOnDirectory(addOnDirectory, options.addOnName);
+
+            this._logger.information(LOGS.creatingAddOn);
+            this._logger.message(LOGS.mayTakeAMinute);
+
+            const templateName = await this._templateSelector.setupTemplate(options);
+
+            const packageJson = PackageManager.getPackageJson(options.entrypointType, options.addOnName);
+            const packageJsonPath = path.join(addOnDirectory, PACKAGE_JSON);
+
+            fs.writeFileSync(packageJsonPath, packageJson.toJSON() + os.EOL);
+
+            this._copyTemplateFiles(addOnDirectory, templateName);
+
+            const rootDirectory = process.cwd();
+            process.chdir(addOnDirectory);
+
+            const devDependencyArgs = [
+                "install",
+                "--save-dev",
+                "@adobe/ccweb-add-on-scripts",
+                "@types/adobe__ccweb-add-on-sdk"
+            ];
+
+            if (options.verbose) {
+                devDependencyArgs.push("--verbose");
+            }
+
+            this._logger.information(LOGS.installingDevDependencies, { prefix: LOGS.newLine });
+            await this._process.execute("npm", devDependencyArgs, { stdio: "inherit" });
+
+            const scaffolderOptions = new ScaffolderOptions(
+                addOnDirectory,
+                options.addOnName,
+                options.entrypointType,
+                rootDirectory,
+                templateName,
+                options.verbose
+            );
+
+            this._logger.information(format(LOGS.scaffoldingProjectFromTemplate, { templateName }), {
+                prefix: LOGS.newLine
+            });
+
+            await this._scaffolder.run(scaffolderOptions);
+
+            const analyticsEventData = [
+                "--addOnName",
+                options.addOnName,
+                "--entrypointType",
+                options.entrypointType,
+                "--template",
+                templateName
+            ];
+            await this._analyticsService.postEvent(AnalyticsSuccessMarkers.SUCCESS, analyticsEventData.join(" "), true);
+        } catch (error) {
+            this._process.handleError(error);
+            this._process.removeAddOn(addOnDirectory, options.addOnName);
+            await this._analyticsService.postEvent(AnalyticsErrorMarkers.ERROR_UNKNOWN_REASON, error.message, false);
+
+            return process.exit(0);
+        }
+    }
+
+    private _copyTemplateFiles(addOnDirectory: string, templateName: string) {
+        const targetPath = path.join(addOnDirectory, TEMP_TEMPLATE_PATH);
+        fs.ensureDirSync(targetPath);
+
+        const templateDirectory = path.join(url.fileURLToPath(import.meta.url), "..", "..", "templates", templateName);
+
+        if (fs.existsSync(templateDirectory)) {
+            fs.copySync(templateDirectory, targetPath);
+        } else {
+            this._logger.error(LOGS.templateNotFound);
+            process.exit(1);
+        }
+    }
 }
+
+const LOGS = {
+    newLine: "\n",
+    creatingAddOn: "Creating a new Add-on ...",
+    mayTakeAMinute: "This may take a minute ...",
+    installingDevDependencies: "Installing dev dependencies ...",
+    scaffoldingProjectFromTemplate: "Scaffolding project from template: {templateName} ...",
+    templateNotFound: "Could not find the artifacts for the selected template."
+};

@@ -38,7 +38,7 @@ import { PackageCommandOptions } from "../models/PackageCommandOptions.js";
  * Package Command's implementation class.
  */
 export class Package extends BaseCommand {
-    private readonly _commandExecutor: CommandExecutor;
+    private readonly _commandExecutor: CommandExecutor<PackageCommandOptions>;
 
     static description = "Create a production build for the add-on and package it into a zip.";
 
@@ -69,7 +69,10 @@ export class Package extends BaseCommand {
     constructor(argv: string[], config: Config) {
         super(argv, config, new CLIProgram(PROGRAM_NAME, config.name + "@" + config.version));
 
-        this._commandExecutor = IContainer.getNamed<CommandExecutor>(ITypes.CommandExecutor, "package");
+        this._commandExecutor = IContainer.getNamed<CommandExecutor<PackageCommandOptions>>(
+            ITypes.CommandExecutor,
+            "package"
+        );
     }
 
     async run(): Promise<void> {
@@ -90,7 +93,11 @@ export class Package extends BaseCommand {
     }
 
     async catch(error: { message: string }): Promise<void> {
-        this._analyticsService.postEvent(AnalyticsErrorMarkers.SCRIPTS_PACKAGE_COMMAND_ERROR, error.message, false);
+        void this._analyticsService.postEvent(
+            AnalyticsErrorMarkers.SCRIPTS_PACKAGE_COMMAND_ERROR,
+            error.message,
+            false
+        );
         throw error;
     }
 }

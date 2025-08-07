@@ -22,7 +22,7 @@
  * SOFTWARE.
  ********************************************************************************/
 
-import type { PreferenceJson } from "../models/index.js";
+import type { PreferenceJson } from "../models/PreferenceJson.js";
 
 /**
  * Preferences interface for managing preferences.

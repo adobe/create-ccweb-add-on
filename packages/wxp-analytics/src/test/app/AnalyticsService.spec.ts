@@ -32,15 +32,14 @@ import type { SinonSandbox } from "sinon";
 import sinon from "sinon";
 import type { StubbedInstance } from "ts-sinon";
 import { stubInterface } from "ts-sinon";
-import type { AnalyticsService } from "../../app/AnalyticsService.js";
-import { WxpAnalyticsService } from "../../app/WxpAnalyticsService.js";
+import { AnalyticsService } from "../../app/AnalyticsService.js";
 import { ANALYTICS_API } from "../../constants.js";
 import { CLIProgram } from "../../models/CLIProgram.js";
 
-describe("WxpAnalyticsService", () => {
+describe("AnalyticsService", () => {
     let sandbox: SinonSandbox;
 
-    let cliPreferences: StubbedInstance<Preferences>;
+    let preferences: StubbedInstance<Preferences>;
     let analyticsService: AnalyticsService;
 
     const program = new CLIProgram("test-program", "1.0.0");
@@ -48,8 +47,8 @@ describe("WxpAnalyticsService", () => {
     beforeEach(() => {
         sandbox = sinon.createSandbox();
 
-        cliPreferences = stubInterface<Preferences>();
-        analyticsService = new WxpAnalyticsService(cliPreferences);
+        preferences = stubInterface<Preferences>();
+        analyticsService = new AnalyticsService(preferences);
     });
 
     afterEach(() => {
@@ -64,7 +63,7 @@ describe("WxpAnalyticsService", () => {
             const clientId = 10001;
             const preferenceJSON = new PreferenceJson({ clientId, hasTelemetryConsent: true });
 
-            cliPreferences.get.returns(preferenceJSON);
+            preferences.get.returns(preferenceJSON);
 
             sandbox.stub(Math, "random").returns(0.3);
 
@@ -95,7 +94,7 @@ describe("WxpAnalyticsService", () => {
 
             await analyticsService.postEvent(eventType, eventData, true);
 
-            assert.equal(cliPreferences.set.callCount, 0);
+            assert.equal(preferences.set.callCount, 0);
             assert.equal(
                 axiosPostStub.calledOnceWith(ANALYTICS_API.URL, expectedApiRequestBody, {
                     headers: ANALYTICS_API.HEADERS
@@ -113,7 +112,7 @@ describe("WxpAnalyticsService", () => {
                 const clientId = 10001;
                 const preferenceJSON = new PreferenceJson({ clientId, hasTelemetryConsent });
 
-                cliPreferences.get.returns(preferenceJSON);
+                preferences.get.returns(preferenceJSON);
 
                 sandbox.stub(Math, "random").returns(0.3);
 
@@ -137,8 +136,8 @@ describe("WxpAnalyticsService", () => {
 
             const preferenceJSON = new PreferenceJson({ hasTelemetryConsent: true });
 
-            cliPreferences.get.returns(preferenceJSON);
-            cliPreferences.set.returns();
+            preferences.get.returns(preferenceJSON);
+            preferences.set.returns();
 
             sandbox.stub(Math, "random").returns(0.3);
 
@@ -155,7 +154,7 @@ describe("WxpAnalyticsService", () => {
 
             preferenceJSON.clientId = Math.floor(Date.now() * Math.random());
 
-            assert.equal(cliPreferences.set.calledOnceWith(preferenceJSON), true);
+            assert.equal(preferences.set.calledOnceWith(preferenceJSON), true);
             assert.equal(axiosPostStub.callCount, 1);
         });
     });

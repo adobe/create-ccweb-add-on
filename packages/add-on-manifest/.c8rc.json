@@ -2,6 +2,10 @@
     "all": true,
     "include": ["src/**/*.ts"],
     "exclude": ["src/**/*.spec.ts", "src/test/**/*", "src/**/*Types.ts", "src/**/index.ts"],
+    "lines": 100,
+    "functions": 100,
+    "branches": 100,
+    "statements": 100,
     "reporter": ["html", "text", "text-summary"],
     "report-dir": "coverage"
 }
