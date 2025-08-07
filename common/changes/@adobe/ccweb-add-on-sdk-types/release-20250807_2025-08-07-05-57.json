@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-sdk-types",
+      "comment": "AdditionalRedirectParams in OAuth's AuthorizeRequest",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-sdk-types"
+}

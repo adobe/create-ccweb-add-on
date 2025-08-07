@@ -349,6 +349,12 @@ export declare type AuthorizationRequest = {
      * are required in the Authorization URL as query string parameters.
      */
     additionalParameters?: Map<string, string>;
+    /**
+     * Additional parameters, specific to an OAuth provider which
+     * are required in the Redirect URL as query string parameters.
+     * Not applicable for {@link AuthorizeWithOwnRedirectRequest}
+     */
+    additionalRedirectParameters?: Map<string, string>;
 };
 
 /**
@@ -2066,4 +2072,5 @@ export declare enum VideoResolution {
     custom = "custom"
 }
 
-export {};
+export { };
+
