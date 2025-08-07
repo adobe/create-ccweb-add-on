@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-core",
+      "comment": "General improvements",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-core"
+}
