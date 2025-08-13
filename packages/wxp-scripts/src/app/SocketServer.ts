@@ -144,7 +144,6 @@ export class SocketServer {
             const manifestJsonPath = path.join(addOnDirectory.srcDirName, MANIFEST_JSON);
             const hasManifestChanged = changedFiles.has(manifestJsonPath);
 
-            /* c8 ignore start */
             let isBuildSuccessful = true;
             if (!isNullOrWhiteSpace(options.transpiler)) {
                 isBuildSuccessful = await this._scriptManager.transpile(options.transpiler);
@@ -154,7 +153,6 @@ export class SocketServer {
 
             // If the manifest has not changed, get its value from the cache, else read it from file.
             const addOnManifest = this._manifestReader.getManifest(this._onValidationFailed, !hasManifestChanged);
-            /* c8 ignore stop */
 
             if (isBuildSuccessful && addOnManifest !== undefined) {
                 this._logger.success(LOGS.done, { postfix: LOGS.newLine });

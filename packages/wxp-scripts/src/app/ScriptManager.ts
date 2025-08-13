@@ -77,7 +77,6 @@ export class ScriptManager {
         return result.isSuccessful;
     }
 
-    /* c8 ignore start */
     /**
      * Copy static files.
      * @param sourceDirectory - Directory containing static files.
@@ -89,5 +88,4 @@ export class ScriptManager {
             filter: src => !EXTENSIONS_TO_TRANSPILE.has(path.extname(src))
         });
     }
-    /* c8 ignore stop */
 }

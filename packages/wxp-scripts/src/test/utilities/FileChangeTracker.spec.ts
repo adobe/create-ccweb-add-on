@@ -30,7 +30,7 @@ import { stubInterface } from "ts-sinon";
 import { FileChangeTracker } from "../../utilities/FileChangeTracker.js";
 
 describe("FileChangeTracker", () => {
-    describe("registerAction and track ...", () => {
+    describe("registerAction and track", () => {
         let logger: StubbedInstance<Logger>;
         let fileChangeTracker: FileChangeTracker;
 

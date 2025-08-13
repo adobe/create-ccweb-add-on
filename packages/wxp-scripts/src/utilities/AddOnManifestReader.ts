@@ -45,7 +45,7 @@ export class AddOnManifestReader {
      * @returns Add-on manifest represented as {@link AddOnManifest}.
      */
     getManifest(
-        handleValidationFailed: (_failedResult: ManifestValidationResult) => void,
+        handleValidationFailed?: (_failedResult: ManifestValidationResult) => void,
         fromCache = true
     ): AddOnManifest | undefined {
         if (fromCache && this._addOnManifest !== undefined) {
@@ -54,7 +54,7 @@ export class AddOnManifestReader {
 
         const distPath = path.resolve(DEFAULT_OUTPUT_DIRECTORY);
         if (!fs.existsSync(distPath) || !fs.lstatSync(distPath).isDirectory()) {
-            handleValidationFailed({
+            handleValidationFailed?.({
                 success: false,
                 errorDetails: [
                     { message: `Could not find the ${DEFAULT_OUTPUT_DIRECTORY} directory.` },
@@ -68,7 +68,7 @@ export class AddOnManifestReader {
 
         const manifestPath = path.resolve(path.join(DEFAULT_OUTPUT_DIRECTORY, MANIFEST_JSON));
         if (!fs.existsSync(manifestPath) || !fs.lstatSync(manifestPath).isFile()) {
-            handleValidationFailed({
+            handleValidationFailed?.({
                 success: false,
                 errorDetails: [{ message: `Could not find ${MANIFEST_JSON} in ${DEFAULT_OUTPUT_DIRECTORY}.` }]
             });
@@ -79,7 +79,7 @@ export class AddOnManifestReader {
 
         const manifestString = fs.readFileSync(manifestPath, "utf8");
         if (isNullOrWhiteSpace(manifestString)) {
-            handleValidationFailed({
+            handleValidationFailed?.({
                 success: false,
                 errorDetails: [{ message: `${MANIFEST_JSON} is empty.` }]
             });
@@ -92,7 +92,7 @@ export class AddOnManifestReader {
         try {
             parsedManifest = JSON.parse(manifestString);
         } catch (error) {
-            handleValidationFailed({
+            handleValidationFailed?.({
                 success: false,
                 errorDetails: [{ message: `JSON format error in ${MANIFEST_JSON}` }]
             });
@@ -107,7 +107,7 @@ export class AddOnManifestReader {
         });
 
         if (!manifestValidationResult.success) {
-            handleValidationFailed(manifestValidationResult);
+            handleValidationFailed?.(manifestValidationResult);
 
             this._addOnManifest = undefined;
             return undefined;
@@ -131,7 +131,7 @@ export class AddOnManifestReader {
             }
         });
         if (errorDetails.length > 0) {
-            handleValidationFailed({
+            handleValidationFailed?.({
                 success: false,
                 errorDetails
             });

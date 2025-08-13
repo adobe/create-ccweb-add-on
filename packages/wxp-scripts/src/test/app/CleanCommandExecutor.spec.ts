@@ -59,7 +59,7 @@ describe("CleanCommandExecutor", () => {
         sandbox.restore();
     });
 
-    describe("execute ...", () => {
+    describe("execute", () => {
         it("should clean destination directory when 'clean' script is run.", async () => {
             scriptManager.cleanDirectory.withArgs(DEFAULT_OUTPUT_DIRECTORY).resolves();
 

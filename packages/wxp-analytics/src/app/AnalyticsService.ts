@@ -22,8 +22,7 @@
  * SOFTWARE.
  ********************************************************************************/
 
-import type { Preferences } from "@adobe/ccweb-add-on-core";
-import { ITypes as ICoreTypes } from "@adobe/ccweb-add-on-core";
+import { ITypes as ICoreTypes, UserPreferences } from "@adobe/ccweb-add-on-core";
 import axios from "axios";
 import { inject, injectable } from "inversify";
 import osName from "os-name";
@@ -36,7 +35,7 @@ import { CLIProgram } from "../models/CLIProgram.js";
  */
 @injectable()
 export class AnalyticsService {
-    private readonly _preferences: Preferences;
+    private readonly _preferences: UserPreferences;
 
     private _program: CLIProgram;
 
@@ -44,10 +43,10 @@ export class AnalyticsService {
 
     /**
      * Instantiate {@link AnalyticsService}.
-     * @param preferences - {@link Preferences} reference.
+     * @param preferences - {@link UserPreferences} reference.
      * @returns Reference to a new {@link AnalyticsService} instance.
      */
-    constructor(@inject(ICoreTypes.Preferences) preferences: Preferences) {
+    constructor(@inject(ICoreTypes.UserPreferences) preferences: UserPreferences) {
         this._preferences = preferences;
 
         this._program = new CLIProgram("", "");

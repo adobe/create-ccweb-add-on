@@ -4,7 +4,7 @@
     "exclude": [
         "src/**/*.spec.ts",
         "src/**/index.ts",
-        "src/config/*",
+        "src/config/*.ts",
         "src/constants.ts",
         "src/app/CommandExecutor.ts",
         "src/validators/CommandValidator.ts",

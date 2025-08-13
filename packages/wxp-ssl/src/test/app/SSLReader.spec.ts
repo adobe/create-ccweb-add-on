@@ -22,7 +22,7 @@
  * SOFTWARE.
  ********************************************************************************/
 
-import type { Logger, Preferences } from "@adobe/ccweb-add-on-core";
+import type { Logger, UserPreferences } from "@adobe/ccweb-add-on-core";
 import { ADD_ON_PREFERENCES_FILE, PreferenceJson } from "@adobe/ccweb-add-on-core";
 import devcert from "@adobe/ccweb-add-on-devcert";
 import chai, { assert, expect } from "chai";
@@ -40,7 +40,7 @@ chai.use(chaiAsPromised);
 describe("SSLReader", () => {
     let sandbox: sinon.SinonSandbox;
 
-    let preferences: StubbedInstance<Preferences>;
+    let preferences: StubbedInstance<UserPreferences>;
     let logger: StubbedInstance<Logger>;
     let sslReader: SSLReader;
 

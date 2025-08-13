@@ -23,7 +23,8 @@
  ********************************************************************************/
 
 import type { AnalyticsService } from "@adobe/ccweb-add-on-analytics";
-import { PreferenceJson, type Logger, type Preferences } from "@adobe/ccweb-add-on-core";
+import type { Logger, UserPreferences } from "@adobe/ccweb-add-on-core";
+import { PreferenceJson } from "@adobe/ccweb-add-on-core";
 import devcert from "@adobe/ccweb-add-on-devcert";
 import { assert } from "chai";
 import chalk from "chalk";
@@ -44,7 +45,7 @@ describe("PurgeCommandExecutor", () => {
     describe("execute", () => {
         let sandbox: SinonSandbox;
 
-        let preferences: StubbedInstance<Preferences>;
+        let preferences: StubbedInstance<UserPreferences>;
         let analyticsService: StubbedInstance<AnalyticsService>;
         let logger: StubbedInstance<Logger>;
 

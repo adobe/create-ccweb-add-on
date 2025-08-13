@@ -22,7 +22,7 @@
  * SOFTWARE.
  ********************************************************************************/
 
-import type { Logger, Preferences } from "@adobe/ccweb-add-on-core";
+import type { Logger, UserPreferences } from "@adobe/ccweb-add-on-core";
 import { ADD_ON_PREFERENCES_FILE, PreferenceJson } from "@adobe/ccweb-add-on-core";
 import { assert } from "chai";
 import chalk from "chalk";
@@ -37,7 +37,7 @@ import { AnalyticsConsent } from "../../app/AnalyticsConsent.js";
 describe("AnalyticsConsent", () => {
     let sandbox: SinonSandbox;
 
-    let preferences: StubbedInstance<Preferences>;
+    let preferences: StubbedInstance<UserPreferences>;
     let logger: StubbedInstance<Logger>;
     let analyticsConsent: AnalyticsConsent;
 
@@ -54,7 +54,7 @@ describe("AnalyticsConsent", () => {
     beforeEach(() => {
         sandbox = sinon.createSandbox();
 
-        preferences = stubInterface<Preferences>();
+        preferences = stubInterface<UserPreferences>();
 
         logger = stubInterface<Logger>();
         logger.warning.returns();

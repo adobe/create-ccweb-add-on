@@ -23,7 +23,7 @@
  ********************************************************************************/
 
 import type { AnalyticsService } from "@adobe/ccweb-add-on-analytics";
-import type { Logger, Preferences } from "@adobe/ccweb-add-on-core";
+import type { Logger, UserPreferences } from "@adobe/ccweb-add-on-core";
 import { ADD_ON_PREFERENCES_FILE, PreferenceJson } from "@adobe/ccweb-add-on-core";
 import devcert from "@adobe/ccweb-add-on-devcert";
 import chai, { assert, expect } from "chai";
@@ -52,7 +52,7 @@ chai.use(chaiAsPromised);
 describe("SetupCommandExecutor", () => {
     let sandbox: SinonSandbox;
 
-    let preferences: StubbedInstance<Preferences>;
+    let preferences: StubbedInstance<UserPreferences>;
     let sslReader: StubbedInstance<SSLReader>;
     let analyticsService: StubbedInstance<AnalyticsService>;
     let logger: StubbedInstance<Logger>;

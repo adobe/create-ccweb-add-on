@@ -22,8 +22,8 @@
  * SOFTWARE.
  ********************************************************************************/
 
-import type { Logger, Preferences } from "@adobe/ccweb-add-on-core";
-import { ITypes as ICoreTypes } from "@adobe/ccweb-add-on-core";
+import type { Logger } from "@adobe/ccweb-add-on-core";
+import { ITypes as ICoreTypes, UserPreferences } from "@adobe/ccweb-add-on-core";
 import chalk from "chalk";
 import { inject, injectable } from "inversify";
 import prompts from "prompts";
@@ -35,16 +35,19 @@ import "reflect-metadata";
  */
 @injectable()
 export class AnalyticsConsent {
-    private readonly _preferences: Preferences;
+    private readonly _preferences: UserPreferences;
     private readonly _logger: Logger;
 
     /**
      * Instantiate {@link AnalyticsConsent}.
-     * @param preferences - {@link Preferences} reference.
+     * @param preferences - {@link UserPreferences} reference.
      * @param logger - {@link Logger} reference.
      * @returns Reference to a new {@link AnalyticsConsent} instance.
      */
-    constructor(@inject(ICoreTypes.Preferences) preferences: Preferences, @inject(ICoreTypes.Logger) logger: Logger) {
+    constructor(
+        @inject(ICoreTypes.UserPreferences) preferences: UserPreferences,
+        @inject(ICoreTypes.Logger) logger: Logger
+    ) {
         this._preferences = preferences;
         this._logger = logger;
     }

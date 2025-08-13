@@ -27,7 +27,6 @@ import "reflect-metadata";
 import { CLIProcess } from "../utilities/CLIProcess.js";
 import { ConsoleLogger } from "../utilities/ConsoleLogger.js";
 import type { Logger } from "../utilities/Logger.js";
-import type { Preferences } from "../utilities/Preferences.js";
 import type { Process } from "../utilities/Process.js";
 import { UserPreferences } from "../utilities/UserPreferences.js";
 import { ITypes } from "./inversify.types.js";
@@ -38,6 +37,6 @@ container.bind<Logger>(ITypes.Logger).to(ConsoleLogger).inTransientScope();
 
 container.bind<Process>(ITypes.Process).to(CLIProcess).inSingletonScope();
 
-container.bind<Preferences>(ITypes.Preferences).to(UserPreferences).inSingletonScope();
+container.bind<UserPreferences>(ITypes.UserPreferences).to(UserPreferences).inSingletonScope();
 
 export { container as IContainer };

@@ -65,11 +65,9 @@ export class AddOnDirectory {
         this.srcDirName = srcDirName;
         this.manifest = manifest;
 
-        /* c8 ignore start */
         const currentDirectory = process.cwd();
         this.rootDirName = path.basename(currentDirectory);
         this.rootDirPath = path.isAbsolute(srcDirName) ? path.resolve(srcDirName, "..") : currentDirectory;
         this.srcDirPath = path.join(this.rootDirPath, this.srcDirName);
-        /* c8 ignore stop */
     }
 }

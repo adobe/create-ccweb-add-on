@@ -58,7 +58,6 @@ export class ExpressServer {
         this._logger = logger;
     }
 
-    /* c8 ignore start */
     /**
      * Start the HTTP server.
      * @param addOnDirectory - {@link AddOnDirectory} Add-on directory information on which the script is executed.
@@ -68,9 +67,7 @@ export class ExpressServer {
      */
     start(addOnDirectory: AddOnDirectory, server: Server, expressApp: Express, options: StartCommandOptions): void {
         expressApp.get(["/"], (request, response) => {
-            const manifest = this._manifestReader.getManifest(() => {
-                return;
-            }, false);
+            const manifest = this._manifestReader.getManifest(undefined, false);
             const baseUrl = getBaseUrl(HTTPS, request.headers.host ?? `${request.hostname}:${options.port}`);
             const addOns = AddOnResourceUtils.getAddOnListingData(manifest!, addOnDirectory, baseUrl);
             response.set("Content-Type", "application/json");
@@ -78,9 +75,7 @@ export class ExpressServer {
         });
 
         expressApp.get(`/${addOnDirectory.manifest.manifestProperties.testId as string}`, (request, response) => {
-            const manifest = this._manifestReader.getManifest(() => {
-                return;
-            }, false);
+            const manifest = this._manifestReader.getManifest(undefined, false);
             let resources: string[] = [];
             try {
                 const baseUrl = getBaseUrl(HTTPS, request.headers.host ?? `${request.hostname}:${options.port}`);
@@ -105,7 +100,6 @@ export class ExpressServer {
 
         server.listen(options.port, options.hostname);
     }
-    /* c8 ignore stop */
 }
 
 const LOGS = {

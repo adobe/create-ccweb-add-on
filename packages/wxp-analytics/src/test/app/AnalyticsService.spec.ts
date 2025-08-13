@@ -22,7 +22,7 @@
  * SOFTWARE.
  ********************************************************************************/
 
-import type { Preferences } from "@adobe/ccweb-add-on-core";
+import type { UserPreferences } from "@adobe/ccweb-add-on-core";
 import { PreferenceJson } from "@adobe/ccweb-add-on-core";
 import axios from "axios";
 import { assert } from "chai";
@@ -39,7 +39,7 @@ import { CLIProgram } from "../../models/CLIProgram.js";
 describe("AnalyticsService", () => {
     let sandbox: SinonSandbox;
 
-    let preferences: StubbedInstance<Preferences>;
+    let preferences: StubbedInstance<UserPreferences>;
     let analyticsService: AnalyticsService;
 
     const program = new CLIProgram("test-program", "1.0.0");
@@ -47,7 +47,7 @@ describe("AnalyticsService", () => {
     beforeEach(() => {
         sandbox = sinon.createSandbox();
 
-        preferences = stubInterface<Preferences>();
+        preferences = stubInterface<UserPreferences>();
         analyticsService = new AnalyticsService(preferences);
     });
 

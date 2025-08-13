@@ -22,8 +22,8 @@
  * SOFTWARE.
  ********************************************************************************/
 
-import type { Logger, Preferences, SSLSettings } from "@adobe/ccweb-add-on-core";
-import { ITypes as ICoreTypes, isFile } from "@adobe/ccweb-add-on-core";
+import type { Logger, SSLSettings } from "@adobe/ccweb-add-on-core";
+import { ITypes as ICoreTypes, isFile, UserPreferences } from "@adobe/ccweb-add-on-core";
 import devcert from "@adobe/ccweb-add-on-devcert";
 import fs from "fs-extra";
 import { inject, injectable } from "inversify";
@@ -36,16 +36,19 @@ import type { SSLData } from "../models/SSLTypes.js";
  */
 @injectable()
 export class SSLReader {
-    private readonly _preferences: Preferences;
+    private readonly _preferences: UserPreferences;
     private readonly _logger: Logger;
 
     /**
      * Instantiate {@link SSLReader}.
-     * @param Preferences - {@link Preferences} reference.
+     * @param Preferences - {@link UserPreferences} reference.
      * @param logger - {@link Logger} reference.
      * @returns Reference to a new {@link SSLReader} instance.
      */
-    constructor(@inject(ICoreTypes.Preferences) preferences: Preferences, @inject(ICoreTypes.Logger) logger: Logger) {
+    constructor(
+        @inject(ICoreTypes.UserPreferences) preferences: UserPreferences,
+        @inject(ICoreTypes.Logger) logger: Logger
+    ) {
         this._preferences = preferences;
         this._logger = logger;
     }

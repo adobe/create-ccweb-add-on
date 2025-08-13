@@ -31,13 +31,12 @@ import path from "path";
 import "reflect-metadata";
 import { ADD_ON_PREFERENCES_FILE, CCWEB_ADDON_DIRECTORY } from "../constants.js";
 import { PreferenceJson } from "../models/PreferenceJson.js";
-import type { Preferences } from "./Preferences.js";
 
 /**
  * Implementation class for configuring CCWeb Add-on CLI related preferences.
  */
 @injectable()
-export class UserPreferences implements Preferences {
+export class UserPreferences {
     private _cachedPreference?: PreferenceJson;
 
     /**

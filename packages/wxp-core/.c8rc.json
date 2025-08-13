@@ -8,7 +8,6 @@
         "src/constants.ts",
         "src/models/AddOnListingData.ts",
         "src/utilities/Logger.ts",
-        "src/utilities/Preferences.ts",
         "src/utilities/Process.ts",
         "**/*.d.ts"
     ],

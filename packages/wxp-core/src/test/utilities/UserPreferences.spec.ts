@@ -32,12 +32,11 @@ import type { SinonSandbox } from "sinon";
 import sinon from "sinon";
 import { ADD_ON_PREFERENCES_FILE, CCWEB_ADDON_DIRECTORY } from "../../constants.js";
 import { PreferenceJson } from "../../models/PreferenceJson.js";
-import type { Preferences } from "../../utilities/Preferences.js";
 import { UserPreferences } from "../../utilities/UserPreferences.js";
 
 describe("UserPreferences", () => {
     let sandbox: SinonSandbox;
-    let preferences: Preferences;
+    let preferences: UserPreferences;
 
     beforeEach(() => {
         sandbox = sinon.createSandbox();

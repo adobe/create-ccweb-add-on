@@ -26,7 +26,6 @@ export * from "./CLIProcess.js";
 export * from "./ConsoleLogger.js";
 export * from "./Extensions.js";
 export type * from "./Logger.js";
-export type * from "./Preferences.js";
 export type * from "./Process.js";
 export * from "./UncaughtExceptionHandler.js";
 export * from "./UserPreferences.js";

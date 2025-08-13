@@ -24,8 +24,8 @@
 
 import type { AnalyticsService } from "@adobe/ccweb-add-on-analytics";
 import { ITypes as IAnalyticsTypes } from "@adobe/ccweb-add-on-analytics";
-import type { Logger, Preferences } from "@adobe/ccweb-add-on-core";
-import { ITypes as ICoreTypes, isFile } from "@adobe/ccweb-add-on-core";
+import type { Logger } from "@adobe/ccweb-add-on-core";
+import { ITypes as ICoreTypes, isFile, UserPreferences } from "@adobe/ccweb-add-on-core";
 import devcert from "@adobe/ccweb-add-on-devcert";
 import chalk from "chalk";
 import { inject, injectable } from "inversify";
@@ -48,21 +48,21 @@ const MAX_PROMPT_RETRIES = 3;
  */
 @injectable()
 export class SetupCommandExecutor implements CommandExecutor<SetupCommandOptions> {
-    private readonly _preferences: Preferences;
+    private readonly _preferences: UserPreferences;
     private readonly _sslReader: SSLReader;
     private readonly _analyticsService: AnalyticsService;
     private readonly _logger: Logger;
 
     /**
      * Instantiate {@link SetupCommandExecutor}.
-     * @param preferences - {@link Preferences} reference.
+     * @param preferences - {@link UserPreferences} reference.
      * @param sslReader - {@link SSLReader} reference.
      * @param analyticsService - {@link AnalyticsService} reference.
      * @param logger - {@link Logger} reference.
      * @returns Reference to a new {@link SetupCommandExecutor} instance.
      */
     constructor(
-        @inject(ICoreTypes.Preferences) preferences: Preferences,
+        @inject(ICoreTypes.UserPreferences) preferences: UserPreferences,
         @inject(ITypes.SSLReader) sslReader: SSLReader,
         @inject(IAnalyticsTypes.AnalyticsService) analyticsService: AnalyticsService,
         @inject(ICoreTypes.Logger) logger: Logger

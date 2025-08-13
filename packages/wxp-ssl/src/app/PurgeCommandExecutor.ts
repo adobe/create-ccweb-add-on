@@ -24,8 +24,8 @@
 
 import type { AnalyticsService } from "@adobe/ccweb-add-on-analytics";
 import { ITypes as IAnalyticsTypes } from "@adobe/ccweb-add-on-analytics";
-import type { Logger, Preferences } from "@adobe/ccweb-add-on-core";
-import { ITypes as ICoreTypes } from "@adobe/ccweb-add-on-core";
+import type { Logger } from "@adobe/ccweb-add-on-core";
+import { ITypes as ICoreTypes, UserPreferences } from "@adobe/ccweb-add-on-core";
 import devcert from "@adobe/ccweb-add-on-devcert";
 import chalk from "chalk";
 import fs from "fs-extra";
@@ -41,19 +41,19 @@ import type { CommandExecutor } from "./CommandExecutor.js";
  */
 @injectable()
 export class PurgeCommandExecutor implements CommandExecutor {
-    private readonly _preferences: Preferences;
+    private readonly _preferences: UserPreferences;
     private readonly _analyticsService: AnalyticsService;
     private readonly _logger: Logger;
 
     /**
      * Instantiate {@link PurgeCommandExecutor}.
-     * @param preferences - {@link Preferences} reference.
+     * @param preferences - {@link UserPreferences} reference.
      * @param analyticsService - {@link AnalyticsService} reference.
      * @param logger - {@link Logger} reference.
      * @returns Reference to a new {@link PurgeCommandExecutor} instance.
      */
     constructor(
-        @inject(ICoreTypes.Preferences) preferences: Preferences,
+        @inject(ICoreTypes.UserPreferences) preferences: UserPreferences,
         @inject(IAnalyticsTypes.AnalyticsService) analyticsService: AnalyticsService,
         @inject(ICoreTypes.Logger) logger: Logger
     ) {

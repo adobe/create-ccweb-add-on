@@ -139,5 +139,30 @@ describe("ScriptManager", () => {
 
             assert.equal(copyStub.callCount, 1);
         });
+
+        it("should pass a filter that excludes EXTENSIONS_TO_TRANSPILE and includes others.", async () => {
+            const sourceDirectory = "src";
+            const destinationDirectory = "dist";
+
+            const copyStub = sandbox.stub(fs, "copy");
+            copyStub.resolves();
+
+            await scriptManager.copyStaticFiles(sourceDirectory, destinationDirectory);
+
+            assert.equal(copyStub.callCount, 1);
+
+            const options = copyStub.getCall(0).args[2] as { filter: (src: string) => boolean };
+            assert.equal(typeof options.filter, "function");
+
+            // Should exclude transpiled extensions
+            assert.equal(options.filter(path.join(sourceDirectory, "file.ts")), false);
+            assert.equal(options.filter(path.join(sourceDirectory, "component.jsx")), false);
+            assert.equal(options.filter(path.join(sourceDirectory, "view.tsx")), false);
+
+            // Should include other files and directories
+            assert.equal(options.filter(path.join(sourceDirectory, "script.js")), true);
+            assert.equal(options.filter(path.join(sourceDirectory, "index.html")), true);
+            assert.equal(options.filter(path.join(sourceDirectory, "assets")), true);
+        });
     });
 });
