@@ -24,7 +24,7 @@
 
 import { assert } from "chai";
 import "mocha";
-import { PackageManager } from "../../utilities/index.js";
+import { PackageManager } from "../../utilities/PackageManager.js";
 
 describe("PackageManager", () => {
     describe("generatePackageManager ...", () => {

@@ -32,9 +32,10 @@ import path from "path";
 import type { SinonSandbox } from "sinon";
 import sinon from "sinon";
 import { DEFAULT_ADD_ON_NAME, HTTPS, MANIFEST_JSON } from "../../constants.js";
-import { AddOnDirectory, StartCommandOptions } from "../../models/index.js";
-import { AddOnResourceUtils } from "../../utilities/index.js";
-import { createCommandManifest, createManifest } from "../test-utilities.js";
+import { AddOnDirectory } from "../../models/AddOnDirectory.js";
+import { StartCommandOptions } from "../../models/StartCommandOptions.js";
+import { AddOnResourceUtils } from "../../utilities/AddOnResourceUtils.js";
+import { createManifest, createScriptManifest } from "../test-utilities.js";
 
 describe("AddOnResourceUtils", () => {
     let sandbox: SinonSandbox;
@@ -84,7 +85,7 @@ describe("AddOnResourceUtils", () => {
             assert.deepEqual(addOnsJson, expectedAddOnsJson);
         });
 
-        it("should return add-on listing data for command entrypoint.", () => {
+        it("should return empty entrypoint data for script entrypoint - manifest validation fails.", () => {
             const options = new StartCommandOptions("src", "tsc", "localhost", 5241, true);
             const addOnDirectory = new AddOnDirectory("src", createManifest());
 
@@ -97,32 +98,15 @@ describe("AddOnResourceUtils", () => {
                     downloadUrl: `${getBaseUrl(HTTPS, DEFAULT_HOST_NAME, options.port)}/test-app/${MANIFEST_JSON}`,
                     addon: {
                         localizedMetadata: {
-                            name: "Test App"
+                            name: DEFAULT_ADD_ON_NAME
                         }
                     },
-                    entryPoints: [
-                        {
-                            type: "command",
-                            id: "assetProvider",
-                            main: "command.html",
-                            commands: [
-                                {
-                                    name: "getAssets",
-                                    supportedMimeTypes: ["image/jpeg", "image/png", "image/bmp"],
-                                    discoverable: true
-                                }
-                            ],
-                            permissions: {
-                                oauth: ["accounts.google.com"]
-                            },
-                            discoverable: false
-                        }
-                    ]
+                    entryPoints: []
                 }
             ];
 
             const addOnsJson = AddOnResourceUtils.getAddOnListingData(
-                createCommandManifest(),
+                createScriptManifest(),
                 addOnDirectory,
                 getBaseUrl(HTTPS, DEFAULT_HOST_NAME, options.port)
             );

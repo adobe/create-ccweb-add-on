@@ -66,7 +66,7 @@ export class Purge extends BaseCommand {
     }
 
     async catch(error: { message: string }): Promise<void> {
-        this._analyticsService.postEvent(AnalyticsErrorMarkers.ERROR_SSL_PURGE, error.message, false);
+        void this._analyticsService.postEvent(AnalyticsErrorMarkers.ERROR_SSL_PURGE, error.message, false);
         throw error;
     }
 }

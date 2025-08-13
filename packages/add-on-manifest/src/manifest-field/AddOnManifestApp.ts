@@ -22,7 +22,7 @@
  * SOFTWARE.
  ********************************************************************************/
 
-import { App } from "../AddOnManifestTypes.js";
+import type { App } from "../AddOnManifestTypes.js";
 
 export const DEFAULT_SUPPORTED_DEVICE_CLASS = ["desktop"];
 

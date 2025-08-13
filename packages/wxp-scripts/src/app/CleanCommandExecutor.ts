@@ -71,7 +71,7 @@ export class CleanCommandExecutor implements CommandExecutor {
         await this._scriptManager.cleanDirectory(DEFAULT_OUTPUT_DIRECTORY);
         this._logger.success(LOGS.done, { postfix: LOGS.newLine });
 
-        this._analyticsService.postEvent(
+        void this._analyticsService.postEvent(
             AnalyticsSuccessMarkers.SCRIPTS_CLEAN_COMMAND_SUCCESS,
             LOGS.cleaningingSuccess,
             true

@@ -22,22 +22,52 @@
  * SOFTWARE.
  ********************************************************************************/
 
-import { CLIProgram } from "../models/index.js";
+import { ITypes as ICoreTypes, UserPreferences } from "@adobe/ccweb-add-on-core";
+import axios from "axios";
+import { inject, injectable } from "inversify";
+import osName from "os-name";
+import "reflect-metadata";
+import { ANALYTICS_API } from "../constants.js";
+import { CLIProgram } from "../models/CLIProgram.js";
 
 /**
- * Analytics service contracts.
+ * Analytics service implementation.
  */
-export interface AnalyticsService {
+@injectable()
+export class AnalyticsService {
+    private readonly _preferences: UserPreferences;
+
+    private _program: CLIProgram;
+
+    private _startTime: number;
+
+    /**
+     * Instantiate {@link AnalyticsService}.
+     * @param preferences - {@link UserPreferences} reference.
+     * @returns Reference to a new {@link AnalyticsService} instance.
+     */
+    constructor(@inject(ICoreTypes.UserPreferences) preferences: UserPreferences) {
+        this._preferences = preferences;
+
+        this._program = new CLIProgram("", "");
+
+        this._startTime = Date.now();
+    }
+
     /**
      * Set the program which is being executed.
      * @param program - {@link CLIProgram} reference.
      */
-    set program(program: CLIProgram);
+    set program(program: CLIProgram) {
+        this._program = program;
+    }
 
     /**
      * Set the start time of an operation.
      */
-    set startTime(time: number);
+    set startTime(time: number) {
+        this._startTime = time;
+    }
 
     /**
      * Post an event to Adobe analytics service.
@@ -46,5 +76,43 @@ export interface AnalyticsService {
      * @param isSuccess - Does the event represent a successful operation.
      * @returns Promise.
      */
-    postEvent(eventType: string, eventData: string, isSuccess: boolean): Promise<void>;
+    async postEvent(eventType: string, eventData: string, isSuccess: boolean): Promise<void> {
+        try {
+            const userPreferences = this._preferences.get();
+            if (!userPreferences.hasTelemetryConsent) {
+                return;
+            }
+
+            const currentTime = Date.now();
+            const body = JSON.stringify({
+                id: Math.floor(currentTime * Math.random()),
+                timestamp: currentTime,
+                _adobeio: {
+                    eventType,
+                    eventData,
+                    cliVersion: this._program.version,
+                    clientId: this._getClientId(),
+                    command: this._program.name,
+                    commandDuration: currentTime - this._startTime,
+                    commandSuccess: isSuccess,
+                    nodeVersion: process.version,
+                    osNameVersion: osName()
+                }
+            });
+
+            await axios.post(ANALYTICS_API.URL, body, { headers: ANALYTICS_API.HEADERS });
+        } catch {
+            return;
+        }
+    }
+
+    private _getClientId(): number {
+        const userPreferences = this._preferences.get();
+        if (userPreferences.clientId === undefined) {
+            userPreferences.clientId = Math.floor(Date.now() * Math.random());
+            this._preferences.set(userPreferences);
+        }
+
+        return userPreferences.clientId;
+    }
 }

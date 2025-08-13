@@ -38,13 +38,12 @@ import type { CommandValidator } from "./CommandValidator.js";
  * Start command validator implementation class.
  */
 @injectable()
-export class StartCommandValidator implements CommandValidator {
+export class StartCommandValidator implements CommandValidator<StartCommandOptions> {
     private readonly _analyticsService: AnalyticsService;
     private readonly _logger: Logger;
 
     /**
      * Instantiate {@link StartCommandValidator}.
-     * @param accountService - {@link AccountService} reference.
      * @param analyticsService - {@link AnalyticsService} reference.
      * @param logger - {@link Logger} reference.
      * @returns Reference to a new {@link StartCommandValidator} instance.
@@ -77,7 +76,7 @@ export class StartCommandValidator implements CommandValidator {
         if (!isHostnameAllowed) {
             this._logger.error(LOGS.invalidHostname, { postfix: LOGS.newLine });
 
-            await this._analyticsService.postEvent(
+            await void this._analyticsService.postEvent(
                 AnalyticsErrorMarkers.SCRIPTS_START_INVALID_HOSTNAME_ERROR,
                 eventData.join(" "),
                 false
@@ -95,7 +94,7 @@ export class StartCommandValidator implements CommandValidator {
         this._logger.error(LOGS.invalidPort, { postfix: LOGS.newLine });
 
         const eventData = ["--use", options.transpiler, "--hostname", options.hostname, "--port", options.port];
-        await this._analyticsService.postEvent(
+        await void this._analyticsService.postEvent(
             AnalyticsErrorMarkers.SCRIPTS_START_INVALID_PORT_ERROR,
             eventData.join(" "),
             false

@@ -25,8 +25,7 @@
 import type { Chalk } from "chalk";
 import chalk from "chalk";
 import { injectable } from "inversify";
-import type { LoggerOptions } from "../models/index.js";
-import type { Logger } from "./Logger.js";
+import type { Logger, LoggerOptions } from "./Logger.js";
 
 /**
  * Console logger implementation class to handle logging of different levels.

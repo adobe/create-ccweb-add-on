@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-manifest",
+      "comment": "New manifest properties",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-manifest"
+}

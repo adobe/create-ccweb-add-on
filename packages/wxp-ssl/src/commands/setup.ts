@@ -40,8 +40,8 @@ import type { CommandValidator } from "../validators/CommandValidator.js";
  * SSL Setup command.
  */
 export class Setup extends BaseCommand {
-    private readonly _commandValidator: CommandValidator;
-    private readonly _commandExecutor: CommandExecutor;
+    private readonly _commandValidator: CommandValidator<SetupCommandOptions>;
+    private readonly _commandExecutor: CommandExecutor<SetupCommandOptions>;
 
     static description = "Setup a locally trusted SSL certificate for hosting an add-on.";
 
@@ -68,8 +68,14 @@ export class Setup extends BaseCommand {
     constructor(argv: string[], config: Config) {
         super(argv, config, new CLIProgram(PROGRAM_NAME, config.name + "@" + config.version));
 
-        this._commandValidator = IContainer.getNamed<CommandValidator>(ITypes.CommandValidator, "setup");
-        this._commandExecutor = IContainer.getNamed<CommandExecutor>(ITypes.CommandExecutor, "setup");
+        this._commandValidator = IContainer.getNamed<CommandValidator<SetupCommandOptions>>(
+            ITypes.CommandValidator,
+            "setup"
+        );
+        this._commandExecutor = IContainer.getNamed<CommandExecutor<SetupCommandOptions>>(
+            ITypes.CommandExecutor,
+            "setup"
+        );
     }
 
     async run(): Promise<void> {
@@ -90,7 +96,7 @@ export class Setup extends BaseCommand {
     }
 
     async catch(error: { message: string }): Promise<void> {
-        this._analyticsService.postEvent(AnalyticsErrorMarkers.ERROR_SSL_SETUP, error.message, false);
+        void this._analyticsService.postEvent(AnalyticsErrorMarkers.ERROR_SSL_SETUP, error.message, false);
         throw error;
     }
 }

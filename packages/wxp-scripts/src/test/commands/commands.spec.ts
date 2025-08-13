@@ -48,8 +48,12 @@ describe("ccweb-add-on-scripts", () => {
 
     let expressApp: StubbedInstance<Express>;
 
-    let commandExecutor: StubbedInstance<CommandExecutor>;
-    let commandValidator: StubbedInstance<CommandValidator>;
+    let cleanCommandExecutor: StubbedInstance<CommandExecutor>;
+    let buildCommandExecutor: StubbedInstance<CommandExecutor<BuildCommandOptions>>;
+    let startCommandExecutor: StubbedInstance<CommandExecutor<StartCommandOptions>>;
+    let packageCommandExecutor: StubbedInstance<CommandExecutor<PackageCommandOptions>>;
+
+    let startCommandValidator: StubbedInstance<CommandValidator<StartCommandOptions>>;
 
     let analyticsConsent: StubbedInstance<AnalyticsConsent>;
     let analyticsService: StubbedInstance<AnalyticsService>;
@@ -57,20 +61,29 @@ describe("ccweb-add-on-scripts", () => {
     beforeEach(() => {
         sandbox = sinon.createSandbox();
 
-        commandValidator = stubInterface();
-        commandValidator.validate.resolves();
+        cleanCommandExecutor = stubInterface();
+        cleanCommandExecutor.execute.resolves();
 
-        commandExecutor = stubInterface();
-        commandExecutor.execute.resolves();
+        buildCommandExecutor = stubInterface();
+        buildCommandExecutor.execute.resolves();
+
+        startCommandExecutor = stubInterface();
+        startCommandExecutor.execute.resolves();
+
+        packageCommandExecutor = stubInterface();
+        packageCommandExecutor.execute.resolves();
+
+        startCommandValidator = stubInterface();
+        startCommandValidator.validate.resolves();
 
         namedContainer = sandbox.stub(IContainer, "getNamed");
 
-        namedContainer.withArgs(ITypes.CommandValidator, "start").returns(commandValidator);
+        namedContainer.withArgs(ITypes.CommandValidator, "start").returns(startCommandValidator);
 
-        namedContainer.withArgs(ITypes.CommandExecutor, "clean").returns(commandExecutor);
-        namedContainer.withArgs(ITypes.CommandExecutor, "build").returns(commandExecutor);
-        namedContainer.withArgs(ITypes.CommandExecutor, "start").returns(commandExecutor);
-        namedContainer.withArgs(ITypes.CommandExecutor, "package").returns(commandExecutor);
+        namedContainer.withArgs(ITypes.CommandExecutor, "clean").returns(cleanCommandExecutor);
+        namedContainer.withArgs(ITypes.CommandExecutor, "build").returns(buildCommandExecutor);
+        namedContainer.withArgs(ITypes.CommandExecutor, "start").returns(startCommandExecutor);
+        namedContainer.withArgs(ITypes.CommandExecutor, "package").returns(packageCommandExecutor);
 
         expressApp = stubInterface();
 
@@ -92,17 +105,17 @@ describe("ccweb-add-on-scripts", () => {
     describe("clean", () => {
         it("should execute succesfully when no parameters are passed.", async () => {
             await runCommand("clean", { root: "." });
-            assert.equal(commandExecutor.execute.callCount, 1);
+            assert.equal(cleanCommandExecutor.execute.callCount, 1);
         });
 
         it("should execute succesfully parameters are passed.", async () => {
             await runCommand(["clean", "--analytics=off"], { root: "." });
-            assert.equal(commandExecutor.execute.callCount, 1);
+            assert.equal(cleanCommandExecutor.execute.callCount, 1);
         });
 
         it("should fail for any errors in command execution.", async () => {
             const error = new Error("Something went wrong.");
-            commandExecutor.execute.rejects(error);
+            cleanCommandExecutor.execute.rejects(error);
 
             await runCommand("clean", { root: "." }).then(result => assert.deepEqual(result.error, error));
 
@@ -122,19 +135,19 @@ describe("ccweb-add-on-scripts", () => {
             await runCommand("build", { root: "." });
 
             const options = new BuildCommandOptions(DEFAULT_SRC_DIRECTORY, "", false);
-            assert.equal(commandExecutor.execute.calledWith(options), true);
+            assert.equal(buildCommandExecutor.execute.calledWith(options), true);
         });
 
         it("should execute succesfully when parameters are passed.", async () => {
             await runCommand(["build", "--use=tsc", "-v"], { root: "." });
 
             const options = new BuildCommandOptions(DEFAULT_SRC_DIRECTORY, "tsc", true);
-            assert.equal(commandExecutor.execute.calledWith(options), true);
+            assert.equal(buildCommandExecutor.execute.calledWith(options), true);
         });
 
         it("should fail for any errors in command execution.", async () => {
             const error = new Error("Something went wrong.");
-            commandExecutor.execute.rejects(error);
+            buildCommandExecutor.execute.rejects(error);
 
             await runCommand("build", { root: "." }).then(result => assert.deepEqual(result.error, error));
 
@@ -160,19 +173,19 @@ describe("ccweb-add-on-scripts", () => {
                 parseInt(DEFAULT_PORT),
                 false
             );
-            assert.equal(commandExecutor.execute.calledWith(options, expressApp), true);
+            assert.equal(startCommandExecutor.execute.calledWith(options, expressApp), true);
         });
 
         it("should execute succesfully when parameters are passed.", async () => {
             await runCommand(["start", "--use=tsc", "-v", "--port=8000"], { root: "." });
 
             const options = new StartCommandOptions(DEFAULT_SRC_DIRECTORY, "tsc", DEFAULT_HOST_NAME, 8000, true);
-            assert.equal(commandExecutor.execute.calledWith(options, expressApp), true);
+            assert.equal(startCommandExecutor.execute.calledWith(options, expressApp), true);
         });
 
         it("should fail for any errors in command execution.", async () => {
             const error = new Error("Something went wrong.");
-            commandExecutor.execute.rejects(error);
+            startCommandExecutor.execute.rejects(error);
 
             await runCommand("start", { root: "." }).then(result => assert.deepEqual(result.error, error));
 
@@ -192,19 +205,19 @@ describe("ccweb-add-on-scripts", () => {
             await runCommand("package", { root: "." });
 
             const options = new PackageCommandOptions(DEFAULT_SRC_DIRECTORY, "", true, false);
-            assert.equal(commandExecutor.execute.calledWith(options), true);
+            assert.equal(packageCommandExecutor.execute.calledWith(options), true);
         });
 
         it("should execute succesfully when parameters are passed.", async () => {
             await runCommand(["package", "--use=tsc", "-v"], { root: "." });
 
             const options = new PackageCommandOptions(DEFAULT_SRC_DIRECTORY, "tsc", true, true);
-            assert.equal(commandExecutor.execute.calledWith(options), true);
+            assert.equal(packageCommandExecutor.execute.calledWith(options), true);
         });
 
         it("should fail for any errors in command execution.", async () => {
             const error = new Error("Something went wrong.");
-            commandExecutor.execute.rejects(error);
+            packageCommandExecutor.execute.rejects(error);
 
             await runCommand("package", { root: "." }).then(result => assert.deepEqual(result.error, error));
 

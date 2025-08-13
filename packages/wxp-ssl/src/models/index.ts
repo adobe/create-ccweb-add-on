@@ -23,4 +23,4 @@
  ********************************************************************************/
 
 export * from "./SetupCommandOptions.js";
-export * from "./Types.js";
+export * from "./SSLTypes.js";

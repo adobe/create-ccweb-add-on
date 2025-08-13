@@ -22,21 +22,87 @@
  * SOFTWARE.
  ********************************************************************************/
 
+import type { Logger } from "@adobe/ccweb-add-on-core";
+import { DEFAULT_OUTPUT_DIRECTORY, ITypes as ICoreTypes, getBaseUrl } from "@adobe/ccweb-add-on-core";
 import type { Express } from "express";
+import express from "express";
 import type { Server } from "https";
-import type { AddOnDirectory, StartCommandOptions } from "../models/index.js";
+import { inject, injectable } from "inversify";
+import "reflect-metadata";
+import format from "string-template";
+import { ITypes } from "../config/inversify.types.js";
+import { HTTPS } from "../constants.js";
+import type { AddOnDirectory } from "../models/AddOnDirectory.js";
+import type { StartCommandOptions } from "../models/StartCommandOptions.js";
+import type { AddOnManifestReader } from "../utilities/AddOnManifestReader.js";
+import { AddOnResourceUtils } from "../utilities/AddOnResourceUtils.js";
 
 /**
- * HTTP server interface for handling HTTP requests on the Add-On server.
+ * HTTP server implementation class for handling HTTP requests on the Add-On server.
  */
-export interface ExpressServer {
+@injectable()
+export class ExpressServer {
+    private readonly _manifestReader: AddOnManifestReader;
+    private readonly _logger: Logger;
+
+    /**
+     * Instantiate {@link ExpressServer}.
+     * @param logger - {@link Logger} reference.
+     * @returns Reference to a new {@link ExpressServer} instance.
+     */
+    constructor(
+        @inject(ITypes.AddOnManifestReader) manifestReader: AddOnManifestReader,
+        @inject(ICoreTypes.Logger) logger: Logger
+    ) {
+        this._manifestReader = manifestReader;
+        this._logger = logger;
+    }
+
     /**
      * Start the HTTP server.
-     *
      * @param addOnDirectory - {@link AddOnDirectory} Add-on directory information on which the script is executed.
      * @param server - {@link Server} Sever where the Add-on is hosted.
      * @param expressApp - {@link Express} Express app for serving HTTP requests.
      * @param options - {@link StartCommandOptions} Options which the Add-on is started with.
      */
-    start(addOnDirectory: AddOnDirectory, server: Server, expressApp: Express, options: StartCommandOptions): void;
+    start(addOnDirectory: AddOnDirectory, server: Server, expressApp: Express, options: StartCommandOptions): void {
+        expressApp.get(["/"], (request, response) => {
+            const manifest = this._manifestReader.getManifest(undefined, false);
+            const baseUrl = getBaseUrl(HTTPS, request.headers.host ?? `${request.hostname}:${options.port}`);
+            const addOns = AddOnResourceUtils.getAddOnListingData(manifest!, addOnDirectory, baseUrl);
+            response.set("Content-Type", "application/json");
+            response.status(200).json({ addOns });
+        });
+
+        expressApp.get(`/${addOnDirectory.manifest.manifestProperties.testId as string}`, (request, response) => {
+            const manifest = this._manifestReader.getManifest(undefined, false);
+            let resources: string[] = [];
+            try {
+                const baseUrl = getBaseUrl(HTTPS, request.headers.host ?? `${request.hostname}:${options.port}`);
+                resources = AddOnResourceUtils.getResources(manifest!, addOnDirectory.rootDirPath, baseUrl);
+            } finally {
+                response.set("Content-Type", "application/json");
+                response.status(200).json({ resources });
+            }
+        });
+
+        expressApp.use(
+            `/${addOnDirectory.manifest.manifestProperties.testId as string}`,
+            express.static(DEFAULT_OUTPUT_DIRECTORY)
+        );
+
+        this._logger.success(
+            format(LOGS.httpServerStarted, {
+                addOnDirectory: addOnDirectory.rootDirName,
+                serverUrl: getBaseUrl(HTTPS, `${options.hostname}:${options.port}`)
+            })
+        );
+
+        server.listen(options.port, options.hostname);
+    }
 }
+
+const LOGS = {
+    newLine: "\n",
+    httpServerStarted: "Done. Your add-on '{addOnDirectory}' is hosted on: {serverUrl}"
+};

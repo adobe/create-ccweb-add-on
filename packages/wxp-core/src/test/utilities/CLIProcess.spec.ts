@@ -36,9 +36,9 @@ import type { SinonSandbox } from "sinon";
 import sinon from "sinon";
 import type { StubbedInstance } from "ts-sinon";
 import { stubInterface } from "ts-sinon";
-import type { ExecutionResult } from "../../models/Types.js";
-import type { Logger, Process } from "../../utilities/index.js";
-import { CLIProcess } from "../../utilities/index.js";
+import { CLIProcess } from "../../utilities/CLIProcess.js";
+import type { Logger } from "../../utilities/Logger.js";
+import type { ExecutionResult, Process } from "../../utilities/Process.js";
 
 describe("CLIProcess", () => {
     let sandbox: SinonSandbox;

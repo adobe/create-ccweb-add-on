@@ -23,7 +23,7 @@
  ********************************************************************************/
 
 import { DEFAULT_HOST_NAME } from "../constants.js";
-import { getJSONString, isNullOrWhiteSpace, isObject } from "../utilities/index.js";
+import { getJSONString, isNullOrWhiteSpace, isObject } from "../utilities/Extensions.js";
 
 /**
  * SSL related settings.

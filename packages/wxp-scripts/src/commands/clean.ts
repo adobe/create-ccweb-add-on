@@ -66,7 +66,7 @@ export class Clean extends BaseCommand {
     }
 
     async catch(error: { message: string }): Promise<void> {
-        this._analyticsService.postEvent(AnalyticsErrorMarkers.SCRIPTS_CLEAN_COMMAND_ERROR, error.message, false);
+        void this._analyticsService.postEvent(AnalyticsErrorMarkers.SCRIPTS_CLEAN_COMMAND_ERROR, error.message, false);
         throw error;
     }
 }

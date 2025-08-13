@@ -22,7 +22,20 @@
  * SOFTWARE.
  ********************************************************************************/
 
-import type { LoggerOptions } from "../models/index.js";
+/**
+ * Logger options.
+ */
+export type LoggerOptions = {
+    /**
+     * Prefix string.
+     */
+    prefix?: string;
+
+    /**
+     * Postfix string.
+     */
+    postfix?: string;
+};
 
 /**
  * Logger interface to handle logging of different levels.

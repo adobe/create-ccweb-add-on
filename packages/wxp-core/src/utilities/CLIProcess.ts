@@ -31,9 +31,8 @@ import process from "process";
 import "reflect-metadata";
 import format from "string-template";
 import { ITypes } from "../config/inversify.types.js";
-import type { ExecutionResult } from "../models/index.js";
 import type { Logger } from "./Logger.js";
-import type { Process } from "./Process.js";
+import type { ExecutionResult, Process } from "./Process.js";
 
 /**
  * CLI Process implementation class for managing execution of commands.

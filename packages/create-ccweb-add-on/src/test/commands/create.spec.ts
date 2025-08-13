@@ -34,10 +34,10 @@ import sinon from "sinon";
 import type { StubbedInstance } from "ts-sinon";
 import { stubInterface } from "ts-sinon";
 import { AnalyticsErrorMarkers } from "../../AnalyticsMarkers.js";
-import type { AddOnFactory } from "../../app/index.js";
+import type { AddOnFactory } from "../../app/AddOnFactory.js";
 import { Create } from "../../commands/create.js";
 import { IContainer, ITypes } from "../../config/index.js";
-import { CLIOptions } from "../../models/index.js";
+import { CLIOptions } from "../../models/CLIOptions.js";
 
 chai.use(chaiAsPromised);
 

@@ -32,7 +32,7 @@ export const ITypes: {
     SecureServer: symbol;
     SocketApp: symbol;
     SocketServer: symbol;
-    EntityTracker: symbol;
+    FileChangeTracker: symbol;
     AddOnManifestReader: symbol;
 } = {
     Command: Symbol.for("Command"),
@@ -44,6 +44,6 @@ export const ITypes: {
     SecureServer: Symbol.for("SecureServer"),
     SocketApp: Symbol.for("SocketApp"),
     SocketServer: Symbol.for("SocketServer"),
-    EntityTracker: Symbol.for("EntityTracker"),
+    FileChangeTracker: Symbol.for("FileChangeTracker"),
     AddOnManifestReader: Symbol.for("AddOnManifestReader")
 };

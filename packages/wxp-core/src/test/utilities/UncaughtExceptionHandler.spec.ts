@@ -31,7 +31,7 @@ import type { StubbedInstance } from "ts-sinon";
 import { stubInterface } from "ts-sinon";
 import { IContainer, ITypes } from "../../config/index.js";
 import type { Logger } from "../../utilities/Logger.js";
-import { UncaughtExceptionHandler } from "../../utilities/index.js";
+import { UncaughtExceptionHandler } from "../../utilities/UncaughtExceptionHandler.js";
 
 describe("UncaughtExceptionHandler", () => {
     let sandbox: SinonSandbox;

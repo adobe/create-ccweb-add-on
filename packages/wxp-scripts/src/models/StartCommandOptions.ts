@@ -22,20 +22,12 @@
  * SOFTWARE.
  ********************************************************************************/
 
+import { BuildCommandOptions } from "./BuildCommandOptions.js";
+
 /**
  * Class representing the user provided CLI options for Start Command.
  */
-export class StartCommandOptions {
-    /**
-     * Source directory - where the code artifacts exist.
-     */
-    readonly srcDirectory: string;
-
-    /**
-     * Command to use for transpilation.
-     */
-    readonly transpiler: string;
-
+export class StartCommandOptions extends BuildCommandOptions {
     /**
      * Hostname where the Add-on is to be hosted.
      */
@@ -47,11 +39,6 @@ export class StartCommandOptions {
     readonly port: number;
 
     /**
-     * Verbose flag.
-     */
-    readonly verbose: boolean;
-
-    /**
      * Instantiate {@link StartCommandOptions}.
      * @param srcDirectory - Source directory - where the code artifacts exist.
      * @param transpiler - Command to use for transpilation.
@@ -61,10 +48,8 @@ export class StartCommandOptions {
      * @returns Reference to a new {@link StartCommandOptions} instance.
      */
     constructor(srcDirectory: string, transpiler: string, hostname: string, port: number, verbose: boolean) {
-        this.srcDirectory = srcDirectory;
-        this.transpiler = transpiler;
+        super(srcDirectory, transpiler, verbose);
         this.hostname = hostname;
         this.port = port;
-        this.verbose = verbose;
     }
 }

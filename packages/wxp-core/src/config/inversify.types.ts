@@ -25,11 +25,9 @@
 export const ITypes: {
     Logger: symbol;
     Process: symbol;
-    Preferences: symbol;
-    AccountService: symbol;
+    UserPreferences: symbol;
 } = {
     Logger: Symbol.for("Logger"),
     Process: Symbol.for("Process"),
-    Preferences: Symbol.for("Preferences"),
-    AccountService: Symbol.for("AccountService")
+    UserPreferences: Symbol.for("UserPreferences")
 };

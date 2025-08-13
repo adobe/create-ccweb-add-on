@@ -24,7 +24,7 @@
 
 import { assert } from "chai";
 import "mocha";
-import { PackageCommandOptions } from "../../models/index.js";
+import { PackageCommandOptions } from "../../models/PackageCommandOptions.js";
 
 describe("PackageCommandOptions", () => {
     describe("constructor", () => {

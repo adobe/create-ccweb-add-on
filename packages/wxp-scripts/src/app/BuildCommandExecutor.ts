@@ -32,8 +32,8 @@ import "reflect-metadata";
 import format from "string-template";
 import { AnalyticsErrorMarkers, AnalyticsSuccessMarkers } from "../AnalyticsMarkers.js";
 import { ITypes } from "../config/inversify.types.js";
-import type { BuildCommandOptions } from "../models/index.js";
-import { AddOnDirectory } from "../models/index.js";
+import { AddOnDirectory } from "../models/AddOnDirectory.js";
+import type { BuildCommandOptions } from "../models/BuildCommandOptions.js";
 import type { AddOnManifestReader } from "../utilities/AddOnManifestReader.js";
 import type { CommandExecutor } from "./CommandExecutor.js";
 import type { ScriptManager } from "./ScriptManager.js";
@@ -42,7 +42,7 @@ import type { ScriptManager } from "./ScriptManager.js";
  * Build command executor.
  */
 @injectable()
-export class BuildCommandExecutor implements CommandExecutor {
+export class BuildCommandExecutor implements CommandExecutor<BuildCommandOptions> {
     private readonly _scriptManager: ScriptManager;
     private readonly _logger: Logger;
     private readonly _cleanCommandExecutor: CommandExecutor;
@@ -97,7 +97,7 @@ export class BuildCommandExecutor implements CommandExecutor {
                     );
                 }
             });
-            this._analyticsService.postEvent(
+            void this._analyticsService.postEvent(
                 AnalyticsErrorMarkers.SCRIPTS_BUILD_COMMAND_ERROR,
                 LOGS.manifestValidationFailed,
                 false
@@ -138,13 +138,13 @@ export class BuildCommandExecutor implements CommandExecutor {
                 "--use",
                 options.transpiler
             ];
-            this._analyticsService.postEvent(
+            void this._analyticsService.postEvent(
                 AnalyticsSuccessMarkers.SCRIPTS_BUILD_COMMAND_SUCCESS,
                 analyticsEventData.join(" "),
                 true
             );
         } else {
-            this._analyticsService.postEvent(
+            void this._analyticsService.postEvent(
                 AnalyticsErrorMarkers.SCRIPTS_BUILD_COMMAND_ERROR,
                 LOGS.buildFailed,
                 false

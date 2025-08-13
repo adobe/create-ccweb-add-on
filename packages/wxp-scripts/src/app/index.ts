@@ -24,12 +24,9 @@
 
 export * from "./BuildCommandExecutor.js";
 export * from "./CleanCommandExecutor.js";
-export * from "./CommandExecutor.js";
+export type * from "./CommandExecutor.js";
 export * from "./ExpressServer.js";
 export * from "./PackageCommandExecutor.js";
 export * from "./ScriptManager.js";
 export * from "./SocketServer.js";
 export * from "./StartCommandExecutor.js";
-export * from "./WxpExpressServer.js";
-export * from "./WxpScriptManager.js";
-export * from "./WxpSocketServer.js";

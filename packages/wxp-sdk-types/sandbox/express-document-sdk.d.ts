@@ -1212,6 +1212,11 @@ export declare class MediaContainerNode extends Node {
  */
 export declare abstract class MediaRectangleNode extends Node implements Readonly<IRectangularNode> {
     /**
+     * Get {@link AddOnData} reference for managing private metadata attached to the media resource displayed by this node.
+     * The same media resource may be reused in multiple places in the document, and all share the same AddOnData state.
+     */
+    get mediaAddOnData(): AddOnData;
+    /**
      * Current width of the "full frame" uncropped media, which may not be fully visible due to cropping/clipping by the
      * enclosing media container's maskShape. This size may be different from the original image/video size in pixels, but
      * will always match its aspect ratio.
@@ -1785,6 +1790,8 @@ declare enum SceneNodeType {
     mediaContainer = "MediaContainer",
     /** Type of MediaContainerNode's "media rectangle" child when it is holding an image */
     imageRectangle = "ImageRectangle",
+    /** Type of MediaContainerNode's "media rectangle" child when it is holding an unknown media type */
+    unknownMediaRectangle = "UnknownMediaRectangle",
     /** Type of PageNode */
     page = "Page",
     /** Type of ComplexShapeNode, representing a complex prepackaged shape with fill and stroke, that appears as a leaf node in the UI */

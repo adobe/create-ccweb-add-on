@@ -22,16 +22,14 @@
  * SOFTWARE.
  ********************************************************************************/
 
-import type { CommandOptions } from "../models/index.js";
-
 /**
- * Command execution contracts.
+ * Command Executor interface for handling CLI commands.
  */
-export interface CommandExecutor {
+export interface CommandExecutor<TOptions = void> {
     /**
-     * Execute command.
-     * @param options - Command arguments entered by user represented as {@link CommandOptions}.
-     * @returns Promise.
+     * Execute the command.
+     * @param options - Command execution options.
+     * @returns Promise that resolves indicating the command was executed successfully.
      */
-    execute(options?: CommandOptions): Promise<void>;
+    execute(options?: TOptions): Promise<void>;
 }

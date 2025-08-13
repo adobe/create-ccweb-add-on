@@ -24,7 +24,8 @@
 
 import type { ErrorObject, ValidateFunction } from "ajv";
 import { ManifestVersion } from "./AddOnManifest.js";
-import { AddOnLogAction, AddOnLogLevel, ManifestError, ManifestValidationResult } from "./AddOnManifestTypes.js";
+import type { AddOnLogAction, ManifestError, ManifestValidationResult } from "./AddOnManifestTypes.js";
+import { AddOnLogLevel } from "./AddOnManifestTypes.js";
 import { validateSchemaDeveloperV1, validateSchemaV2 } from "./generated/validateManifestSchema.mjs";
 
 // Add schema validators to the following list ordered by version numbers

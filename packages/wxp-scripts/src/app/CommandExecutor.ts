@@ -23,17 +23,16 @@
  ********************************************************************************/
 
 import type { Express } from "express";
-import type { CommandOptions } from "../models/index.js";
 
 /**
  * Command Executor interface for handling CLI commands.
  */
-export interface CommandExecutor {
+export interface CommandExecutor<TOptions = void> {
     /**
      * Executes the command.
-     *
-     * @param options - {@link CommandOptions}.
+     * @param options - Command execution options.
      * @param expressApp - {@link Express}.
+     * @returns Promise that resolves indicating the command was executed successfully.
      */
-    execute(options?: CommandOptions, expressApp?: Express): Promise<void | boolean>;
+    execute(options?: TOptions, expressApp?: Express): Promise<void | boolean>;
 }

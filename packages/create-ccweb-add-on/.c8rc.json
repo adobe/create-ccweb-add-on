@@ -4,12 +4,15 @@
     "exclude": [
         "src/**/*.spec.ts",
         "src/**/index.ts",
-        "src/**/Types.ts",
         "src/config/*",
         "src/constants.ts",
         "src/templates/*",
         "**/*.d.ts"
     ],
+    "lines": 100,
+    "functions": 100,
+    "branches": 100,
+    "statements": 100,
     "reporter": ["html", "text", "text-summary"],
     "report-dir": "coverage"
 }

@@ -24,5 +24,3 @@
 
 export * from "./AnalyticsConsent.js";
 export * from "./AnalyticsService.js";
-export * from "./WxpAnalyticsConsent.js";
-export * from "./WxpAnalyticsService.js";

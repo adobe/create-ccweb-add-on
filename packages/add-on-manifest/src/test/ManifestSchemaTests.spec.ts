@@ -25,20 +25,19 @@
 import { assert } from "chai";
 import "mocha";
 import sinon from "sinon";
-import { AddOnManifestType, ManifestVersion } from "../AddOnManifest.js";
-import {
+import type { AddOnManifestType, ManifestVersion } from "../AddOnManifest.js";
+import type {
     AddOnLogAction,
-    AddOnLogLevel,
     App,
     AuthorInfo,
     EntrypointV1,
     IconType,
     LocalisedStrings,
     ManifestEntrypoint,
-    OTHER_MANIFEST_ERRORS,
     RequirementsV1,
     Size
 } from "../AddOnManifestTypes.js";
+import { AddOnLogLevel, OTHER_MANIFEST_ERRORS } from "../AddOnManifestTypes.js";
 import { AddOnManifestValidator } from "../AddOnManifestValidator.js";
 import {
     getTestManifestV1,
@@ -633,6 +632,23 @@ describe("ManifestSchema Validations - Version 2", () => {
         assert.equal(validationResult.success, false);
         assert.notEqual(validationResult.errorDetails, undefined);
         assert.equal(validationResult.errorDetails?.[0], OTHER_MANIFEST_ERRORS.RestrictedContentHubEntrypoint);
+    });
+
+    it("should fail and return error response if script entrypoint type is used by non-playground add-on", () => {
+        const manifest = getTestManifestV2();
+        const testManifest = {
+            ...manifest,
+            entryPoints: [
+                {
+                    ...manifest.entryPoints[0],
+                    type: "script"
+                }
+            ]
+        };
+        const validationResult = validator.validateManifestSchema(testManifest, additionInfo);
+        assert.equal(validationResult.success, false);
+        assert.notEqual(validationResult.errorDetails, undefined);
+        assert.equal(validationResult.errorDetails?.[0], OTHER_MANIFEST_ERRORS.RestrictedScriptEntrypoint);
     });
 
     it("should succeed for 'allow-forms' sanbox property with trusted flag or privileged", () => {

@@ -23,13 +23,11 @@
  ********************************************************************************/
 
 export const ITypes: {
-    Command: symbol;
     AddOnScaffolder: symbol;
     AddOnBuilder: symbol;
     PackageBuilder: symbol;
     TemplateValidator: symbol;
 } = {
-    Command: Symbol.for("Command"),
     AddOnScaffolder: Symbol.for("AddOnScaffolder"),
     AddOnBuilder: Symbol.for("AddOnBuilder"),
     PackageBuilder: Symbol.for("PackageBuilder"),

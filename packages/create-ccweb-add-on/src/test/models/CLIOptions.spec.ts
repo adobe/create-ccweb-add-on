@@ -25,7 +25,7 @@
 import { EntrypointType } from "@adobe/ccweb-add-on-manifest";
 import { assert } from "chai";
 import "mocha";
-import { CLIOptions } from "../../models/index.js";
+import { CLIOptions } from "../../models/CLIOptions.js";
 
 describe("CLIOptions", () => {
     describe("constructor", () => {

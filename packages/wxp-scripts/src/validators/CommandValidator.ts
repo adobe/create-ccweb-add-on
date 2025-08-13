@@ -22,16 +22,14 @@
  * SOFTWARE.
  ********************************************************************************/
 
-import { type CommandOptions } from "../models/index.js";
-
 /**
  * Command validator interface.
  */
-export interface CommandValidator {
+export interface CommandValidator<TOptions> {
     /**
-     * Validate command options.
-     * @param options - Command arguments provided by user.
-     * @returns Promise.
+     * Validate command options provided by user.
+     * @param options - Command specific options.
+     * @returns Promise that resolves when the options are valid.
      */
-    validate(options: CommandOptions): Promise<void>;
+    validate(options: TOptions): Promise<void>;
 }

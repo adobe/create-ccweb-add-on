@@ -54,7 +54,7 @@ export function createManifest(): AddOnManifest {
     return manifest!;
 }
 
-export function createCommandManifest(): AddOnManifest {
+export function createScriptManifest(): AddOnManifest {
     const { manifest } = AddOnManifest.createManifest({
         manifest: {
             testId: "test-app",
@@ -71,7 +71,7 @@ export function createCommandManifest(): AddOnManifest {
             },
             entryPoints: [
                 {
-                    type: "command",
+                    type: "script",
                     id: "assetProvider",
                     main: "command.html",
                     commands: [

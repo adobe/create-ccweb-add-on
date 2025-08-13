@@ -47,8 +47,8 @@ import type { CommandValidator } from "../validators/CommandValidator.js";
  */
 export class Start extends BaseCommand {
     private readonly _expressApp: Express;
-    private readonly _commandValidator: CommandValidator;
-    private readonly _commandExecutor: CommandExecutor;
+    private readonly _commandValidator: CommandValidator<StartCommandOptions>;
+    private readonly _commandExecutor: CommandExecutor<StartCommandOptions>;
 
     static description = "Host the built source folder.";
 
@@ -87,8 +87,14 @@ export class Start extends BaseCommand {
 
         this._expressApp = IContainer.get<Express>(ITypes.ExpressApp);
 
-        this._commandValidator = IContainer.getNamed<CommandValidator>(ITypes.CommandValidator, "start");
-        this._commandExecutor = IContainer.getNamed<CommandExecutor>(ITypes.CommandExecutor, "start");
+        this._commandValidator = IContainer.getNamed<CommandValidator<StartCommandOptions>>(
+            ITypes.CommandValidator,
+            "start"
+        );
+        this._commandExecutor = IContainer.getNamed<CommandExecutor<StartCommandOptions>>(
+            ITypes.CommandExecutor,
+            "start"
+        );
     }
 
     async run(): Promise<void> {
@@ -109,7 +115,7 @@ export class Start extends BaseCommand {
     }
 
     async catch(error: { message: string }): Promise<void> {
-        this._analyticsService.postEvent(AnalyticsErrorMarkers.SCRIPTS_START_COMMAND_ERROR, error.message, false);
+        void this._analyticsService.postEvent(AnalyticsErrorMarkers.SCRIPTS_START_COMMAND_ERROR, error.message, false);
         throw error;
     }
 }

@@ -26,7 +26,7 @@ import { BaseCommand, CLIProgram } from "@adobe/ccweb-add-on-analytics";
 import { DEFAULT_SRC_DIRECTORY, UncaughtExceptionHandler } from "@adobe/ccweb-add-on-core";
 import type { Config } from "@oclif/core";
 import { Flags } from "@oclif/core";
-import { CustomOptions, OptionFlag } from "@oclif/core/lib/interfaces/parser.js";
+import type { CustomOptions, OptionFlag } from "@oclif/core/lib/interfaces/parser.js";
 import process from "process";
 import "reflect-metadata";
 import { AnalyticsErrorMarkers } from "../AnalyticsMarkers.js";
@@ -39,7 +39,7 @@ import { BuildCommandOptions } from "../models/BuildCommandOptions.js";
  * Build Command's implementation class.
  */
 export class Build extends BaseCommand {
-    private readonly _commandExecutor: CommandExecutor;
+    private readonly _commandExecutor: CommandExecutor<BuildCommandOptions>;
 
     static description = "Build the source folder.";
 
@@ -64,7 +64,10 @@ export class Build extends BaseCommand {
     constructor(argv: string[], config: Config) {
         super(argv, config, new CLIProgram(PROGRAM_NAME, config.name + "@" + config.version));
 
-        this._commandExecutor = IContainer.getNamed<CommandExecutor>(ITypes.CommandExecutor, "build");
+        this._commandExecutor = IContainer.getNamed<CommandExecutor<BuildCommandOptions>>(
+            ITypes.CommandExecutor,
+            "build"
+        );
     }
 
     async run(): Promise<void> {
@@ -84,7 +87,7 @@ export class Build extends BaseCommand {
     }
 
     async catch(error: { message: string }): Promise<void> {
-        this._analyticsService.postEvent(AnalyticsErrorMarkers.SCRIPTS_BUILD_COMMAND_ERROR, error.message, false);
+        void this._analyticsService.postEvent(AnalyticsErrorMarkers.SCRIPTS_BUILD_COMMAND_ERROR, error.message, false);
         throw error;
     }
 }

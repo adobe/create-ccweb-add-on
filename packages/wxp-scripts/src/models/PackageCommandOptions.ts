@@ -22,29 +22,16 @@
  * SOFTWARE.
  ********************************************************************************/
 
+import { BuildCommandOptions } from "./BuildCommandOptions.js";
+
 /**
  * Class representing the user provided CLI options for Package Command.
  */
-export class PackageCommandOptions {
-    /**
-     * Source directory - where the code artifacts exist.
-     */
-    readonly srcDirectory: string;
-
-    /**
-     * Command to use for transpilation.
-     */
-    readonly transpiler: string;
-
+export class PackageCommandOptions extends BuildCommandOptions {
     /**
      * Should rebuild flag.
      */
     readonly shouldRebuild: boolean;
-
-    /**
-     * Verbose flag.
-     */
-    readonly verbose: boolean;
 
     /**
      * Instantiate {@link PackageCommandOptions}.
@@ -55,9 +42,7 @@ export class PackageCommandOptions {
      * @returns Reference to a new {@link PackageCommandOptions} instance.
      */
     constructor(srcDirectory: string, transpiler: string, shouldRebuild: boolean, verbose: boolean) {
-        this.srcDirectory = srcDirectory;
-        this.transpiler = transpiler;
+        super(srcDirectory, transpiler, verbose);
         this.shouldRebuild = shouldRebuild;
-        this.verbose = verbose;
     }
 }

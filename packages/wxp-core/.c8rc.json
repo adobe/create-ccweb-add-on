@@ -3,12 +3,18 @@
     "include": ["src/**/*.ts"],
     "exclude": [
         "src/**/*.spec.ts",
-        "src/**/*Types.ts",
         "src/**/index.ts",
         "src/config/*",
         "src/constants.ts",
+        "src/models/AddOnListingData.ts",
+        "src/utilities/Logger.ts",
+        "src/utilities/Process.ts",
         "**/*.d.ts"
     ],
+    "lines": 100,
+    "functions": 100,
+    "branches": 100,
+    "statements": 100,
     "reporter": ["html", "text", "text-summary"],
     "report-dir": "coverage"
 }

@@ -2,4 +2,3 @@
 dist/
 src/generated
 
-!BUILD.bazel

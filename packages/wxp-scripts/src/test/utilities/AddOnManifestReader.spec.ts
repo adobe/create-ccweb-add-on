@@ -35,7 +35,7 @@ import sinon from "sinon";
 import type { StubbedInstance } from "ts-sinon";
 import { stubInterface } from "ts-sinon";
 import { MANIFEST_JSON } from "../../constants.js";
-import { AddOnManifestReader } from "../../utilities/index.js";
+import { AddOnManifestReader } from "../../utilities/AddOnManifestReader.js";
 import { createManifest } from "../test-utilities.js";
 
 describe("AddOnManifestReader", () => {

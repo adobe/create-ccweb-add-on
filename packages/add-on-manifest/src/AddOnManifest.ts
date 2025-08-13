@@ -22,7 +22,7 @@
  * SOFTWARE.
  ********************************************************************************/
 
-import {
+import type {
     AddOnInfo,
     AddOnLogAction,
     AddOnLogLevel,

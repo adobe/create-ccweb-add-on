@@ -22,23 +22,175 @@
  * SOFTWARE.
  ********************************************************************************/
 
+import type { AnalyticsService } from "@adobe/ccweb-add-on-analytics";
+import { ITypes as IAnalyticsTypes } from "@adobe/ccweb-add-on-analytics";
+import type { Logger, Process } from "@adobe/ccweb-add-on-core";
+import { ITypes as ICoreTypes } from "@adobe/ccweb-add-on-core";
+import { inject, injectable } from "inversify";
+import process from "process";
+import "reflect-metadata";
+import semver from "semver";
+import format from "string-template";
+import { AnalyticsErrorMarkers } from "../AnalyticsMarkers.js";
+import { PROGRAM_NAME } from "../constants.js";
+
 /**
- * Environment validator interface to validate
+ * Environment validator implementation class to validate
  * the system requirements required for running the app.
  */
-export interface EnvironmentValidator {
+@injectable()
+export class EnvironmentValidator {
+    private readonly _process: Process;
+    private readonly _logger: Logger;
+    private readonly _analyticsService: AnalyticsService;
+    /**
+     * Instantiate {@link EnvironmentValidator}.
+     *
+     * @param processHandler - {@link Process} reference.
+     * @param logger - {@link Logger} reference.
+     * @param analyticsService - {@link AnalyticsService} reference.
+     * @returns Reference to a new {@link EnvironmentValidator} instance.
+     */
+    constructor(
+        @inject(ICoreTypes.Process) processHandler: Process,
+        @inject(ICoreTypes.Logger) logger: Logger,
+        @inject(IAnalyticsTypes.AnalyticsService) analyticsService: AnalyticsService
+    ) {
+        this._process = processHandler;
+        this._logger = logger;
+        this._analyticsService = analyticsService;
+    }
+
     /**
      * Validate the node version in the user's system.
      */
-    validateNodeVersion(): Promise<void>;
+    async validateNodeVersion(): Promise<void> {
+        const minNode = "18.0.0";
+        try {
+            const result = this._process.executeSync("node", ["--version"]);
+            const nodeVersion = String(result?.data)?.trim();
+            const hasMinNode = semver.gte(nodeVersion, minNode);
+            if (!hasMinNode) {
+                this._logger.warning(format(LOGS.usingNodeVersion, { nodeVersion }));
+                this._logger.information(
+                    format(LOGS.requiresHigherNode, {
+                        PROGRAM_NAME,
+                        minNode
+                    })
+                );
+                this._logger.information(LOGS.updateNodeVersion);
+                await this._analyticsService.postEvent(
+                    AnalyticsErrorMarkers.ERROR_INVALID_NODE,
+                    format(LOGS.analyticsInvalidNode, { nodeVersion }),
+                    false
+                );
+                return process.exit(0);
+            }
+        } catch (error) {
+            this._process.handleError(error);
+        }
+    }
 
     /**
      * Validate the npm version in the user's system.
      */
-    validateNpmVersion(): Promise<void>;
+    async validateNpmVersion(): Promise<void> {
+        const minNpm = "10.0.0";
+        try {
+            const result = this._process.executeSync("npm", ["--version"]);
+            const npmVersion = result.data ? String(result.data)?.trim() : undefined;
+            if (!npmVersion) {
+                this._logger.warning(LOGS.notUsingNpm);
+                this._logger.information(
+                    format(LOGS.requiresHigherNpm, {
+                        PROGRAM_NAME,
+                        minNpm
+                    })
+                );
+                this._logger.information(LOGS.installNpm);
+                await this._analyticsService.postEvent(AnalyticsErrorMarkers.ERROR_NO_NPM, LOGS.analyticsNoNpm, false);
+                return process.exit(0);
+            }
+
+            const hasMinNpm = semver.gte(npmVersion, minNpm);
+            if (!hasMinNpm) {
+                this._logger.warning(format(LOGS.usingNpmVersion, { npmVersion }));
+                this._logger.information(
+                    format(LOGS.requiresHigherNpm, {
+                        PROGRAM_NAME,
+                        minNpm
+                    })
+                );
+                this._logger.information(LOGS.updateNpm);
+                await this._analyticsService.postEvent(
+                    AnalyticsErrorMarkers.ERROR_INVALID_NPM,
+                    format(LOGS.analyticsInvalidNpm, { npmVersion }),
+                    false
+                );
+                return process.exit(0);
+            }
+        } catch (error) {
+            this._process.handleError(error);
+        }
+    }
 
     /**
      * Validate the npm configuration in the user's system.
      */
-    validateNpmConfiguration(): Promise<void>;
+    async validateNpmConfiguration(): Promise<void> {
+        try {
+            const cwd = process.cwd();
+            const configList = this._process.executeSync("npm", ["config", "list"])?.data;
+            if (!configList) {
+                return;
+            }
+
+            const prefix = "; cwd = ";
+            const configLines = configList.split("\n");
+            const cwdLine = configLines.find(line => line.startsWith(prefix));
+            if (!cwdLine) {
+                return;
+            }
+
+            const npmCWD = cwdLine.substring(prefix.length);
+            if (npmCWD === cwd) {
+                return;
+            }
+
+            this._logger.warning(LOGS.couldNotStartNpmProcess);
+            this._logger.information(format(LOGS.currentDirectory, { cwd }));
+            this._logger.information(format(LOGS.newNpmProcessRunsIn, { npmCWD }));
+            this._logger.information(LOGS.misconfiguredTerminalShell);
+
+            await this._analyticsService.postEvent(
+                AnalyticsErrorMarkers.ERROR_NPM_NOT_STARTED,
+                LOGS.analyticsNotStartNpm,
+                false
+            );
+            return process.exit(0);
+        } catch (error) {
+            return;
+        }
+    }
 }
+
+const LOGS = {
+    newLine: "\n",
+    tab: "  ",
+    usingNodeVersion: "You are using node {nodeVersion}.",
+    requiresHigherNode: "{PROGRAM_NAME} requires node {minNode} or higher.",
+    updateNodeVersion: "Please update your version of node.",
+    notUsingNpm: "You are not using npm.",
+    requiresHigherNpm: "{PROGRAM_NAME} requires npm {minNpm} or higher.",
+    installNpm: "Please install npm.",
+    usingNpmVersion: "You are using npm {npmVersion}.",
+    updateNpm: "Please update your version of npm.",
+    couldNotStartNpmProcess: "Could not start an npm process in the right directory.",
+    currentDirectory: "The current directory is: {cwd}",
+    newNpmProcessRunsIn: "However, a newly started npm process runs in: {npmCWD}",
+    misconfiguredTerminalShell: "This is probably caused by a misconfigured system terminal shell.",
+    analyticsInvalidNode: "Invalid node version: {nodeVersion}",
+    analyticsNoNpm: "npm is not present",
+    analyticsInvalidNpm: "Invalid npm version: {npmVersion}",
+    analyticsNotStartNpm: "npm process could not be started"
+};

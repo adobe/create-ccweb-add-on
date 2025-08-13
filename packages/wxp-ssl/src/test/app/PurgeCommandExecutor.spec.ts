@@ -23,7 +23,8 @@
  ********************************************************************************/
 
 import type { AnalyticsService } from "@adobe/ccweb-add-on-analytics";
-import { PreferenceJson, type Logger, type Preferences } from "@adobe/ccweb-add-on-core";
+import type { Logger, UserPreferences } from "@adobe/ccweb-add-on-core";
+import { PreferenceJson } from "@adobe/ccweb-add-on-core";
 import devcert from "@adobe/ccweb-add-on-devcert";
 import { assert } from "chai";
 import chalk from "chalk";
@@ -36,15 +37,15 @@ import sinon from "sinon";
 import type { StubbedInstance } from "ts-sinon";
 import { stubInterface } from "ts-sinon";
 import { AnalyticsErrorMarkers, AnalyticsSuccessMarkers } from "../../AnalyticsMarkers.js";
-import type { CommandExecutor } from "../../app/index.js";
-import { PurgeCommandExecutor } from "../../app/index.js";
-import { SSLRemoveOption } from "../../models/index.js";
+import type { CommandExecutor } from "../../app/CommandExecutor.js";
+import { PurgeCommandExecutor } from "../../app/PurgeCommandExecutor.js";
+import { SSLRemoveOption } from "../../models/SSLTypes.js";
 
 describe("PurgeCommandExecutor", () => {
     describe("execute", () => {
         let sandbox: SinonSandbox;
 
-        let preferences: StubbedInstance<Preferences>;
+        let preferences: StubbedInstance<UserPreferences>;
         let analyticsService: StubbedInstance<AnalyticsService>;
         let logger: StubbedInstance<Logger>;
 

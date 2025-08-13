@@ -34,14 +34,15 @@ import { ITypes } from "../config/inversify.types.js";
 import type { PackageCommandOptions } from "../models/PackageCommandOptions.js";
 import type { AddOnManifestReader } from "../utilities/AddOnManifestReader.js";
 import { PackageManager } from "../utilities/PackageManager.js";
+import type { BuildCommandExecutor } from "./BuildCommandExecutor.js";
 import type { CommandExecutor } from "./CommandExecutor.js";
 
 /**
  * Package command executor.
  */
 @injectable()
-export class PackageCommandExecutor implements CommandExecutor {
-    private readonly _buildCommandExecutor: CommandExecutor;
+export class PackageCommandExecutor implements CommandExecutor<PackageCommandOptions> {
+    private readonly _buildCommandExecutor: BuildCommandExecutor;
     private readonly _logger: Logger;
     private readonly _manifestReader: AddOnManifestReader;
 
@@ -54,7 +55,7 @@ export class PackageCommandExecutor implements CommandExecutor {
      * @returns Reference to a new {@link PackageCommandExecutor} instance.
      */
     constructor(
-        @inject(ITypes.CommandExecutor) @named("build") buildCommandExecutor: CommandExecutor,
+        @inject(ITypes.CommandExecutor) @named("build") buildCommandExecutor: BuildCommandExecutor,
         @inject(ICoreTypes.Logger) logger: Logger,
         @inject(ITypes.AddOnManifestReader) manifestReader: AddOnManifestReader
     ) {
@@ -71,7 +72,11 @@ export class PackageCommandExecutor implements CommandExecutor {
      */
     async execute(options: PackageCommandOptions): Promise<void> {
         if (options.shouldRebuild) {
-            const isBuildSuccessful = await this._buildCommandExecutor.execute(options);
+            const isBuildSuccessful = await this._buildCommandExecutor.execute({
+                srcDirectory: options.srcDirectory,
+                transpiler: options.transpiler,
+                verbose: options.verbose
+            });
             if (!isBuildSuccessful) {
                 return;
             }

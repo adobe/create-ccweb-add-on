@@ -22,19 +22,85 @@
  * SOFTWARE.
  ********************************************************************************/
 
-import type { PackageJson, TemplateJson } from "@adobe/ccweb-add-on-core";
-
-/**
- * Package builder interface for constructing the package.json of the Add-on project.
- */
-export interface PackageBuilder {
-    /**
-     * Build {@link PackageJson}.
-     */
-    build(): PackageJson;
-}
+import type { TemplateJson } from "@adobe/ccweb-add-on-core";
+import { PackageJson } from "@adobe/ccweb-add-on-core";
+import { injectable } from "inversify";
 
 /**
  * Package builder factory.
  */
 export type PackageBuilderFactory = (packageJson: PackageJson) => (templateJson: TemplateJson) => PackageBuilder;
+
+/**
+ * Package builder class for constructing the package.json of the add-on project.
+ */
+@injectable()
+export class PackageBuilder {
+    private _combinedPackage: PackageJson;
+    private _templateJson: TemplateJson;
+
+    /**
+     * Instantiate {@link PackageBuilder}.
+     *
+     * @param packageJson - {@link PackageJson}.
+     * @param templateJson - {@link TemplateJson}.
+     * @returns Reference to a new {@link PackageBuilder} instance.
+     */
+    constructor(packageJson: PackageJson, templateJson: TemplateJson) {
+        this._combinedPackage = new PackageJson({ ...packageJson });
+        this._templateJson = templateJson;
+    }
+
+    /**
+     * Build {@link PackageJson}.
+     */
+    build(): PackageJson {
+        this._buildDevDependencies();
+        this._buildDependencies();
+        this._buildScripts();
+
+        return this._combinedPackage;
+    }
+
+    private _buildDevDependencies(): void {
+        if (!this._templateJson.devDependencies || this._templateJson.devDependencies.size === 0) {
+            return;
+        }
+
+        this._templateJson.devDependencies.forEach((value, key) => {
+            if (!this._combinedPackage.devDependencies) {
+                this._combinedPackage.devDependencies = new Map<string, string>();
+            }
+
+            this._combinedPackage.devDependencies.set(key, value);
+        });
+    }
+
+    private _buildDependencies(): void {
+        if (!this._templateJson.dependencies || this._templateJson.dependencies.size === 0) {
+            return;
+        }
+
+        this._templateJson.dependencies.forEach((value, key) => {
+            if (!this._combinedPackage.dependencies) {
+                this._combinedPackage.dependencies = new Map<string, string>();
+            }
+
+            this._combinedPackage.dependencies.set(key, value);
+        });
+    }
+
+    private _buildScripts(): void {
+        if (!this._templateJson.scripts || this._templateJson.scripts.size === 0) {
+            return;
+        }
+
+        this._templateJson.scripts.forEach((value, key) => {
+            if (!this._combinedPackage.scripts) {
+                this._combinedPackage.scripts = new Map<string, string>();
+            }
+
+            this._combinedPackage.scripts.set(key, value);
+        });
+    }
+}
