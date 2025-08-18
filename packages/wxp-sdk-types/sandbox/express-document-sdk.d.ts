@@ -22,7 +22,7 @@
  * SOFTWARE.
  ********************************************************************************/
 
-import { mat2d } from "gl-matrix";
+import type { mat2d } from "gl-matrix";
 
 /**
  * AddOnData class provides APIs to read, write, remove private metadata to a Node.
@@ -968,7 +968,7 @@ export declare class GridLayoutNode extends Node implements IRectangularNode {
      * Grid Cells are ordered by the y and then x position of their top left corner, i.e. left to right and top to bottom.
      * The children cannot be added or removed.
      */
-    get allChildren(): Readonly<Iterable<Node>>;
+    get allChildren(): Readonly<Iterable<GridCellNode>>;
     /**
      * The background fill of the GridLayout.
      */
@@ -1864,7 +1864,7 @@ export declare type SolidColorStrokeWithOptionalType = Omit<SolidColorStroke, "t
 
 /**
  * A StandaloneTextNode represents a text display frame in the scenegraph. It displays an entire piece of text.
- * The StandaloneTextNode does not directly hold the text content and styles – instead it refers to a {@link TextContentModel}.
+ * The StandaloneTextNode does not directly hold the text content and styles – instead it refers to a {@link TextNodeContentModel}.
  *
  * To create new a single-frame piece of text, see {@link Editor.createText}.
  */
@@ -1975,11 +1975,10 @@ declare enum TextAlignment {
 }
 
 /**
- * Represents a complete piece of text content, which may be contained within a single {@link StandaloneTextNode} *or*
- * split across multiple {@link ThreadedTextNode} frames for display.
+ * TextContentModel is an abstract base class representing a complete piece of text content.
  * Use this model to get or modify the text string and the style ranges applied to it.
  */
-export declare class TextContentModel {
+export declare abstract class TextContentModel {
     /**
      * <InlineAlert slots="text" variant="warning"/>
      *
@@ -1994,14 +1993,6 @@ export declare class TextContentModel {
      * Comparing two models using `===` will always fail.
      */
     get id(): string;
-    /**
-     * Get ordered list of all {@link TextNode}s that display this text content in the scenegraph. The text content
-     * starts in the first  {@link ThreadedTextNode} "frame", and then flows into the second node once it has filled the first one. The ending of the
-     * text content may not be visible at all, if the last {@link ThreadedTextNode} "frame" is not large enough to accommodate it.
-     *
-     * If there are multiple {@link ThreadedTextNode}s, all of them must be configured to use {@link AreaTextLayout}.
-     */
-    get allTextNodes(): Readonly<Iterable<TextNode>>;
     /**
      * The complete text string, which may span multiple {@link ThreadedTextNode} "frames" in the scenegraph.
      */
@@ -2126,7 +2117,7 @@ declare enum TextLayout {
 /**
  * TextNode is an abstract base class representing text displayed in the scenegraph, regardless of whether it's a fully
  * self-contained {@link StandaloneTextNode} or one {@link ThreadedTextNode} "frame" of multiple in a larger flow. The
- * APIs on TextNode and its {@link TextContentModel} allow you to generically work with text without needing to know
+ * APIs on TextNode and its {@link TextNodeContentModel} allow you to generically work with text without needing to know
  * which of those subtypes you are dealing with.
  */
 export declare abstract class TextNode extends Node {
@@ -2179,12 +2170,12 @@ export declare abstract class TextNode extends Node {
      * fixed-size frame using {@link AreaTextLayout} does not fit all the (remaining) text.
      *
      * Note: When traversing the scenegraph in search of text content, bear in mind that multiple TextNodes may refer to the
-     * same single {@link TextContentModel}; this can give the impression that the same text is duplicated multiple times when it is
-     * not. Use {@link TextContentModel}.id to determine whether a given piece of text content is unique or if it's already been
+     * same single {@link TextNodeContentModel}; this can give the impression that the same text is duplicated multiple times when it is
+     * not. Use {@link TextNodeContentModel}.id to determine whether a given piece of text content is unique or if it's already been
      * encountered before.
      *
      */
-    get fullContent(): TextContentModel;
+    get fullContent(): TextNodeContentModel;
     /**
      * Helper method to determine if the text is standalone.
      */
@@ -2204,14 +2195,14 @@ export declare abstract class TextNode extends Node {
      * The text string content which is partially *or* fully displayed in this TextNode "frame."
      * WARNING: If a piece of text content flows across several TextNodes, *each* TextNode's `text` getter will return
      * the *entire* text content string.
-     * @deprecated - Use the text getter on {@link TextContentModel} instead. Access it via `TextNode.fullContent.text`.
+     * @deprecated - Use the text getter on {@link TextNodeContentModel} instead. Access it via `TextNode.fullContent.text`.
      */
     get text(): string;
     /**
      * Sets the text content of the TextNode.
      * WARNING: If a piece of text content flows across several TextNodes,
      * *each* TextNode's `text` setter will sets the *entire* text content string.
-     * @deprecated - Use the text setter on {@link TextContentModel} instead. Access it via `TextNode.fullContent.text`.
+     * @deprecated - Use the text setter on {@link TextNodeContentModel} instead. Access it via `TextNode.fullContent.text`.
      */
     set text(textContent: string);
     /**
@@ -2232,6 +2223,22 @@ export declare abstract class TextNode extends Node {
      * @returns The layout mode of the TextNode "frame."
      */
     get layout(): Readonly<AutoWidthTextLayout | AutoHeightTextLayout | AreaTextLayout | UnsupportedTextLayout>;
+}
+
+/**
+ * Represents a complete piece of text content, which may be contained within a single {@link StandaloneTextNode} *or*
+ * split across multiple {@link ThreadedTextNode} frames for display.
+ * Use this model to get or modify the text string and the style ranges applied to it.
+ */
+export declare class TextNodeContentModel extends TextContentModel {
+    /**
+     * Get ordered list of all {@link TextNode}s that display this text content in the scenegraph. The text content
+     * starts in the first  {@link ThreadedTextNode} "frame", and then flows into the second node once it has filled the first one. The ending of the
+     * text content may not be visible at all, if the last {@link ThreadedTextNode} "frame" is not large enough to accommodate it.
+     *
+     * If there are multiple {@link ThreadedTextNode}s, all of them must be configured to use {@link AreaTextLayout}.
+     */
+    get allTextNodes(): Readonly<Iterable<TextNode>>;
 }
 
 /**
@@ -2257,7 +2264,7 @@ export declare enum TextScriptStyle {
 /**
  * A ThreadedTextNode represents a text display frame in the scenegraph. It is a subset of longer text that flows across
  * multiple TextNode "frames". Because of this, the TextNode does not directly hold the text content and styles –
- * instead it refers to a {@link TextContentModel}, which may be shared across multiple ThreadedTextNode frames.
+ * instead it refers to a {@link TextNodeContentModel}, which may be shared across multiple ThreadedTextNode frames.
  *
  * APIs are not yet available to create multi-frame text flows.
  */

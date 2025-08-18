@@ -23,6 +23,6 @@
  ********************************************************************************/
 
 export * from "./express-document-sdk.js";
-export * from "./global.js";
+export type * from "./global.js";
 export * from "./add-on-sdk-document-sandbox.js";
 export { default } from "./add-on-sdk-document-sandbox.js";

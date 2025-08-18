@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-sdk-types",
+      "comment": "Changes made to text content model, PPT export added",
+      "type": "major"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-sdk-types"
+}
