@@ -947,7 +947,7 @@ declare interface Document_2 {
      */
     runPrintQualityCheck(options: PrintQualityCheckOptions): void;
 }
-export { Document_2 as Document };
+export type { Document_2 as Document };
 
 /**
  * The payload data sent when the document's export permission status changes in review and approval workflow.
@@ -1741,6 +1741,13 @@ export declare interface PngRenditionOptions extends RenditionOptions {
     fileSizeLimitUnit?: FileSizeLimitUnit;
 }
 
+export declare interface PptxRenditionOptions extends RenditionOptions {
+    /**
+     * PPTX rendition format
+     */
+    format: RenditionFormat.pptx;
+}
+
 /**
  * @experimental - Experimental API
  * Options for running print quality check
@@ -1874,7 +1881,11 @@ export declare enum RenditionFormat {
     /**
      * PDF format
      */
-    pdf = "application/pdf"
+    pdf = "application/pdf",
+    /**
+     * PPTX format
+     */
+    pptx = "application/vnd.openxmlformats-officedocument.presentationml.presentation"
 }
 
 /**
