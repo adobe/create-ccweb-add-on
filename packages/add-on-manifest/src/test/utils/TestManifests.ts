@@ -141,6 +141,11 @@ export function getTestManifestV1(privileged?: boolean): AddOnManifestV1 {
                 type: EntrypointType.CONTEXTUAL_BULK_CREATE,
                 id: `contextual-bulk-create-${count}`,
                 ...entryPointDetails
+            },
+            {
+                type: EntrypointType.IMPORT_HUB,
+                id: `import-hub-${count}`,
+                ...entryPointDetails
             }
         ],
         icon: [
@@ -237,6 +242,11 @@ export function getTestManifestV2(privileged?: boolean): AddOnManifestV2 {
             {
                 type: EntrypointType.CONTEXTUAL_BULK_CREATE,
                 id: `contextual-bulk-create-${count}`,
+                main: "index.html"
+            },
+            {
+                type: EntrypointType.IMPORT_HUB,
+                id: `import-hub-${count}`,
                 main: "index.html"
             }
         ]

@@ -887,7 +887,7 @@ export declare type DisableDragToDocument = () => void;
  */
 declare interface Document_2 {
     /**
-     * Add image/Ps/Ai files to the current page
+     * Add image/PSD/AI assets to the current page
      */
     addImage(blob: Blob, attributes?: MediaAttributes, importAddOnData?: ImportAddOnData): Promise<void>;
     /**
@@ -947,7 +947,7 @@ declare interface Document_2 {
      */
     runPrintQualityCheck(options: PrintQualityCheckOptions): void;
 }
-export type { Document_2 as Document };
+export { Document_2 as Document };
 
 /**
  * The payload data sent when the document's export permission status changes in review and approval workflow.
@@ -1012,6 +1012,10 @@ export declare interface DragCompletionData {
      * Media info
      */
     attributes?: MediaAttributes & SourceMimeTypeInfo;
+    /**
+     * Add-on specific metadata to attach to the imported asset.
+     */
+    importAddOnData?: ImportAddOnData;
 }
 
 /**
@@ -1150,7 +1154,11 @@ export declare enum EntrypointType {
     /**
      * Contextual bulk create entrypoint type.
      */
-    CONTEXTUAL_BULK_CREATE = "contextual.bulk-create"
+    CONTEXTUAL_BULK_CREATE = "contextual.bulk-create",
+    /**
+     * Import hub entrypoint type.
+     */
+    IMPORT_HUB = "import-hub"
 }
 
 export declare interface Field {
@@ -1227,19 +1235,22 @@ export declare enum FrameRate {
 }
 
 /**
- * Represents the add-on data for a node.
+ * Represents add-on-specific data that can be attached to imported media assets (nodes).
+ * This data provides a way for add-ons to store custom metadata with imported assets across multiple import APIs.
  * Note: This support is not present for PSD/AI assets.
  */
 export declare interface ImportAddOnData {
     /**
-     * The node add-on data which will persist on the image frame even if the image content is replaced with a
-     * different one. This data can be accessed later via the MediaContainerNode.addOnData API.
+     * Node-specific add-on data that persists with the individual asset container.
+     * This data remains attached to the container node even when the asset content is replaced.
+     * This data can be accessed later via document sandbox MediaContainerNode.addOnData API.
      */
     nodeAddOnData?: Record<string, string>;
     /**
-     * The media add-on data which will reset if the image is replaced with a different one. All copies of the
-     * same image in the document will share the same mediaAddOnData. This data can be accessed later via the
-     * MediaRectangleNode.mediaAddOnData API.
+     * Media-specific add-on data that is tied to the actual asset content.
+     * This data is shared across all copies of the same asset throughout the document
+     * and will be reset if the asset content is replaced with different media.
+     * This data can be accessed later via document sandbox MediaRectangleNode.mediaAddOnData API.
      */
     mediaAddOnData?: Record<string, string>;
 }
