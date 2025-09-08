@@ -195,7 +195,11 @@ export enum EntrypointType {
     /**
      * Contextual bulk create entrypoint type.
      */
-    CONTEXTUAL_BULK_CREATE = "contextual.bulk-create"
+    CONTEXTUAL_BULK_CREATE = "contextual.bulk-create",
+    /**
+     * Import hub entrypoint type.
+     */
+    IMPORT_HUB = "import-hub"
 }
 
 export type AuthorInfo = {

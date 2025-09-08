@@ -22,7 +22,7 @@
  * SOFTWARE.
  ********************************************************************************/
 
-import type { mat2d } from "gl-matrix";
+import { mat2d } from "gl-matrix";
 
 /**
  * AddOnData class provides APIs to read, write, remove private metadata to a Node.
@@ -85,6 +85,7 @@ declare namespace ApiConstants {
         TextScriptStyle,
         EditorEvent,
         VisualEffectType,
+        TextStyleSource,
         ParagraphListType,
         OrderedListNumbering
     };
@@ -265,10 +266,12 @@ declare interface BaseCharacterStyles {
      */
     underline: boolean;
     /**
-     * URL for the hyperlink.
-     * A link can be removed by setting it to undefined
+     * A URL hyperlink. Character ranges with a link are underlined *by default*, unless these styles explicitly specify
+     * `underline: false`.
+     *
+     * To remove a link from existing text, explicitly specify `link: ""` in {@link TextContentModel.applyCharacterStyles}.
      */
-    link: string | undefined;
+    link?: string;
     /**
      * Sets a superscript or subscript style.
      */
@@ -394,15 +397,15 @@ declare interface BaseParagraphStyles {
  * Represents a bitmap image resource. Use {@link Editor.loadBitmapImage} to create a BitmapImage, and then {@link Editor.createImageContainer}
  * to display it in the document by creating a MediaContainerNode structure.
  */
-export declare interface BitmapImage {
+export declare class BitmapImage {
     /**
      * Original width of the bitmap in pixels.
      */
-    readonly width: number;
+    get width(): number;
     /**
      * Original height of the bitmap in pixels.
      */
-    readonly height: number;
+    get height(): number;
 }
 
 /**
@@ -447,7 +450,8 @@ declare enum BlendMode {
     hue = 14,
     saturation = 15,
     color = 16,
-    luminosity = 17
+    luminosity = 17,
+    accumulate = 18
 }
 
 /**
@@ -938,11 +942,11 @@ export declare class Fonts {
 export declare const fonts: ExpressFonts;
 
 /**
- * A GridCellNode represents the MediaContainerNode aspect of a grid cell. Unlike other MediaContainerNodes,
- * GridCellNodes cannot be translated or rotated directly. This implementation translates and rotates the
- * MediaRectangle child of the GridCellNode when those actions are applied.
+ * A GridCellNode represents the media aspect of a grid cell. Unlike MediaContainerNodes, grid cells cannot be
+ * translated or rotated directly and can't modify a mask shape. This implementation translates and rotates the
+ * media rectangle child when those actions are applied.
  */
-export declare class GridCellNode extends MediaContainerNode {
+export declare class GridCellNode extends Node implements IMediaContainerNode {
     /**
      * <InlineAlert slots="text" variant="warning"/>
      *
@@ -953,7 +957,11 @@ export declare class GridCellNode extends MediaContainerNode {
      * Use the parent grid container instead.
      *
      */
-    clone(): never;
+    cloneInPlace(): never;
+    get allChildren(): Readonly<Iterable<Node>>;
+    get mediaRectangle(): ImageRectangleNode | UnknownMediaRectangleNode;
+    replaceMedia(media: BitmapImage): void;
+    get maskShape(): ReadOnlyMask;
 }
 
 /**
@@ -1041,6 +1049,72 @@ declare interface IFillableNode {
 export declare class ImageRectangleNode extends MediaRectangleNode {}
 
 /**
+ * Interface for nodes that contain media.
+ */
+export declare interface IMediaContainerNode {
+    /**
+     * The rectangular node representing the entire, uncropped bounds of the media (e.g. image, GIFs, or video). The media's position and
+     * rotation can be changed, but it cannot be resized yet via this API. Media types other than images will yield an UnknownMediaRectangleNode
+     * object for now.
+     * @privateRemarks
+     * Future: for resizing, see HZ-17885 & HZ-12247; for other media types, see HZ-15896.
+     */
+    get mediaRectangle(): ImageRectangleNode | UnknownMediaRectangleNode;
+    /**
+     * Replace existing media inline. The new media is sized to completely fill the bounds of the existing maskShape; if the
+     * media's aspect ratio differs from the maskShape's, the media will be cropped by the maskShape on either the left/right
+     * or top/bottom edges. Currently only supports images as the new media, but previous media can be of any type.
+     *
+     * @param media - New content to display. Currently must be a {@link BitmapImage}.
+     */
+    replaceMedia(media: BitmapImage): void;
+    /**
+     * A read-only view of the mask shape used for cropping/clipping the media.
+     */
+    get maskShape(): INodeBounds;
+}
+
+/**
+ * An interface for the bounds of a {@link Node}.
+ */
+export declare interface INodeBounds extends IVisualNodeBounds {
+    /**
+     * An axis-aligned box in the parent’s coordinate space encompassing the node’s layout bounds (its
+     * {@link boundsLocal}, as transformed by its position and rotation relative to the parent). If the node has
+     * rotation, the top-left of its boundsLocal box (aligned to its own axes) is not necessarily located at the
+     * top-left of the boundsInParent box (since it's aligned to the parent's axes). This value is well-defined
+     * even for an orphan node with no parent.
+     */
+    get boundsInParent(): Readonly<Rect>;
+    /**
+     * The translation of the node along its parent's axes. This is identical to the translation component of
+     * `transformMatrix`. It is often simpler to set a node's position using `setPositionInParent` than by
+     * setting translation directly.
+     */
+    get translation(): Readonly<Point>;
+    /**
+     * The node's local rotation angle in degrees, relative to its parent's axes. Use `setRotationInParent` to
+     * change rotation by rotating around a defined centerpoint.
+     */
+    get rotation(): number;
+    /**
+     * The node's total rotation angle in degrees, relative to the overall global view of the document – including any
+     * cumulative rotation from the node's parent containers.
+     */
+    get rotationInScreen(): number;
+    /**
+     * The node's transform matrix relative to its parent.
+     */
+    get transformMatrix(): mat2d;
+    /**
+     * Convert the node's {@link boundsLocal} to an axis-aligned bounding box in the coordinate space of the target
+     * node. Both nodes must share the same {@link visualRoot}, but can lie anywhere within that subtree
+     * relative to one another (the target node need not be an ancestor of this node, nor vice versa).
+     */
+    boundsInNode(targetNode: VisualNode): Readonly<Rect>;
+}
+
+/**
  * Interface for nodes with width and height properties.
  */
 declare interface IRectangularNode {
@@ -1101,6 +1175,37 @@ export declare class ItemList<T extends ListItem> extends RestrictedItemList<T> 
      * @throws - if newItem has a different parent and it is a {@link ThreadedTextNode}, or if newItem's children subtree contains a {@link ThreadedTextNode}.
      */
     insertAfter(newItem: T, after: T): void;
+}
+
+/**
+ * An interface for the bounds of a {@link VisualNode}.
+ */
+export declare interface IVisualNodeBounds {
+    /**
+     * The bounding box of the node, expressed in the node's local coordinate space (which may be shifted or rotated
+     * relative to its parent). Generally matches the selection outline seen in the UI, encompassing the vector path
+     * "spine" of the shape as well as its stroke, but excluding effects such as shadows.
+     *
+     * The top-left corner of the bounding box corresponds to the visual top-left corner of the node, but this value is
+     * *not* necessarily (0,0) – this is especially true for Text and Path nodes.
+     */
+    get boundsLocal(): Readonly<Rect>;
+    /**
+     * Position of the node's centerpoint in its own local coordinate space, i.e. the center of the boundsLocal box.
+     */
+    get centerPointLocal(): Readonly<Point>;
+    /**
+     * Position of the node's top-left corner in its own local coordinate space, equal to (boundsLocal.x,
+     * boundsLocal.y). If the node is rotated, this is not the same as the top-left corner of
+     * boundsInParent.
+     */
+    get topLeftLocal(): Readonly<Point>;
+    /**
+     * Convert a point given in the node’s local coordinate space to a point in the coordinate space of the target node.
+     * Both nodes must share the same {@link visualRoot}, but can lie anywhere within that subtree relative to one
+     * another (the target node need not be an ancestor of this node, nor vice versa).
+     */
+    localPointInNode(localPoint: Point, targetNode: VisualNode): Readonly<Point>;
 }
 
 /**
@@ -1181,12 +1286,7 @@ export declare interface ListItem {}
  * To create new media container for a bitmap image, see {@link Editor.createImageContainer}. APIs for creating a
  * container with other content, such as videos, are not yet available.
  */
-export declare class MediaContainerNode extends Node {
-    /**
-     * The rectangular node representing the entire, uncropped bounds of the media (e.g. image, GIFs, or video). The media's position and
-     * rotation can be changed, but it cannot be resized yet via this API. Media types other than images will yield an UnknownMediaRectangleNode
-     * object for now.
-     */
+export declare class MediaContainerNode extends Node implements IMediaContainerNode {
     get mediaRectangle(): ImageRectangleNode | UnknownMediaRectangleNode;
     /**
      * The mask used for cropping/clipping the media. The bounds of this shape are entire visible bounds of the container.
@@ -1194,13 +1294,6 @@ export declare class MediaContainerNode extends Node {
      * different shape via this API.
      */
     get maskShape(): FillableNode;
-    /**
-     * Replace existing media inline. The new media is sized to completely fill the bounds of the existing maskShape; if the
-     * media's aspect ratio differs from the maskShape's, the media will be cropped by the maskShape on either the left/right
-     * or top/bottom edges. Currently only supports images as the new media, but previous media can be of any type.
-     *
-     * @param media - New content to display. Currently must be a {@link BitmapImage}.
-     */
     replaceMedia(media: BitmapImage): void;
 }
 
@@ -1238,7 +1331,7 @@ export declare abstract class MediaRectangleNode extends Node implements Readonl
      * Clone the entire parent MediaContainerNode instead.
      *
      */
-    clone(): never;
+    cloneInPlace(): never;
 }
 
 /**
@@ -1247,9 +1340,9 @@ export declare abstract class MediaRectangleNode extends Node implements Readonl
  * minimal VisualNode or BaseNode. As a general rule, if you can click or drag an object with the select/move
  * tool in the UI, then it extends from Node.
  *
- * A Node’s parent is always a VisualContentNode but may not be another Node (e.g. if the parent is an ArtboardNode)
+ * A Node’s parent is always a {@link VisualNode}, but it might not be another Node (e.g. if the parent is an ArtboardNode).
  */
-declare class Node extends VisualNode {
+declare class Node extends VisualNode implements INodeBounds {
     /**
      * Returns a read-only list of all children of the node. General-purpose content containers such as ArtboardNode or
      * GroupNode also provide a mutable {@link ContainerNode.children} list. Other nodes with a more specific structure can
@@ -1259,25 +1352,8 @@ declare class Node extends VisualNode {
      * The children of a Node are always other Node classes (never the more minimal BaseNode).
      */
     get allChildren(): Readonly<Iterable<Node>>;
-    /**
-     * An axis-aligned box in the parent’s coordinate space encompassing the node’s layout bounds (its
-     * {@link boundsLocal}, as transformed by its position and rotation relative to the parent). If the node has
-     * rotation, the top-left of its boundsLocal box (aligned to its own axes) is not necessarily located at the
-     * top-left of the boundsInParent box (since it's aligned to the parent's axes). This value is well-defined
-     * even for an orphan node with no parent.
-     */
     get boundsInParent(): Readonly<Rect>;
-    /**
-     * Convert the node's {@link boundsLocal} to an axis-aligned bounding box in the coordinate space of the target
-     * node. Both nodes must share the same {@link visualRoot}, but can lie anywhere within that subtree
-     * relative to one another (the target node need not be an ancestor of this node, nor vice versa).
-     */
     boundsInNode(targetNode: VisualNode): Readonly<Rect>;
-    /**
-     * The translation of the node along its parent's axes. This is identical to the translation component of
-     * `transformMatrix`. It is often simpler to set a node's position using `setPositionInParent` than by
-     * setting translation directly.
-     */
     get translation(): Readonly<Point>;
     set translation(value: Point);
     /**
@@ -1295,10 +1371,6 @@ declare class Node extends VisualNode {
      * ```
      */
     setPositionInParent(parentPoint: Point, localRegistrationPoint: Point): void;
-    /**
-     * The node's local rotation angle in degrees, relative to its parent's axes. Use `setRotationInParent` to
-     * change rotation by rotating around a defined centerpoint.
-     */
     get rotation(): number;
     /**
      * Set the node’s rotation angle relative to its parent to exactly the given value, keeping the given point in the
@@ -1310,29 +1382,23 @@ declare class Node extends VisualNode {
      * @example
      * Rotate the rectangle 45 degrees clockwise around its centerpoint:
      * ```
-     * rectangle.setRotationInParent(45, { x: rectangle.width / 2, y: rectangle.height / 2 });
+     * rectangle.setRotationInParent(45, rectangle.centerPointLocal);
      * ```
      */
     setRotationInParent(angleInDegrees: number, localRotationPoint: Point): void;
-    /**
-     * The node's total rotation angle in degrees, relative to the overall global view of the document – including any
-     * cumulative rotation from the node's parent containers.
-     */
     get rotationInScreen(): number;
     /**
      * The node's opacity, from 0.0 to 1.0
      */
     get opacity(): number;
     set opacity(opacity: number);
-    /**
-     * The node's transform matrix relative to its parent.
-     */
     get transformMatrix(): mat2d;
     /**
      * The node's lock/unlock state. Locked nodes are excluded from the selection (see {@link Context.selection}), and
-     * cannot be edited by the user in the UI unless they are unlocked first. Operations on locked nodes using the API
-     * are permitted. However, please consider if modifying a locked node would align with user expectations
-     * before using the API to make changes to locked nodes.
+     * cannot be edited by the user in the UI unless they are unlocked first. It is still possible to mutate locked nodes
+     * at the model level using these APIs. However, please consider if modifying a locked node would align with user
+     * expectations before doing so.
+     *
      */
     get locked(): boolean;
     set locked(locked: boolean);
@@ -1348,7 +1414,15 @@ declare class Node extends VisualNode {
      * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
      *
      * @experimental
-     * Changes the width to the given value and the height to the given width multiplied by the aspect ratio.
+     * Changes the width to the given value by visually *scaling* the entire content larger or smaller on both axes to
+     * preserve its existing aspect ratio, keeping its top-left corner ({@link topLeftLocal}) at a fixed location.
+     *
+     * Scaling changes the size of visual styling elements such as stroke width, corner detailing, and font size.
+     * Contrast this to *resizing* operations (such as {@link resizeToFitWithin}), which adjust the bounding box of an
+     * element while trying to preserve the existing size of visual detailing such as strokes, corners, and fonts.
+     *
+     * Rescaling becomes baked into the updated values of fields such as stroke weight, rectangle width, etc. (it is not
+     * a separate, persistent scale factor multiplier).
      */
     rescaleProportionalToWidth(width: number): void;
     /**
@@ -1357,7 +1431,8 @@ declare class Node extends VisualNode {
      * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
      *
      * @experimental
-     * Changes the height to the given value and the width to the given height multiplied by the aspect ratio.
+     * Changes the height to the given value by visually *scaling* the entire content larger or smaller on both axes to
+     * preserve its existing aspect ratio. See {@link rescaleProportionalToWidth} documentation for additional explanation.
      */
     rescaleProportionalToHeight(height: number): void;
     /**
@@ -1366,9 +1441,17 @@ declare class Node extends VisualNode {
      * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
      *
      * @experimental
-     * Resizes the node to fit within a box with the given dimensions.
+     * Resizes the node to fit entirely *within* a box of the given dimensions, keeping its top-left corner ({@link topLeftLocal})
+     * at a fixed location. Nodes with a fixed aspect ratio may leave unused space on one axis as a result, but nodes
+     * with flexible aspect ratio will be resized to the exact box size specified.
      *
-     * If the node doesn't have a fixed aspect ratio then this will resize the node to the given width and height.
+     * Resizing attempts to preserve the existing size of visual styling elements such as stroke width, corner detailing,
+     * and font size as much as possible. Contrast with *rescaling* (such as {@link rescaleProportionalToWidth}), which
+     * always changes the size of visual detailing in exact proportion to the change in overall bounding box size. This
+     * API may still produce *some* degree of rescaling if necessary for certain shapes with fixed corner/edge detailing
+     * to fit the box better.
+     *
+     * @see resizeToCover
      */
     resizeToFitWithin(width: number, height: number): void;
     /**
@@ -1377,9 +1460,12 @@ declare class Node extends VisualNode {
      * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
      *
      * @experimental
-     * Resizes the node to cover a box with the given dimensions.
+     * Resizes the node to completely *cover* a box of the given dimensions, keeping its top-left corner ({@link topLeftLocal})
+     * at a fixed location. Nodes with a fixed aspect ratio may extend outside the box on one axis as a result, but
+     * nodes with flexible aspect ratio will be resized to the exact box size specified. See {@link resizeToFitWithin}
+     * documentation for additional explanation.
      *
-     * If the node doesn't have a fixed aspect ratio then this will resize the node to the given width and height.
+     * @see resizeToFitWithin
      */
     resizeToCover(width: number, height: number): void;
     /**
@@ -1388,9 +1474,12 @@ declare class Node extends VisualNode {
      * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
      *
      * @experimental
-     * Creates an orphaned copy of this node, including all persistent attributes and descendants.
+     * Creates a copy of this node and its entire subtree of descendants.
+     *
+     * The node must be attached to a page as the copy will be added as a sibling.
+     *
      */
-    clone(): typeof this;
+    cloneInPlace(): typeof this;
 }
 export { Node as Node };
 
@@ -1653,6 +1742,26 @@ export declare class ReadOnlyItemList<T extends ListItem> {
      * All items in the list, as a static array. Mutations that occur later are not reflected in an array returned earlier.
      */
     toArray(): readonly T[];
+}
+
+/**
+ * A read-only view of a mask shape.
+ */
+export declare class ReadOnlyMask implements INodeBounds {
+    /**
+     * The type of {@link ReadOnlyMask}.
+     */
+    get type(): "ReadOnlyMask";
+    get boundsLocal(): Readonly<Rect>;
+    get centerPointLocal(): Readonly<Point>;
+    get topLeftLocal(): Readonly<Point>;
+    localPointInNode(localPoint: Point, targetNode: VisualNode): Readonly<Point>;
+    get boundsInParent(): Readonly<Rect>;
+    boundsInNode(targetNode: VisualNode): Readonly<Rect>;
+    get translation(): Readonly<Point>;
+    get rotation(): number;
+    get rotationInScreen(): number;
+    get transformMatrix(): mat2d;
 }
 
 export declare interface Rect {
@@ -1999,6 +2108,72 @@ export declare abstract class TextContentModel {
     get text(): string;
     set text(textContent: string);
     /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Appends a new text string to the end of the text content.
+     *
+     * @param newText - The text to append.
+     * @throws if the existing text contains fonts unavailable to the current user. See {@link hasUnavailableFonts}.
+     */
+    appendText(newText: string): void;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Inserts a new text string into the text content at the specified index.
+     *
+     * @param newText - The text to insert.
+     * @param index - The index at which to insert the new text.
+     * @param style - Style to use for the new text: either directly provides a style to use, or indicates which
+     *      existing text to match the style of. Default: `beforeInsertionPoint`.
+     * @throws if the existing text contains fonts unavailable to the current user. See {@link hasUnavailableFonts}.
+     */
+    insertText(
+        newText: string,
+        index: number,
+        style?: CharacterStylesInput | TextStyleSource.beforeInsertionPoint | TextStyleSource.afterInsertionPoint
+    ): void;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Replaces a range of text with a new text string.
+     *
+     * @param newText - The text to replace the range with.
+     * @param replaceRange - The range of text to replace.
+     * @param style - Style to use for the new text: either directly provides a style to use, or indicates which
+     *      existing text to match the style of. Default: `firstReplacedCharacter`.
+     * @throws if the existing text contains fonts unavailable to the current user. See {@link hasUnavailableFonts}.
+     */
+    replaceText(
+        newText: string,
+        replaceRange: TextRange,
+        style?:
+            | CharacterStylesInput
+            | TextStyleSource.beforeInsertionPoint
+            | TextStyleSource.afterInsertionPoint
+            | TextStyleSource.firstReplacedCharacter
+    ): void;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Deletes a range of text from the content.
+     *
+     * @param range - The range of text to delete.
+     * @throws if the existing text contains fonts unavailable to the current user. See {@link hasUnavailableFonts}.
+     */
+    deleteText(range: TextRange): void;
+    /**
      * The character styles are applied to different ranges of this text content. When setting character styles, any style
      * properties that are not provided are reset to their defaults (contrast to {@link applyCharacterStyles} which
      * preserves the text's existing styles for any fields not specified). When *getting* styles, all fields are always
@@ -2242,9 +2417,9 @@ export declare class TextNodeContentModel extends TextContentModel {
 }
 
 /**
- * A range of text in a {@link TextContentModel}.
+ * A range of text in a {@link TextContentModel}, specified in characters.
  */
-declare interface TextRange {
+export declare interface TextRange {
     start: number;
     length: number;
 }
@@ -2262,6 +2437,37 @@ export declare enum TextScriptStyle {
 }
 
 /**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * Indicates which existing text to match the style of when inserting new text or replacing text.
+ */
+export declare enum TextStyleSource {
+    /**
+     * Use style of the character just before the insertion point, *unless* that character is not on the same line (same
+     * paragraph) in which case falls back to afterInsertionPoint behavior. This generally matches the style a user would
+     * get in the UI if they place their cursor at this insertion point.
+     */
+    beforeInsertionPoint = 0,
+    /**
+     * Use style of the character just after the insertion point (which is always on the same line/paragraph, since lines end
+     * with a `\n` character; an insertion point past this is inserting on the next line). If there is no character after the
+     * insertion point, the insertion point is at the end of the text (appending) and the style of the previous character is
+     * used instead. This option is useful when *pre*pending to an existing block of text.
+     */
+    afterInsertionPoint = 1,
+    /**
+     * When replacing existing text, use the style of the first character in the replaced text. This may feel more
+     * predictable to users than the styles on either side of the replaced text. E.g. if replacing a single word one-to-one
+     * with a new word, and the replaced word has a style unique to the text on either side of it, one may expect the new
+     * text to match that original word's style.
+     */
+    firstReplacedCharacter = 2
+}
+
+/**
  * A ThreadedTextNode represents a text display frame in the scenegraph. It is a subset of longer text that flows across
  * multiple TextNode "frames". Because of this, the TextNode does not directly hold the text content and styles –
  * instead it refers to a {@link TextNodeContentModel}, which may be shared across multiple ThreadedTextNode frames.
@@ -2269,15 +2475,6 @@ export declare enum TextScriptStyle {
  * APIs are not yet available to create multi-frame text flows.
  */
 export declare class ThreadedTextNode extends TextNode {
-    /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
-     * Always throws as it's not possible to clone only a single "frame" of threaded text.
-     */
-    clone(): never;
     get nextTextNode(): ThreadedTextNode | undefined;
     get layout(): Readonly<AreaTextLayout>;
     /**
@@ -2396,7 +2593,7 @@ declare enum VisualEffectType {
  *
  * Some VisualNodes might have a non-visual parent such as a PageNode.
  */
-export declare class VisualNode extends BaseNode {
+export declare class VisualNode extends BaseNode implements IVisualNodeBounds {
     /**
      * The highest ancestor that still has visual presence in the document. Typically an Artboard, but for orphaned
      * content, it will be the root of the deleted content (which might be this node itself).
@@ -2406,30 +2603,9 @@ export declare class VisualNode extends BaseNode {
      * meaningful comparison or conversion between the bounds or coordinate spaces of such nodes.
      */
     get visualRoot(): VisualNode;
-    /**
-     * The bounding box of the node, expressed in the node's local coordinate space (which may be shifted or rotated
-     * relative to its parent). Generally matches the selection outline seen in the UI, encompassing the vector path
-     * "spine" of the shape as well as its stroke, but excluding effects such as shadows.
-     *
-     * The top-left corner of the bounding box corresponds to the visual top-left corner of the node, but this value is
-     * *not* necessarily (0,0) – this is especially true for Text and Path nodes.
-     */
     get boundsLocal(): Readonly<Rect>;
-    /**
-     * Position of the node's centerpoint in its own local coordinate space, i.e. the center of the boundsLocal box.
-     */
     get centerPointLocal(): Readonly<Point>;
-    /**
-     * Position of the node's top-left corner in its own local coordinate space, equal to (boundsLocal.x,
-     * boundsLocal.y). If the node is rotated, this is not the same as the top-left corner of
-     * boundsInParent.
-     */
     get topLeftLocal(): Readonly<Point>;
-    /**
-     * Convert a point given in the node’s local coordinate space to a point in the coordinate space of the target node.
-     * Both nodes must share the same {@link visualRoot}, but can lie anywhere within that subtree relative to one
-     * another (the target node need not be an ancestor of this node, nor vice versa).
-     */
     localPointInNode(localPoint: Point, targetNode: VisualNode): Readonly<Point>;
 }
 
