@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-core",
+      "comment": "Bump package version",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-core"
+}

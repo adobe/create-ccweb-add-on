@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-scripts",
+      "comment": "Bump package version",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-scripts"
+}
