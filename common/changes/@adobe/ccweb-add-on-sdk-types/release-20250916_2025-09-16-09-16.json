@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-sdk-types",
+      "comment": "Sync wxp hlapi sdk docs and stablizing clone/duplicate node",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-sdk-types"
+}
