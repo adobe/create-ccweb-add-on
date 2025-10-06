@@ -1158,7 +1158,11 @@ export declare enum EntrypointType {
     /**
      * Import hub entrypoint type.
      */
-    IMPORT_HUB = "import-hub"
+    IMPORT_HUB = "import-hub",
+    /**
+     * Quick action entrypoint type.
+     */
+    QUICK_ACTION = "quick-action"
 }
 
 export declare interface Field {
@@ -1527,6 +1531,10 @@ export declare interface PageMetadata {
      * Whether the page contains animated content
      */
     hasAnimatedContent: boolean;
+    /**
+     * The page's background color in ARGB format (32-bit integer)
+     */
+    backgroundARGB?: number;
     /**
      * Whether the page is blank
      */
