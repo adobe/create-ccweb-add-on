@@ -199,15 +199,7 @@ export enum EntrypointType {
     /**
      * Import hub entrypoint type.
      */
-    IMPORT_HUB = "import-hub",
-    /**
-     * Quick action entrypoint type.
-     */
-    QUICK_ACTION = "quick-action",
-    /**
-     * Content hub home (L1) entrypoint type.
-     */
-    CONTENT_HUB_HOME = "content-hub-home"
+    IMPORT_HUB = "import-hub"
 }
 
 export type AuthorInfo = {

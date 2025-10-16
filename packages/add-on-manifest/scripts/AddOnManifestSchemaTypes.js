@@ -23,7 +23,7 @@
  ********************************************************************************/
 
 const typePattern =
-    "^(panel|script|share|content-hub|content-hub-home|mobile.your-stuff.files|mobile.media.audio|mobile.more|schedule|contextual.replace|contextual.upload|contextual.bulk-create|command|import-hub|quick-action)$";
+    "^(panel|script|share|content-hub|mobile.your-stuff.files|mobile.media.audio|mobile.more|schedule|contextual.replace|contextual.upload|contextual.bulk-create|command|import-hub)$";
 const sandboxPattern = "^(allow-popups|allow-presentation|allow-downloads|allow-popups-to-escape-sandbox|allow-forms)$";
 const clipboardPattern = "^(clipboard-write|clipboard-read)$";
 const iconPattern = "^(lightest|light|medium|dark|darkest|all)$";

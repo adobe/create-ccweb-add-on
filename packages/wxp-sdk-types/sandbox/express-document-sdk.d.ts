@@ -85,6 +85,7 @@ declare namespace ApiConstants {
         TextScriptStyle,
         EditorEvent,
         VisualEffectType,
+        TextStyleSource,
         ParagraphListType,
         OrderedListNumbering
     };
@@ -99,11 +100,8 @@ declare interface ApiModuleExport {
 }
 
 /**
- * <InlineAlert slots="text" variant="warning"/>
- *
- * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
- *
- * @experimental
+ * Area text: both width and height are explicitly set. If text content is too long to fit, the end of the text will be
+ * clipped. If text content is short, the frame's bounds will occupy extra height that is just blank space.
  */
 export declare interface AreaTextLayout {
     type: TextLayout.area;
@@ -139,8 +137,8 @@ declare enum ArrowHeadType {
 }
 
 /**
- * ArtboardList represents an ordered list of ArtboardNodes arranged in a timeline sequence, where they are called "scenes."
- * All items in the list are children of a single {@link PageNode}.
+ * ArtboardList represents an ordered list of ArtboardNodes, which are the children of one {@link PageNode}. If multiple
+ * artboards are present, each represents a keyframe "scene" in the page's animation timeline.
  *
  * ArtboardList also provides APIs for adding/removing artboards from the page. ArtboardList is never empty: it is illegal to
  * remove the last remaining artboard from the list.
@@ -157,13 +155,10 @@ export declare class ArtboardList extends RestrictedItemList<ArtboardNode> {
 }
 
 /**
- * An ArtboardNode represents an artboard object in the scenegraph. All user visual content must be contained on an artboard.
- * Artboards are always contained on a {@link PageNode}; when a page contains multiple artboards, the artboards represent
- * "scenes" in a linear timeline sequence.
+ * An ArtboardNode represents the topmost container of visual content within a {@link PageNode}. When a page contains
+ * multiple artboards, each represents a keyframe "scene" in the page's animation timeline.
  *
  * To create a new artboard, see {@link ArtboardList.addArtboard}.
- *
- * Please note that creating and deleting an artboard in a single frame will crash the editor.
  */
 export declare class ArtboardNode extends VisualNode implements Readonly<IRectangularNode>, ContainerNode {
     /**
@@ -172,11 +167,13 @@ export declare class ArtboardNode extends VisualNode implements Readonly<IRectan
      * hold children in various discrete "slots"; this `allChildren` list includes *all* such children and reflects their
      * overall display z-order.
      *
-     * The children of an Artboard are always other Node classes (never the more minimal BaseNode).
+     * The children of an Artboard are all subclasses of Node (not just the more minimal BaseNode or VisualNode).
      */
     get allChildren(): Readonly<Iterable<Node>>;
     /**
-     * The node's children. Use the methods on this ItemList object to get, add, and remove children.
+     * The artboards's regular children (does not include any "background layer" content if present; use {@link allChildren}
+     * for a read-only view that includes background content). Use the methods on this `children` ItemList object to get,
+     * add, and remove regular children.
      */
     get children(): ItemList<Node>;
     /**
@@ -204,11 +201,8 @@ export declare class ArtboardNode extends VisualNode implements Readonly<IRectan
 }
 
 /**
- * <InlineAlert slots="text" variant="warning"/>
- *
- * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
- *
- * @experimental
+ * Auto-height text: Width is explicitly set, and text wraps to use as much vertical space as necessary to display the
+ * full content.
  */
 export declare interface AutoHeightTextLayout {
     type: TextLayout.autoHeight;
@@ -219,11 +213,8 @@ export declare interface AutoHeightTextLayout {
 }
 
 /**
- * <InlineAlert slots="text" variant="warning"/>
- *
- * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
- *
- * @experimental
+ * Auto-width, aka point text: both width and height are automatically determined based on the content. There is no
+ * automatic line wrapping, so the text will all be on one line unless the text contains explicit newlines.
  */
 export declare interface AutoWidthTextLayout {
     type: TextLayout.autoWidth;
@@ -265,10 +256,12 @@ declare interface BaseCharacterStyles {
      */
     underline: boolean;
     /**
-     * URL for the hyperlink.
-     * A link can be removed by setting it to undefined
+     * A URL hyperlink. Character ranges with a link are underlined *by default*, unless these styles explicitly specify
+     * `underline: false`.
+     *
+     * To remove a link from existing text, explicitly specify `link: ""` in {@link TextContentModel.applyCharacterStyles}.
      */
-    link: string | undefined;
+    link?: string;
     /**
      * Sets a superscript or subscript style.
      */
@@ -350,11 +343,6 @@ export declare class BaseNode {
 }
 
 /**
- * <InlineAlert slots="text" variant="warning"/>
- *
- * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
- *
- * @experimental
  * BaseParagraphListStyle interface represents common properties shared between ordered and unordered list types.
  */
 declare interface BaseParagraphListStyle {
@@ -363,11 +351,6 @@ declare interface BaseParagraphListStyle {
 }
 
 /**
- * <InlineAlert slots="text" variant="warning"/>
- *
- * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
- *
- * @experimental
  * Base paragraph styles that can be applied to an entire paragraph atomically.
  * Excludes list style settings, which differ between the getter-oriented {@link ParagraphStyles} interface and the
  * setter-oriented {@link ParagraphStylesRangeInput}.
@@ -394,15 +377,15 @@ declare interface BaseParagraphStyles {
  * Represents a bitmap image resource. Use {@link Editor.loadBitmapImage} to create a BitmapImage, and then {@link Editor.createImageContainer}
  * to display it in the document by creating a MediaContainerNode structure.
  */
-export declare interface BitmapImage {
+export declare class BitmapImage {
     /**
      * Original width of the bitmap in pixels.
      */
-    readonly width: number;
+    get width(): number;
     /**
      * Original height of the bitmap in pixels.
      */
-    readonly height: number;
+    get height(): number;
 }
 
 /**
@@ -447,7 +430,8 @@ declare enum BlendMode {
     hue = 14,
     saturation = 15,
     color = 16,
-    luminosity = 17
+    luminosity = 17,
+    accumulate = 18
 }
 
 /**
@@ -604,7 +588,8 @@ export declare class Context {
      */
     off(eventName: EditorEvent, handlerId: EventHandlerId): void;
     /**
-     * @returns the current selection. Nodes that are locked or otherwise non-editable are never included in the selection.
+     * @returns the current selection. Nodes that are locked or otherwise non-editable are never included in the regular
+     * selection (see {@link selectionIncludingNonEditable} to get any locked nodes the user may have clicked).
      */
     get selection(): readonly Node[];
     /**
@@ -636,6 +621,7 @@ export declare class Context {
     get insertionParent(): ContainerNode;
     /**
      * @returns The currently viewed page.
+     * To change the current page, call {@link Viewport.bringIntoView} with an artboard or other content on that page.
      */
     get currentPage(): PageNode;
 }
@@ -787,6 +773,9 @@ export declare class Editor {
      * Note that the path data will be normalized, and therefore the `path` getter may return a different SVG string from the path creation input.
      * For example, "M 10 80 Q 52.5 10, 95 80 T 180 80" becomes "M 10 80 C 38.33 33.33 66.67 33.33 95 80...".
      * Throws if the input is empty or is not legal SVG path syntax.
+     *
+     * Note: the visual top-left corner of a path may not be its local (0,0) origin point, so it's easiest to position
+     * a newly created path using {@link Node.setPositionInParent} rather than setting {@link Node.translation} directly.
      */
     createPath(path: string): PathNode;
 }
@@ -847,8 +836,7 @@ declare class ExpressFonts extends Fonts {}
 
 /**
  * An ExpressRootNode represents the root node of the document's "scenegraph" artwork tree. The root contains a collection
- * of {@link pages}. Each page contains one or more artboards, arranged in a timeline sequence. All the visual content of
- * the document lies within those artboards.
+ * of {@link pages}. Each page contains one or more artboards, which in turn hold all the visual content of the document.
  *
  * The parent of ExpressRootNode is undefined, since it is the root of the document tree.
  */
@@ -938,50 +926,48 @@ export declare class Fonts {
 export declare const fonts: ExpressFonts;
 
 /**
- * A GridCellNode represents the MediaContainerNode aspect of a grid cell. Unlike other MediaContainerNodes,
- * GridCellNodes cannot be translated or rotated directly. This implementation translates and rotates the
- * MediaRectangle child of the GridCellNode when those actions are applied.
+ * A GridCellNode represents the media aspect of a grid cell. Unlike MediaContainerNodes, grid cells cannot be
+ * translated or rotated directly and can't modify a mask shape. This implementation translates and rotates the
+ * media rectangle child when those actions are applied.
  */
-export declare class GridCellNode extends MediaContainerNode {
+export declare class GridCellNode extends Node implements IMediaContainerNode {
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * Always throws as it's not possible to clone a single grid slot.
      * Use the parent grid container instead.
      *
      */
-    clone(): never;
+    cloneInPlace(): never;
+    get allChildren(): Readonly<Iterable<Node>>;
+    get mediaRectangle(): ImageRectangleNode | UnknownMediaRectangleNode;
+    replaceMedia(media: BitmapImage): void;
+    get maskShape(): ReadOnlyMask;
 }
 
 /**
- * A GridLayoutNode represents a grid layout in the scenegraph. The GridLayoutNode is used to create
- * a layout grid that other content can be placed into.
+ * A GridLayoutNode represents a grid layout in the scenegraph. Currently, grids contain only images but in the future
+ * they may support other types of content as well.
  *
  * APIs to create a new grid layout are not yet available.
  */
 export declare class GridLayoutNode extends Node implements IRectangularNode {
     /**
-     * The Grid's regular children. Does not include rectangles and skips over media constainer nodes to return fill grandchildren.
-     * Grid Cells are ordered by the y and then x position of their top left corner, i.e. left to right and top to bottom.
-     * The children cannot be added or removed.
+     * The GridLayout's child nodes. Nodes are returned in order sorted by the y and then x position of their top left
+     * corner, i.e. left to right and top to bottom. These children cannot be added or removed.
      */
-    get allChildren(): Readonly<Iterable<Node>>;
+    get allChildren(): Readonly<Iterable<GridCellNode>>;
     /**
-     * The background fill of the GridLayout.
+     * The background fill of the GridLayout. GridLayouts must always have a fill.
      */
     set fill(fill: Fill);
     get fill(): Readonly<Fill>;
     /**
-     * The width of the node.
+     * The width of the entire GridLayout node.
      * Must be at least {@link MIN_DIMENSION}.
      */
     get width(): number;
     set width(value: number);
     /**
-     * The height of the node.
+     * The height of the entire GridLayout node.
      * Must be at least {@link MIN_DIMENSION}.
      */
     get height(): number;
@@ -996,8 +982,8 @@ export declare class GridLayoutNode extends Node implements IRectangularNode {
  */
 export declare class GroupNode extends Node implements ContainerNode {
     /**
-     * The Group's regular children. Does not include the maskShape if one is present.
-     * Use the methods on this ItemList object to get, add, and remove children.
+     * The Group's regular children. Does not include the {@link maskShape} if one is present.
+     * Use the methods on this ItemList object to get, add, and remove regular children.
      */
     get children(): ItemList<Node>;
     /**
@@ -1041,6 +1027,72 @@ declare interface IFillableNode {
 export declare class ImageRectangleNode extends MediaRectangleNode {}
 
 /**
+ * Interface for nodes that contain media.
+ */
+export declare interface IMediaContainerNode {
+    /**
+     * The rectangular node representing the entire, uncropped bounds of the media (e.g. image, GIFs, or video). The media's position and
+     * rotation can be changed, but it cannot be resized yet via this API. Media types other than images will yield an UnknownMediaRectangleNode
+     * object for now.
+     * @privateRemarks
+     * Future: for resizing, see HZ-17885 & HZ-12247; for other media types, see HZ-15896.
+     */
+    get mediaRectangle(): ImageRectangleNode | UnknownMediaRectangleNode;
+    /**
+     * Replace existing media inline. The new media is sized to completely fill the bounds of the existing maskShape; if the
+     * media's aspect ratio differs from the maskShape's, the media will be cropped by the maskShape on either the left/right
+     * or top/bottom edges. Currently only supports images as the new media, but previous media can be of any type.
+     *
+     * @param media - New content to display. Currently must be a {@link BitmapImage}.
+     */
+    replaceMedia(media: BitmapImage): void;
+    /**
+     * A read-only view of the mask shape used for cropping/clipping the media.
+     */
+    get maskShape(): INodeBounds;
+}
+
+/**
+ * An interface for the bounds of a {@link Node}.
+ */
+export declare interface INodeBounds extends IVisualNodeBounds {
+    /**
+     * An axis-aligned box in the parent’s coordinate space encompassing the node’s layout bounds (its
+     * {@link boundsLocal}, as transformed by its position and rotation relative to the parent). If the node has
+     * rotation, the top-left of its boundsLocal box (aligned to its own axes) is not necessarily located at the
+     * top-left of the boundsInParent box (since it's aligned to the parent's axes). This value is well-defined
+     * even for an orphan node with no parent.
+     */
+    get boundsInParent(): Readonly<Rect>;
+    /**
+     * The translation of the node along its parent's axes. This is identical to the translation component of
+     * `transformMatrix`. It is often simpler to set a node's position using `setPositionInParent` than by
+     * setting translation directly.
+     */
+    get translation(): Readonly<Point>;
+    /**
+     * The node's local rotation angle in degrees, relative to its parent's axes. Use `setRotationInParent` to
+     * change rotation by rotating around a defined centerpoint.
+     */
+    get rotation(): number;
+    /**
+     * The node's total rotation angle in degrees, relative to the overall global view of the document – including any
+     * cumulative rotation from the node's parent containers.
+     */
+    get rotationInScreen(): number;
+    /**
+     * The node's transform matrix relative to its parent.
+     */
+    get transformMatrix(): mat2d;
+    /**
+     * Convert the node's {@link boundsLocal} to an axis-aligned bounding box in the coordinate space of the target
+     * node. Both nodes must share the same {@link visualRoot}, but can lie anywhere within that subtree
+     * relative to one another (the target node need not be an ancestor of this node, nor vice versa).
+     */
+    boundsInNode(targetNode: VisualNode): Readonly<Rect>;
+}
+
+/**
  * Interface for nodes with width and height properties.
  */
 declare interface IRectangularNode {
@@ -1057,20 +1109,18 @@ declare interface IStrokableNode {
 }
 
 /**
- * ItemList represents an ordered list of API objects, representing items that are all children of the
- * same parent node. (The reverse is not necessarily true, however: this list might not include all
- * children that exist in the parent node. See {@link Node.allChildren} for details).
+ * ItemList represents an ordered list of API objects that are all children of the same parent node. It is most
+ * frequently encountered as {@link ArtboardNode.children} or {@link GroupNode.children}.
  *
  * ItemList also provides APIs for manipulating the list by adding items to the parent or removing items from the parent.
  *
- * This class is used in different places for various types of items, including Nodes, Fills, and Strokes.
+ * Note that some parent nodes may have additional children that are *not* present in the main `children` ItemList
+ * (e.g. {@link GroupNode.maskShape}). Use the read-only {@link Node.allChildren} for a combined view of all children.
  */
 export declare class ItemList<T extends ListItem> extends RestrictedItemList<T> {
     /**
      * Add one or more items to the end of the list. The last argument will become the last item in this list. Items are
      * removed from their previous parent, if any – or if an item is already in *this* list, its index is simply changed.
-     *
-     * @throws - if item has a different parent and item is a {@link ThreadedTextNode}, or if item's children subtree contains a {@link ThreadedTextNode}.
      */
     append(...items: T[]): void;
     /**
@@ -1081,26 +1131,51 @@ export declare class ItemList<T extends ListItem> extends RestrictedItemList<T> 
      * Replace `oldItem` with `newItem` in this list. Throws if `oldItem` is not a member of this list.
      * `newItem` is removed from its previous parent, if any – or if it's already in *this* list, its index is simply
      * changed. No-op if both arguments are the same item.
-     *
-     * @throws - if newItem has a different parent and newItem is a {@link ThreadedTextNode}, or if newItem's children subtree contains a {@link ThreadedTextNode}.
      */
     replace(oldItem: T, newItem: T): void;
     /**
      * Insert `newItem` so it is immediately before `before` in this list: places `newItem` at the index that `before` used
      * to occupy, shifting `before` and all later items to higher indices. `newItem` is removed from its previous parent,
      * if any – or if it's already in *this* list, its index is simply changed. No-op if both arguments are the same item.
-     *
-     * @throws - if newItem has a different parent and it is a {@link ThreadedTextNode}, or if newItem's children subtree contains a {@link ThreadedTextNode}.
      */
     insertBefore(newItem: T, before: T): void;
     /**
      * Insert `newItem` so it is immediately after `after` in this list: places `newItem` at the index one higher than `after`,
      * shifting all later items to higher indices (the index of `after` remains unchanged). `newItem` is removed from its previous parent,
      * if any – or if it's already in *this* list, its index is simply changed. No-op if both arguments are the same item.
-     *
-     * @throws - if newItem has a different parent and it is a {@link ThreadedTextNode}, or if newItem's children subtree contains a {@link ThreadedTextNode}.
      */
     insertAfter(newItem: T, after: T): void;
+}
+
+/**
+ * An interface for the bounds of a {@link VisualNode}.
+ */
+export declare interface IVisualNodeBounds {
+    /**
+     * The bounding box of the node, expressed in the node's local coordinate space (which may be shifted or rotated
+     * relative to its parent). Generally matches the selection outline seen in the UI, encompassing the vector path
+     * "spine" of the shape as well as its stroke, but excluding effects such as shadows.
+     *
+     * The top-left corner of the bounding box corresponds to the visual top-left corner of the node, but this value is
+     * *not* necessarily (0,0) – this is especially true for Text and Path nodes.
+     */
+    get boundsLocal(): Readonly<Rect>;
+    /**
+     * Position of the node's centerpoint in its own local coordinate space, i.e. the center of the boundsLocal box.
+     */
+    get centerPointLocal(): Readonly<Point>;
+    /**
+     * Position of the node's top-left corner in its own local coordinate space, equal to (boundsLocal.x,
+     * boundsLocal.y). If the node is rotated, this is not the same as the top-left corner of
+     * boundsInParent.
+     */
+    get topLeftLocal(): Readonly<Point>;
+    /**
+     * Convert a point given in the node’s local coordinate space to a point in the coordinate space of the target node.
+     * Both nodes must share the same {@link visualRoot}, but can lie anywhere within that subtree relative to one
+     * another (the target node need not be an ancestor of this node, nor vice versa).
+     */
+    localPointInNode(localPoint: Point, targetNode: VisualNode): Readonly<Point>;
 }
 
 /**
@@ -1168,10 +1243,11 @@ export declare class LineNode extends StrokableNode {
 }
 
 /**
- * Base interface for any item that can be used in {@link ItemList}. ItemList is used in different places to hold various
- * types of items, including Nodes, Fills, and Strokes.
+ * Base interface for any item that can be stored in an {@link ItemList} (typically a {@link Node} type).
  */
 export declare interface ListItem {}
+
+declare type ListStyleInput = OrderedListStyleInput | UnorderedListStyleInput | RemoveListStyleInput;
 
 /**
  * A MediaContainerNode is a multi-node construct that displays media (such as images or video) with optional cropping and
@@ -1181,12 +1257,7 @@ export declare interface ListItem {}
  * To create new media container for a bitmap image, see {@link Editor.createImageContainer}. APIs for creating a
  * container with other content, such as videos, are not yet available.
  */
-export declare class MediaContainerNode extends Node {
-    /**
-     * The rectangular node representing the entire, uncropped bounds of the media (e.g. image, GIFs, or video). The media's position and
-     * rotation can be changed, but it cannot be resized yet via this API. Media types other than images will yield an UnknownMediaRectangleNode
-     * object for now.
-     */
+export declare class MediaContainerNode extends Node implements IMediaContainerNode {
     get mediaRectangle(): ImageRectangleNode | UnknownMediaRectangleNode;
     /**
      * The mask used for cropping/clipping the media. The bounds of this shape are entire visible bounds of the container.
@@ -1194,13 +1265,6 @@ export declare class MediaContainerNode extends Node {
      * different shape via this API.
      */
     get maskShape(): FillableNode;
-    /**
-     * Replace existing media inline. The new media is sized to completely fill the bounds of the existing maskShape; if the
-     * media's aspect ratio differs from the maskShape's, the media will be cropped by the maskShape on either the left/right
-     * or top/bottom edges. Currently only supports images as the new media, but previous media can be of any type.
-     *
-     * @param media - New content to display. Currently must be a {@link BitmapImage}.
-     */
     replaceMedia(media: BitmapImage): void;
 }
 
@@ -1214,6 +1278,7 @@ export declare abstract class MediaRectangleNode extends Node implements Readonl
     /**
      * Get {@link AddOnData} reference for managing private metadata attached to the media resource displayed by this node.
      * The same media resource may be reused in multiple places in the document, and all share the same AddOnData state.
+     * Note: This support is not present for PSD/AI assets. An error will be thrown in that case.
      */
     get mediaAddOnData(): AddOnData;
     /**
@@ -1229,16 +1294,11 @@ export declare abstract class MediaRectangleNode extends Node implements Readonl
      */
     get height(): number;
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * Always throws as it's not possible to clone just the media rectangle alone.
      * Clone the entire parent MediaContainerNode instead.
      *
      */
-    clone(): never;
+    cloneInPlace(): never;
 }
 
 /**
@@ -1247,9 +1307,9 @@ export declare abstract class MediaRectangleNode extends Node implements Readonl
  * minimal VisualNode or BaseNode. As a general rule, if you can click or drag an object with the select/move
  * tool in the UI, then it extends from Node.
  *
- * A Node’s parent is always a VisualContentNode but may not be another Node (e.g. if the parent is an ArtboardNode)
+ * A Node’s parent is always a {@link VisualNode}, but it might not be another Node (e.g. if the parent is an ArtboardNode).
  */
-declare class Node extends VisualNode {
+declare class Node extends VisualNode implements INodeBounds {
     /**
      * Returns a read-only list of all children of the node. General-purpose content containers such as ArtboardNode or
      * GroupNode also provide a mutable {@link ContainerNode.children} list. Other nodes with a more specific structure can
@@ -1259,25 +1319,8 @@ declare class Node extends VisualNode {
      * The children of a Node are always other Node classes (never the more minimal BaseNode).
      */
     get allChildren(): Readonly<Iterable<Node>>;
-    /**
-     * An axis-aligned box in the parent’s coordinate space encompassing the node’s layout bounds (its
-     * {@link boundsLocal}, as transformed by its position and rotation relative to the parent). If the node has
-     * rotation, the top-left of its boundsLocal box (aligned to its own axes) is not necessarily located at the
-     * top-left of the boundsInParent box (since it's aligned to the parent's axes). This value is well-defined
-     * even for an orphan node with no parent.
-     */
     get boundsInParent(): Readonly<Rect>;
-    /**
-     * Convert the node's {@link boundsLocal} to an axis-aligned bounding box in the coordinate space of the target
-     * node. Both nodes must share the same {@link visualRoot}, but can lie anywhere within that subtree
-     * relative to one another (the target node need not be an ancestor of this node, nor vice versa).
-     */
     boundsInNode(targetNode: VisualNode): Readonly<Rect>;
-    /**
-     * The translation of the node along its parent's axes. This is identical to the translation component of
-     * `transformMatrix`. It is often simpler to set a node's position using `setPositionInParent` than by
-     * setting translation directly.
-     */
     get translation(): Readonly<Point>;
     set translation(value: Point);
     /**
@@ -1295,10 +1338,6 @@ declare class Node extends VisualNode {
      * ```
      */
     setPositionInParent(parentPoint: Point, localRegistrationPoint: Point): void;
-    /**
-     * The node's local rotation angle in degrees, relative to its parent's axes. Use `setRotationInParent` to
-     * change rotation by rotating around a defined centerpoint.
-     */
     get rotation(): number;
     /**
      * Set the node’s rotation angle relative to its parent to exactly the given value, keeping the given point in the
@@ -1310,29 +1349,23 @@ declare class Node extends VisualNode {
      * @example
      * Rotate the rectangle 45 degrees clockwise around its centerpoint:
      * ```
-     * rectangle.setRotationInParent(45, { x: rectangle.width / 2, y: rectangle.height / 2 });
+     * rectangle.setRotationInParent(45, rectangle.centerPointLocal);
      * ```
      */
     setRotationInParent(angleInDegrees: number, localRotationPoint: Point): void;
-    /**
-     * The node's total rotation angle in degrees, relative to the overall global view of the document – including any
-     * cumulative rotation from the node's parent containers.
-     */
     get rotationInScreen(): number;
     /**
      * The node's opacity, from 0.0 to 1.0
      */
     get opacity(): number;
     set opacity(opacity: number);
-    /**
-     * The node's transform matrix relative to its parent.
-     */
     get transformMatrix(): mat2d;
     /**
      * The node's lock/unlock state. Locked nodes are excluded from the selection (see {@link Context.selection}), and
-     * cannot be edited by the user in the UI unless they are unlocked first. Operations on locked nodes using the API
-     * are permitted. However, please consider if modifying a locked node would align with user expectations
-     * before using the API to make changes to locked nodes.
+     * cannot be edited by the user in the UI unless they are unlocked first. It is still possible to mutate locked nodes
+     * at the model level using these APIs. However, please consider if modifying a locked node would align with user
+     * expectations before doing so.
+     *
      */
     get locked(): boolean;
     set locked(locked: boolean);
@@ -1348,7 +1381,15 @@ declare class Node extends VisualNode {
      * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
      *
      * @experimental
-     * Changes the width to the given value and the height to the given width multiplied by the aspect ratio.
+     * Changes the width to the given value by visually *scaling* the entire content larger or smaller on both axes to
+     * preserve its existing aspect ratio, keeping its top-left corner ({@link topLeftLocal}) at a fixed location.
+     *
+     * Scaling changes the size of visual styling elements such as stroke width, corner detailing, and font size.
+     * Contrast this to *resizing* operations (such as {@link resizeToFitWithin}), which adjust the bounding box of an
+     * element while trying to preserve the existing size of visual detailing such as strokes, corners, and fonts.
+     *
+     * Rescaling becomes baked into the updated values of fields such as stroke weight, rectangle width, etc. (it is not
+     * a separate, persistent scale factor multiplier).
      */
     rescaleProportionalToWidth(width: number): void;
     /**
@@ -1357,7 +1398,8 @@ declare class Node extends VisualNode {
      * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
      *
      * @experimental
-     * Changes the height to the given value and the width to the given height multiplied by the aspect ratio.
+     * Changes the height to the given value by visually *scaling* the entire content larger or smaller on both axes to
+     * preserve its existing aspect ratio. See {@link rescaleProportionalToWidth} documentation for additional explanation.
      */
     rescaleProportionalToHeight(height: number): void;
     /**
@@ -1366,9 +1408,17 @@ declare class Node extends VisualNode {
      * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
      *
      * @experimental
-     * Resizes the node to fit within a box with the given dimensions.
+     * Resizes the node to fit entirely *within* a box of the given dimensions, keeping its top-left corner ({@link topLeftLocal})
+     * at a fixed location. Nodes with a fixed aspect ratio may leave unused space on one axis as a result, but nodes
+     * with flexible aspect ratio will be resized to the exact box size specified.
      *
-     * If the node doesn't have a fixed aspect ratio then this will resize the node to the given width and height.
+     * Resizing attempts to preserve the existing size of visual styling elements such as stroke width, corner detailing,
+     * and font size as much as possible. Contrast with *rescaling* (such as {@link rescaleProportionalToWidth}), which
+     * always changes the size of visual detailing in exact proportion to the change in overall bounding box size. This
+     * API may still produce *some* degree of rescaling if necessary for certain shapes with fixed corner/edge detailing
+     * to fit the box better.
+     *
+     * @see resizeToCover
      */
     resizeToFitWithin(width: number, height: number): void;
     /**
@@ -1377,29 +1427,25 @@ declare class Node extends VisualNode {
      * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
      *
      * @experimental
-     * Resizes the node to cover a box with the given dimensions.
+     * Resizes the node to completely *cover* a box of the given dimensions, keeping its top-left corner ({@link topLeftLocal})
+     * at a fixed location. Nodes with a fixed aspect ratio may extend outside the box on one axis as a result, but
+     * nodes with flexible aspect ratio will be resized to the exact box size specified. See {@link resizeToFitWithin}
+     * documentation for additional explanation.
      *
-     * If the node doesn't have a fixed aspect ratio then this will resize the node to the given width and height.
+     * @see resizeToFitWithin
      */
     resizeToCover(width: number, height: number): void;
     /**
-     * <InlineAlert slots="text" variant="warning"/>
+     * Creates a copy of this node and its entire subtree of descendants.
      *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     * The node must be attached to a page as the copy will be added as a sibling.
      *
-     * @experimental
-     * Creates an orphaned copy of this node, including all persistent attributes and descendants.
      */
-    clone(): typeof this;
+    cloneInPlace(): typeof this;
 }
 export { Node as Node };
 
 /**
- * <InlineAlert slots="text" variant="warning"/>
- *
- * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
- *
- * @experimental
  * Numbering types used to display ordered lists: 1, A, a, I, i 01, 001.
  */
 export declare enum OrderedListNumbering {
@@ -1413,28 +1459,18 @@ export declare enum OrderedListNumbering {
 }
 
 /**
- * <InlineAlert slots="text" variant="warning"/>
- *
- * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
- *
- * @experimental
  * OrderedListStyle represents the style of an ordered list.
  */
 export declare type OrderedListStyle = Required<OrderedListStyleInput>;
 
 /**
- * <InlineAlert slots="text" variant="warning"/>
- *
- * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
- *
- * @experimental
  * Interface for specifying an ordered list style, such as a numbered list.
  */
 export declare interface OrderedListStyleInput extends BaseParagraphListStyle {
     type: ParagraphListType.ordered;
     /**
      * The numbering style to use. If undefined, it defaults to a different type depending on the paragraph's indent level.
-     * The defaults for increasing indent are 1, a, i, I, and then they repeat.
+     * The defaults for increasing indent are: 1, a, i, I, and then they repeat.
      * These markers and the prefix/postfix strings (if any) are displayed using the same font as the start of the
      * paragraph's text content.
      */
@@ -1466,14 +1502,15 @@ export declare class PageList extends RestrictedItemList<PageNode> {
 
 /**
  * A PageNode represents a page in the document, a child of the root node of the document's "scenegraph" artwork tree
- * (see {@link ExpressRootNode}). A page contains one or more artboards, representing "scenes" in a linear timeline
- * sequence. Those artboards, in turn, contain all the visual content of the document.
+ * (see {@link ExpressRootNode}). A page contains one or more artboards, which in turn contain all the page's visual
+ * content. If multiple artboards are present, each represents a keyframe "scene" in the page's animation timeline.
  *
  * To create new pages, see {@link PageList.addPage}.
  */
 export declare class PageNode extends BaseNode implements IRectangularNode {
     /**
-     * The artboards or "scenes" of a page, ordered by timeline sequence.
+     * The artboards or "scenes," which hold the page's visual contents. If multiple artboards are present, this list
+     * represents an ordered keyframe sequence in the page's animation timeline.
      * To create new artboards, see {@link ArtboardList.addArtboard}.
      */
     get artboards(): ArtboardList;
@@ -1524,24 +1561,15 @@ export declare class PageNode extends BaseNode implements IRectangularNode {
 }
 
 /**
- * <InlineAlert slots="text" variant="warning"/>
- *
- * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
- *
- * @experimental
  * Indicates list type: see {@link UnorderedListStyleInput} and {@link OrderedListStyleInput}.
  */
 export declare enum ParagraphListType {
-    unordered = 0,
-    ordered = 1
+    none = 0,
+    unordered = 1,
+    ordered = 2
 }
 
 /**
- * <InlineAlert slots="text" variant="warning"/>
- *
- * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
- *
- * @experimental
  * Text styles that must be applied to an entire paragraph atomically. (Contrast with CharacterStyles which can be applied to
  * any range of characters, even a short span like one single word).
  */
@@ -1550,39 +1578,23 @@ export declare interface ParagraphStyles extends BaseParagraphStyles {
 }
 
 /**
- * <InlineAlert slots="text" variant="warning"/>
- *
- * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
- *
- * @experimental
- * The variant of {@link ParagraphStyles} with all optional style fields is used to apply ParagraphStyles(). When using that API,
+ * A variant of {@link ParagraphStyles} with all style fields optional, used for applyParagraphStyles(). When using that API,
  * any fields not specified are left unchanged, preserving the text's existing styles.
  */
 export declare interface ParagraphStylesInput extends Partial<BaseParagraphStyles> {
-    list?: OrderedListStyleInput | UnorderedListStyleInput;
+    list?: ListStyleInput;
 }
 
 /**
- * <InlineAlert slots="text" variant="warning"/>
- *
- * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
- *
- * @experimental
- * A set of {@link ParagraphStyles} and the text range they apply to. It is seen in the paragraphStyleRanges getter.
+ * A set of {@link ParagraphStyles} along with the text range they apply to. Returned by the paragraphStyleRanges getter.
  */
 export declare interface ParagraphStylesRange extends ParagraphStyles, StyleRange {}
 
 /**
- * <InlineAlert slots="text" variant="warning"/>
- *
- * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
- *
- * @experimental
- * A variant of {@link ParagraphStylesRange} with all style fields optional and the text range they apply to. Used for the
+ * A variant of {@link ParagraphStylesRange} with all style fields optional, along with the text range they apply to. Used for the
  * paragraphStyleRanges setter. When invoking the setter, any fields not specified are reset to their defaults.
  *
- * Paragraphs are separated by newline characters (`\n`). The ranges specified here should align with
- * those boundaries.
+ * Paragraphs are separated by newline characters (`\n`). Ranges specified here should align with those boundaries.
  */
 export declare interface ParagraphStylesRangeInput extends ParagraphStylesInput, StyleRange {}
 
@@ -1591,6 +1603,9 @@ export declare interface ParagraphStylesRangeInput extends ParagraphStylesInput,
  * yet, only read.
  *
  * To create new paths, see {@link Editor.createPath}.
+ *
+ * Note: the visual top-left corner of a path may not be its local (0,0) origin point, so it's easiest to position
+ * a path using {@link Node.setPositionInParent} rather than setting its {@link Node.translation} directly.
  */
 export declare class PathNode extends FillableNode {
     /**
@@ -1616,11 +1631,10 @@ export declare interface Point {
 }
 
 /**
- * ReadOnlyItemList represents an ordered list of API objects, representing items that are all children of the
- * same parent node. (The reverse is not necessarily true, however: this list might not include all
- * children that exist in the parent node. See {@link Node.allChildren} for details).
+ * ReadOnlyItemList represents an ordered list of API objects that are all children of the same parent node.
  *
- * Items in a bare ReadOnlyItemList cannot be added, removed, or reordered. Subclasses like ItemList may add these capabilities, however.
+ * Items in a bare ReadOnlyItemList cannot be added, removed, or reordered. The {@link ItemList} subclass adds more
+ * capabilities, and is most frequently encountered as {@link ArtboardNode.children} or {@link GroupNode.children}.
  */
 export declare class ReadOnlyItemList<T extends ListItem> {
     /**
@@ -1653,6 +1667,26 @@ export declare class ReadOnlyItemList<T extends ListItem> {
      * All items in the list, as a static array. Mutations that occur later are not reflected in an array returned earlier.
      */
     toArray(): readonly T[];
+}
+
+/**
+ * A read-only view of a mask shape.
+ */
+export declare class ReadOnlyMask implements INodeBounds {
+    /**
+     * The type of {@link ReadOnlyMask}.
+     */
+    get type(): "ReadOnlyMask";
+    get boundsLocal(): Readonly<Rect>;
+    get centerPointLocal(): Readonly<Point>;
+    get topLeftLocal(): Readonly<Point>;
+    localPointInNode(localPoint: Point, targetNode: VisualNode): Readonly<Point>;
+    get boundsInParent(): Readonly<Rect>;
+    boundsInNode(targetNode: VisualNode): Readonly<Rect>;
+    get translation(): Readonly<Point>;
+    get rotation(): number;
+    get rotationInScreen(): number;
+    get transformMatrix(): mat2d;
 }
 
 export declare interface Rect {
@@ -1737,9 +1771,15 @@ export declare class RectangleNode extends FillableNode implements IRectangularN
 }
 
 /**
- * Base for ItemLists that have restricted behavior on how items are added to the list,
- * but allow items to be removed and reordered. Subclasses like ItemList may add more
- * capabilities, however.
+ * Interface for removing a list style.
+ */
+declare interface RemoveListStyleInput extends BaseParagraphListStyle {
+    type: ParagraphListType.none;
+}
+
+/**
+ * Base for ItemLists that restrict how items are added to the list, but freely allow items to be removed and
+ * reordered. The {@link ItemList} subclass adds more capabilities, however.
  */
 declare class RestrictedItemList<T extends ListItem> extends ReadOnlyItemList<T> {
     /**
@@ -1863,26 +1903,22 @@ export declare type SolidColorStrokeWithOptionalType = Omit<SolidColorStroke, "t
     Partial<Pick<SolidColorStroke, "type">>;
 
 /**
- * A StandaloneTextNode represents a text display frame in the scenegraph. It displays an entire piece of text.
- * The StandaloneTextNode does not directly hold the text content and styles – instead it refers to a {@link TextContentModel}.
+ * A StandaloneTextNode represents text that is displayed *entirely* within one single frame in the scenegraph (in
+ * contrast to {@link ThreadedTextNode}, where text may flow across several separate display "frames").
+ * The StandaloneTextNode does not directly hold the text content and styles – instead it refers to a {@link TextNodeContentModel}.
  *
- * To create new a single-frame piece of text, see {@link Editor.createText}.
+ * To create a new StandaloneTextNode, see {@link Editor.createText}.
  */
 export declare class StandaloneTextNode extends TextNode {
     get nextTextNode(): undefined;
     get layout(): Readonly<AutoWidthTextLayout | AutoHeightTextLayout | UnsupportedTextLayout>;
     /**
-     * <InlineAlert slots="text" variant="warning"/>
+     * Sets the layout mode of this TextNode "frame" which the text content is displayed within.
+     * {@link AreaTextLayout} is not supported by standalone text.
      *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
-     * Sets the layout mode of the TextNode "frame."
-     *
-     * {@link AreaTextLayout} is not supported by single-frame text.
-     *
-     * @throws if changing text layout to/from {@link TextLayout.magicFit} or {@link TextLayout.circular} layout when the text contains font(s) unavailable to the current user.
-     * @throws if {@link StandaloneTextNode} is not a part of a multi-frame text content flow and the layout is {@link AreaTextLayout}.
+     * @throws if changing text layout to/from {@link TextLayout.magicFit} or {@link TextLayout.circular}
+     * layout when the text contains fonts that are unavailable to the current user, because these layouts change
+     * capitalization and thus alter which glyphs are displayed.
      */
     set layout(layout: AutoWidthTextLayout | AutoHeightTextLayout);
 }
@@ -1975,11 +2011,10 @@ declare enum TextAlignment {
 }
 
 /**
- * Represents a complete piece of text content, which may be contained within a single {@link StandaloneTextNode} *or*
- * split across multiple {@link ThreadedTextNode} frames for display.
+ * TextContentModel is an abstract base class representing a complete piece of text content.
  * Use this model to get or modify the text string and the style ranges applied to it.
  */
-export declare class TextContentModel {
+export declare abstract class TextContentModel {
     /**
      * <InlineAlert slots="text" variant="warning"/>
      *
@@ -1995,23 +2030,86 @@ export declare class TextContentModel {
      */
     get id(): string;
     /**
-     * Get ordered list of all {@link TextNode}s that display this text content in the scenegraph. The text content
-     * starts in the first  {@link ThreadedTextNode} "frame", and then flows into the second node once it has filled the first one. The ending of the
-     * text content may not be visible at all, if the last {@link ThreadedTextNode} "frame" is not large enough to accommodate it.
-     *
-     * If there are multiple {@link ThreadedTextNode}s, all of them must be configured to use {@link AreaTextLayout}.
-     */
-    get allTextNodes(): Readonly<Iterable<TextNode>>;
-    /**
      * The complete text string, which may span multiple {@link ThreadedTextNode} "frames" in the scenegraph.
+     * @throws The setter throws if the existing text contains fonts unavailable to the current user.
+     * See {@link hasUnavailableFonts}.
      */
     get text(): string;
     set text(textContent: string);
     /**
-     * The character styles are applied to different ranges of this text content. When setting character styles, any style
-     * properties that are not provided are reset to their defaults (contrast to {@link applyCharacterStyles} which
-     * preserves the text's existing styles for any fields not specified). When *getting* styles, all fields are always
-     * provided.
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Appends a new text string to the end of the text content.
+     *
+     * @param newText - The text to append.
+     * @throws if the existing text contains fonts unavailable to the current user. See {@link hasUnavailableFonts}.
+     */
+    appendText(newText: string): void;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Inserts a new text string into the text content at the specified index.
+     *
+     * @param newText - The text to insert.
+     * @param index - The index at which to insert the new text.
+     * @param style - Style to use for the new text: either directly provides a style to use, or indicates which
+     *      existing text to match the style of. Default: `beforeInsertionPoint`.
+     * @throws if the existing text contains fonts unavailable to the current user. See {@link hasUnavailableFonts}.
+     */
+    insertText(
+        newText: string,
+        index: number,
+        style?: CharacterStylesInput | TextStyleSource.beforeInsertionPoint | TextStyleSource.afterInsertionPoint
+    ): void;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Replaces a range of text with a new text string.
+     *
+     * @param newText - The text to replace the range with.
+     * @param replaceRange - The range of text to replace.
+     * @param style - Style to use for the new text: either directly provides a style to use, or indicates which
+     *      existing text to match the style of. Default: `firstReplacedCharacter`.
+     * @throws if the existing text contains fonts unavailable to the current user. See {@link hasUnavailableFonts}.
+     */
+    replaceText(
+        newText: string,
+        replaceRange: TextRange,
+        style?:
+            | CharacterStylesInput
+            | TextStyleSource.beforeInsertionPoint
+            | TextStyleSource.afterInsertionPoint
+            | TextStyleSource.firstReplacedCharacter
+    ): void;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Deletes a range of text from the content.
+     *
+     * @param range - The range of text to delete.
+     * @throws if the existing text contains fonts unavailable to the current user. See {@link hasUnavailableFonts}.
+     */
+    deleteText(range: TextRange): void;
+    /**
+     * The character styles that are applied to different ranges of this text content. Each range starts immediately after
+     * the previous one: they are always contiguous, and never overlap.
+     *
+     * When *setting* character styles, any style properties that are not provided are reset to their defaults (contrast to
+     * {@link applyCharacterStyles} which preserves the text's existing styles for any fields not specified). If the ranges
+     * do not cover the full length of the text, the last range is extended to cover all the remaining text.
+     * When *getting* styles, all fields are always provided.
      *
      * Note: existing fonts used in the document, returned by this getter, are not guaranteed to be ones the current user
      * has rights to edit with. The *setter* only accepts the AvailableFont type which has been verified to be usable.
@@ -2019,20 +2117,10 @@ export declare class TextContentModel {
     get characterStyleRanges(): readonly CharacterStylesRange[];
     set characterStyleRanges(styles: readonly CharacterStylesRangeInput[]);
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * The styles applied to different paragraphs of this text content.
      */
     get paragraphStyleRanges(): readonly ParagraphStylesRange[];
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * Apply styles to different paragraphs of this text content. Any style properties that are not provided are reset to their defaults.
      * When **getting** styles, all properties are always provided.
      *
@@ -2040,7 +2128,7 @@ export declare class TextContentModel {
      * those boundaries. If multiple ranges provided overlap a single paragraph, the first one to overlap is applied to the
      * entire paragraph.
      *
-     * @throws if the text content contains fonts unavailable to the current user and an ordered-list style is being applied.
+     * @throws if applying an ordered-list style when the text contains fonts that are unavailable to the current user.
      */
     set paragraphStyleRanges(styles: readonly ParagraphStylesRangeInput[]);
     /**
@@ -2048,28 +2136,27 @@ export declare class TextContentModel {
      * unchanged. Does not modify any styles in the text outside this range. Contrast to the {@link characterStyleRanges}
      * setter, which specifies new style range(s) for the entire text at once, and resets any unspecified properties back to
      * default styles.
-
+     *
+     * Explicitly specifying `link: ""` will remove any hyperlinks present in the existing text. If the `link` style
+     * property is not specified at all, existing links are preserved.
+     *
      * @param styles - The styles to apply.
-     * @param range -The start and length of the character sequence to which the styles should be applied.
-     * The styles will be applied to the entire text content flow if not specified.
-     * If the specified range doesn't align well with the paragraph boundaries, the range will be expanded to cover the
-     * entire paragraphs, it overlaps.
+     * @param range - The start and length of the character sequence to which the styles should be applied.
+     * If no range is specified, styles will be applied to the entire text content flow.
      */
     applyCharacterStyles(styles: CharacterStylesInput, range?: TextRange): void;
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * Apply one or more styles to the paragraphs in the given range, leaving any style properties that were not specified
      * unchanged. Does not modify any styles in the text outside this range. Contrast to the {@link paragraphStyleRanges}
      * setter, which specifies new style range(s) for the entire text at once, and resets any unspecified properties back to
      * default styles.
-
+     *
      * @param styles - The styles to apply.
-     * @param range - The start and length of character sequence to which the styles should be applied.
-     * If not specified the styles will be applied to the entire piece of text content flow.
+     * @param range - The start and length of character sequence to which the styles should be applied. Styles apply to any
+     * paragraphs that even partially overlap this range.
+     * If range is not specified, the styles will be applied to the entire text content flow.
+     *
+     * @throws if applying an ordered-list style when the text contains fonts that are unavailable to the current user.
      */
     applyParagraphStyles(styles: ParagraphStylesInput, range?: TextRange): void;
     /**
@@ -2125,9 +2212,12 @@ declare enum TextLayout {
 
 /**
  * TextNode is an abstract base class representing text displayed in the scenegraph, regardless of whether it's a fully
- * self-contained {@link StandaloneTextNode} or one {@link ThreadedTextNode} "frame" of multiple in a larger flow. The
- * APIs on TextNode and its {@link TextContentModel} allow you to generically work with text without needing to know
- * which of those subtypes you are dealing with.
+ * self-contained {@link StandaloneTextNode} or one of multiple {@link ThreadedTextNode} "frames" in a larger flow. The
+ * APIs on TextNode and its {@link TextNodeContentModel} allow you to generically work with text without needing to know
+ * which subtype you are dealing with.
+ *
+ * Note: the visual top-left corner of text is not located at its local (0,0) origin point, so it's easiest to position
+ * text using {@link Node.setPositionInParent} rather than setting its {@link Node.translation} directly.
  */
 export declare abstract class TextNode extends Node {
     /**
@@ -2136,6 +2226,9 @@ export declare abstract class TextNode extends Node {
      * @returns
      * Note: The bounding box of the orphaned TextNode may be different from the bounding box of the node placed on a
      * page. It is recommended to use this property only when the node is placed on a page.
+     *
+     * Note: the visual top-left corner of this box is usually not (0,0). Always use `boundsLocal` or {@link topLeftLocal}
+     * instead of assuming (0,0).
      *
      */
     get boundsLocal(): Readonly<Rect>;
@@ -2154,6 +2247,8 @@ export declare abstract class TextNode extends Node {
      * @returns
      * Note: The top-left of the orphaned TextNode may be different from the top-left of the node placed on a
      * page. It is recommended to use this property only when the node is placed on a page.
+     *
+     * Note: this value is usually not (0,0) due to the way text layout is defined.
      *
      */
     get topLeftLocal(): Readonly<Point>;
@@ -2179,12 +2274,12 @@ export declare abstract class TextNode extends Node {
      * fixed-size frame using {@link AreaTextLayout} does not fit all the (remaining) text.
      *
      * Note: When traversing the scenegraph in search of text content, bear in mind that multiple TextNodes may refer to the
-     * same single {@link TextContentModel}; this can give the impression that the same text is duplicated multiple times when it is
-     * not. Use {@link TextContentModel}.id to determine whether a given piece of text content is unique or if it's already been
+     * same single {@link TextNodeContentModel}; this can give the impression that the same text is duplicated multiple times when it is
+     * not. Use {@link TextNodeContentModel}.id to determine whether a given piece of text content is unique or if it's already been
      * encountered before.
      *
      */
-    get fullContent(): TextContentModel;
+    get fullContent(): TextNodeContentModel;
     /**
      * Helper method to determine if the text is standalone.
      */
@@ -2204,14 +2299,14 @@ export declare abstract class TextNode extends Node {
      * The text string content which is partially *or* fully displayed in this TextNode "frame."
      * WARNING: If a piece of text content flows across several TextNodes, *each* TextNode's `text` getter will return
      * the *entire* text content string.
-     * @deprecated - Use the text getter on {@link TextContentModel} instead. Access it via `TextNode.fullContent.text`.
+     * @deprecated - Use the text getter on {@link TextNodeContentModel} instead. Access it via `TextNode.fullContent.text`.
      */
     get text(): string;
     /**
      * Sets the text content of the TextNode.
      * WARNING: If a piece of text content flows across several TextNodes,
      * *each* TextNode's `text` setter will sets the *entire* text content string.
-     * @deprecated - Use the text setter on {@link TextContentModel} instead. Access it via `TextNode.fullContent.text`.
+     * @deprecated - Use the text setter on {@link TextNodeContentModel} instead. Access it via `TextNode.fullContent.text`.
      */
     set text(textContent: string);
     /**
@@ -2224,20 +2319,33 @@ export declare abstract class TextNode extends Node {
      */
     get visualEffects(): readonly VisualEffectType[];
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * @returns The layout mode of the TextNode "frame."
      */
     get layout(): Readonly<AutoWidthTextLayout | AutoHeightTextLayout | AreaTextLayout | UnsupportedTextLayout>;
 }
 
 /**
- * A range of text in a {@link TextContentModel}.
+ * Represents a complete piece of text content, which may be contained within a single {@link StandaloneTextNode} *or*
+ * split across multiple {@link ThreadedTextNode} frames for display.
+ * Use this model to get or modify the text string and the style ranges applied to it.
  */
-declare interface TextRange {
+export declare class TextNodeContentModel extends TextContentModel {
+    /**
+     * Get ordered list of all {@link TextNode}s that display this text content in the scenegraph. This might be a single
+     * {@link StandaloneTextNode} *or* a list of one or more {@link ThreadedTextNode}s. In the case of threaded text, the
+     * text content starts in the first {@link ThreadedTextNode} "frame", and then flows into the second node once it has
+     * filled the first one. The ending of the text content may not be visible at all, if the last "frame" is not large
+     * enough to accommodate it.
+     *
+     * All linked ThreadedTextNodes that share a single TextContentModel must remain together within the same artboard.
+     */
+    get allTextNodes(): Readonly<Iterable<TextNode>>;
+}
+
+/**
+ * A range of text in a {@link TextContentModel}, specified in characters.
+ */
+export declare interface TextRange {
     start: number;
     length: number;
 }
@@ -2255,35 +2363,51 @@ export declare enum TextScriptStyle {
 }
 
 /**
- * A ThreadedTextNode represents a text display frame in the scenegraph. It is a subset of longer text that flows across
- * multiple TextNode "frames". Because of this, the TextNode does not directly hold the text content and styles –
- * instead it refers to a {@link TextContentModel}, which may be shared across multiple ThreadedTextNode frames.
+ * <InlineAlert slots="text" variant="warning"/>
  *
- * APIs are not yet available to create multi-frame text flows.
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * Indicates which existing text to match the style of when inserting new text or replacing text.
+ */
+export declare enum TextStyleSource {
+    /**
+     * Use style of the character just before the insertion point, *unless* that character is not on the same line (same
+     * paragraph) in which case falls back to afterInsertionPoint behavior. This generally matches the style a user would
+     * get in the UI if they place their cursor at this insertion point.
+     */
+    beforeInsertionPoint = 0,
+    /**
+     * Use style of the character just after the insertion point (which is always on the same line/paragraph, since lines end
+     * with a `\n` character; an insertion point past this is inserting on the next line). If there is no character after the
+     * insertion point, the insertion point is at the end of the text (appending) and the style of the previous character is
+     * used instead. This option is useful when *pre*pending to an existing block of text.
+     */
+    afterInsertionPoint = 1,
+    /**
+     * When replacing existing text, use the style of the first character in the replaced text. This may feel more
+     * predictable to users than the styles on either side of the replaced text. E.g. if replacing a single word one-to-one
+     * with a new word, and the replaced word has a style unique to the text on either side of it, one may expect the new
+     * text to match that original word's style.
+     */
+    firstReplacedCharacter = 2
+}
+
+/**
+ * A ThreadedTextNode represents a text display frame in the scenegraph which is a subset of longer text that flows across
+ * multiple such "frames". Because of this, the TextNode does not directly hold the text content and styles –
+ * instead it refers to a {@link TextNodeContentModel}, which may be shared across multiple ThreadedTextNode frames.
+ *
+ * All linked ThreadedTextNodes that share a single TextContentModel must remain together within the same artboard.
+ *
+ * APIs are not yet available to create multi-frame text flows. To create *non*-threaded text, use {@link Editor.createText}.
  */
 export declare class ThreadedTextNode extends TextNode {
-    /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
-     * Always throws as it's not possible to clone only a single "frame" of threaded text.
-     */
-    clone(): never;
     get nextTextNode(): ThreadedTextNode | undefined;
     get layout(): Readonly<AreaTextLayout>;
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
-     * Sets the layout mode of the TextNode "frame."
-     *
+     * Sets the layout mode of this TextNode "frame" which the text content is displayed within.
      * Only {@link AreaTextLayout}, with fully fixed bounds, is currently supported by threaded text.
-     *
-     * @throws if {@link ThreadedTextNode} is part of a multi-frame text content flow and the layout is not {@link AreaTextLayout}.
      */
     set layout(layout: AreaTextLayout);
 }
@@ -2308,21 +2432,11 @@ export declare class UnknownMediaRectangleNode extends MediaRectangleNode {}
 export declare class UnknownNode extends Node {}
 
 /**
- * <InlineAlert slots="text" variant="warning"/>
- *
- * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
- *
- * @experimental
  * UnorderedListStyle represents the style of an unordered list.
  */
 export declare type UnorderedListStyle = Required<UnorderedListStyleInput>;
 
 /**
- * <InlineAlert slots="text" variant="warning"/>
- *
- * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
- *
- * @experimental
  * Interface for specifying an unordered list style, such as a bullet list.
  */
 export declare interface UnorderedListStyleInput extends BaseParagraphListStyle {
@@ -2339,11 +2453,7 @@ export declare interface UnorderedListStyleInput extends BaseParagraphListStyle 
 }
 
 /**
- * <InlineAlert slots="text" variant="warning"/>
- *
- * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
- *
- * @experimental
+ * Represents a text layout the API does not yet support setting or reading the details of.
  */
 export declare interface UnsupportedTextLayout {
     type: TextLayout.magicFit | TextLayout.circular;
@@ -2389,7 +2499,7 @@ declare enum VisualEffectType {
  *
  * Some VisualNodes might have a non-visual parent such as a PageNode.
  */
-export declare class VisualNode extends BaseNode {
+export declare class VisualNode extends BaseNode implements IVisualNodeBounds {
     /**
      * The highest ancestor that still has visual presence in the document. Typically an Artboard, but for orphaned
      * content, it will be the root of the deleted content (which might be this node itself).
@@ -2399,30 +2509,9 @@ export declare class VisualNode extends BaseNode {
      * meaningful comparison or conversion between the bounds or coordinate spaces of such nodes.
      */
     get visualRoot(): VisualNode;
-    /**
-     * The bounding box of the node, expressed in the node's local coordinate space (which may be shifted or rotated
-     * relative to its parent). Generally matches the selection outline seen in the UI, encompassing the vector path
-     * "spine" of the shape as well as its stroke, but excluding effects such as shadows.
-     *
-     * The top-left corner of the bounding box corresponds to the visual top-left corner of the node, but this value is
-     * *not* necessarily (0,0) – this is especially true for Text and Path nodes.
-     */
     get boundsLocal(): Readonly<Rect>;
-    /**
-     * Position of the node's centerpoint in its own local coordinate space, i.e. the center of the boundsLocal box.
-     */
     get centerPointLocal(): Readonly<Point>;
-    /**
-     * Position of the node's top-left corner in its own local coordinate space, equal to (boundsLocal.x,
-     * boundsLocal.y). If the node is rotated, this is not the same as the top-left corner of
-     * boundsInParent.
-     */
     get topLeftLocal(): Readonly<Point>;
-    /**
-     * Convert a point given in the node’s local coordinate space to a point in the coordinate space of the target node.
-     * Both nodes must share the same {@link visualRoot}, but can lie anywhere within that subtree relative to one
-     * another (the target node need not be an ancestor of this node, nor vice versa).
-     */
     localPointInNode(localPoint: Point, targetNode: VisualNode): Readonly<Point>;
 }
 
