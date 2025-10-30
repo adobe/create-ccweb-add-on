@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-core",
+      "comment": " manifest updates",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-core"
+}

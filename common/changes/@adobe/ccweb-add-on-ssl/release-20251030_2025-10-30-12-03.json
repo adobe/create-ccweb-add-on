@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-ssl",
+      "comment": " manifest updates",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-ssl"
+}

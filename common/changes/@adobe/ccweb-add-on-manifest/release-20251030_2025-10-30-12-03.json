@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-manifest",
+      "comment": "Added validation for the content-hub-home entry point to be accessible only to privileged users",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-manifest"
+}
