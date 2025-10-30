@@ -1,6 +1,6 @@
 {
     "name": "@adobe/ccweb-add-on-sdk-types",
-    "version": "1.24.0",
+    "version": "1.25.0",
     "author": "Adobe",
     "license": "MIT",
     "description": "Type definitions for Adobe Creative Cloud Web Add-on SDK.",

@@ -1,6 +1,6 @@
 {
     "name": "@adobe/ccweb-add-on-core",
-    "version": "3.3.0",
+    "version": "3.4.0",
     "author": "Adobe",
     "license": "MIT",
     "description": "Core libraries for Adobe Creative Cloud Web Add-on.",
