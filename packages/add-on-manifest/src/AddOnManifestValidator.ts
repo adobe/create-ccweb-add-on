@@ -75,6 +75,11 @@ export class AddOnManifestValidator {
                 isValidSchema = false;
                 validationErrors.push(OTHER_MANIFEST_ERRORS.RestrictedContentHubEntrypoint);
             }
+            if (entryPoint.type === EntrypointType.CONTENT_HUB_HOME && !manifest.requirements?.privilegedApis) {
+                this._logError("Entrypoint type 'content-hub-home' is allowed only for privileged add-ons");
+                isValidSchema = false;
+                validationErrors.push(OTHER_MANIFEST_ERRORS.RestrictedContentHubHomeEntrypoint);
+            }
             if (entryPoint.type === EntrypointType.SCRIPT && additionalInfo.sourceId !== "playgroundSource") {
                 this._logError("Entrypoint type 'script' is allowed only for add-ons created in the code-playground");
                 isValidSchema = false;
