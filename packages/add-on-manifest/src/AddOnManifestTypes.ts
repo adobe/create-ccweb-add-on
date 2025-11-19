@@ -284,6 +284,10 @@ export const OTHER_MANIFEST_ERRORS: ManifestErrorType = {
         instancePath: "/entryPoints/type",
         message: "Entrypoint type 'content-hub' is allowed only for privileged add-ons"
     },
+    RestrictedContentHubHomeEntrypoint: {
+        instancePath: "/entryPoints/type",
+        message: "Entrypoint type 'content-hub-home' is allowed only for privileged add-ons"
+    },
     RestrictedFormsSandboxProperty: {
         instancePath: "/entryPoints/permissions/sandbox",
         message: `Sandbox property "allow-forms" is not allowed for this AddOn`

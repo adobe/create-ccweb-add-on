@@ -103,6 +103,8 @@ describe("AddOnManifest", () => {
 
     it("should return AddOn - Manifest Version 2", () => {
         const testManifest = getTestManifestV2() as ReturnType<typeof JSON.parse>;
+        testManifest.name = "Test Add on";
+
         const { manifest } = AddOnManifest.createManifest({ manifest: testManifest, additionalInfo }, _addOnLogger);
 
         verifyCommonManifestFields(manifest, testManifest);
@@ -112,7 +114,7 @@ describe("AddOnManifest", () => {
             return;
         }
         assert.equal(manifest.id, "");
-        assert.equal(manifest.name, undefined);
+        assert.equal(manifest.name, "Test Add on");
         assert.equal(manifest.icon, undefined);
         assert.equal(manifest.authorInfo, undefined);
 
@@ -132,6 +134,18 @@ describe("AddOnManifest", () => {
         assert.equal(apps[1].name, testManifest.requirements.apps[1].name);
         assert.equal(apps[1].apiVersion, testManifest.requirements.apps[1].apiVersion);
         assert.equal(apps[1].supportedDeviceClass, DEFAULT_SUPPORTED_DEVICE_CLASS);
+    });
+
+    it("should return undefined name for an unsupported manifest version", () => {
+        const testManifest = getTestManifestV2() as ReturnType<typeof JSON.parse>;
+        const { manifest } = AddOnManifest.createManifest({ manifest: testManifest, additionalInfo });
+        assert.notEqual(manifest, undefined);
+        if (!manifest) {
+            return;
+        }
+        // @ts-ignore - This is a test to simulate an unsupported manifest version
+        manifest["_manifest"].manifestVersion = 99;
+        assert.equal(manifest.name, undefined);
     });
 
     it("should return default manifestVersion for dev AddOn", () => {

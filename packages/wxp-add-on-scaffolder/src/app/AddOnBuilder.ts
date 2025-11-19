@@ -222,7 +222,7 @@ export class AddOnBuilder {
         this._gitignoreExists = fs.existsSync(path.join(this._options.addOnDirectory, ".gitignore"));
         if (this._gitignoreExists) {
             const data = fs.readFileSync(path.join(this._options.addOnDirectory, "gitignore"));
-            fs.appendFileSync(path.join(this._options.addOnDirectory, ".gitignore"), data);
+            fs.appendFileSync(path.join(this._options.addOnDirectory, ".gitignore"), data as Uint8Array<ArrayBuffer>);
             fs.unlinkSync(path.join(this._options.addOnDirectory, "gitignore"));
         } else {
             fs.moveSync(

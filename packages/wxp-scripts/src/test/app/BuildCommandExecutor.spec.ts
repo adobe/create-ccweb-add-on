@@ -45,6 +45,7 @@ import { AddOnDirectory } from "../../models/AddOnDirectory.js";
 import { BuildCommandOptions } from "../../models/BuildCommandOptions.js";
 import { AddOnManifestReader } from "../../utilities/AddOnManifestReader.js";
 import { createManifest } from "../test-utilities.js";
+import { GlobalOverrides } from "../../utilities/GlobalOverrides.js";
 
 chai.use(chaiAsPromised);
 
@@ -127,6 +128,8 @@ describe("BuildCommandExecutor", () => {
                     }
                 });
             });
+            const overrideGlobalConsoleStub = sandbox.stub(GlobalOverrides, "overrideGlobalConsole");
+            sandbox.stub(manifestReader, "getManifest").returns(addOnManifest);
 
             const isBuildSuccessful = await buildCommandExecutor.execute(options);
 
@@ -150,6 +153,8 @@ describe("BuildCommandExecutor", () => {
             );
 
             const addOnDirectory = new AddOnDirectory(options.srcDirectory, addOnManifest);
+            assert.equal(overrideGlobalConsoleStub.calledWith(addOnManifest, addOnDirectory), true);
+
             const analyticsServiceEventData = [
                 "--addOnName",
                 addOnDirectory.rootDirName,
@@ -267,7 +272,12 @@ describe("BuildCommandExecutor", () => {
                 });
             });
 
-            await buildCommandExecutor.execute(options);
+            const overrideGlobalConsoleStub = sandbox.stub(GlobalOverrides, "overrideGlobalConsole");
+            sandbox.stub(manifestReader, "getManifest").returns(addOnManifest);
+
+            const isBuildSuccessful = await buildCommandExecutor.execute(options);
+
+            assert.equal(isBuildSuccessful, true);
 
             assert.equal(
                 logger.information
@@ -287,6 +297,8 @@ describe("BuildCommandExecutor", () => {
             );
 
             const addOnDirectory = new AddOnDirectory(options.srcDirectory, addOnManifest);
+            assert.equal(overrideGlobalConsoleStub.calledWith(addOnManifest, addOnDirectory), true);
+
             const analyticsServiceEventData = [
                 "--addOnName",
                 addOnDirectory.rootDirName,

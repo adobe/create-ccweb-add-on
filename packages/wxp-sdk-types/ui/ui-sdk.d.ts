@@ -1162,7 +1162,11 @@ export declare enum EntrypointType {
     /**
      * Quick action entrypoint type.
      */
-    QUICK_ACTION = "quick-action"
+    QUICK_ACTION = "quick-action",
+    /**
+     * Content hub home (L1) entrypoint type.
+     */
+    CONTENT_HUB_HOME = "content-hub-home"
 }
 
 export declare interface Field {

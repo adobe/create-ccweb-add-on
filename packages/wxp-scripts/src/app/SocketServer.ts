@@ -49,6 +49,7 @@ import type { StartCommandOptions } from "../models/StartCommandOptions.js";
 import type { AddOnManifestReader } from "../utilities/AddOnManifestReader.js";
 import type { FileChangeTracker } from "../utilities/FileChangeTracker.js";
 import type { ScriptManager } from "./ScriptManager.js";
+import { GlobalOverrides } from "../utilities/GlobalOverrides.js";
 
 /**
  * Socket Add-on factory.
@@ -155,6 +156,7 @@ export class SocketServer {
             const addOnManifest = this._manifestReader.getManifest(this._onValidationFailed, !hasManifestChanged);
 
             if (isBuildSuccessful && addOnManifest !== undefined) {
+                GlobalOverrides.overrideGlobalConsole(addOnManifest, addOnDirectory);
                 this._logger.success(LOGS.done, { postfix: LOGS.newLine });
             } else {
                 await this._scriptManager.cleanDirectoryAndAddManifest(DEFAULT_OUTPUT_DIRECTORY, manifestJsonPath);

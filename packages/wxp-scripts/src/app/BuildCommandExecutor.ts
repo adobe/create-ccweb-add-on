@@ -37,6 +37,7 @@ import type { BuildCommandOptions } from "../models/BuildCommandOptions.js";
 import type { AddOnManifestReader } from "../utilities/AddOnManifestReader.js";
 import type { CommandExecutor } from "./CommandExecutor.js";
 import type { ScriptManager } from "./ScriptManager.js";
+import { GlobalOverrides } from "../utilities/GlobalOverrides.js";
 
 /**
  * Build command executor.
@@ -127,6 +128,7 @@ export class BuildCommandExecutor implements CommandExecutor<BuildCommandOptions
         const addOnDirectory = new AddOnDirectory(options.srcDirectory, addOnManifest);
 
         if (isBuildSuccessful) {
+            GlobalOverrides.overrideGlobalConsole(addOnManifest, addOnDirectory);
             this._logger.success(LOGS.done, { postfix: LOGS.newLine });
             const analyticsEventData = [
                 "--addOnName",

@@ -92,11 +92,11 @@ declare namespace ApiConstants {
 }
 
 declare interface ApiModuleExport {
-    editor: ExpressEditor;
+    editor: ExpressEditorWrapper;
     constants: unknown;
-    colorUtils: ExpressColorUtils;
-    fonts: ExpressFonts;
-    viewport: ExpressViewport;
+    colorUtils: ExpressColorUtilsWrapper;
+    fonts: ExpressFontsWrapper;
+    viewport: ExpressViewportWrapper;
 }
 
 /**
@@ -386,6 +386,15 @@ export declare class BitmapImage {
      * Original height of the bitmap in pixels.
      */
     get height(): number;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Fetches the bitmap data as a Blob. This will wait for the bitmap to be available if necessary.
+     */
+    data(): Promise<Blob>;
 }
 
 /**
@@ -542,7 +551,7 @@ export declare class ColorUtils {
     toHex(color: Color): string;
 }
 
-export declare const colorUtils: ExpressColorUtils;
+export declare const colorUtils: ExpressColorUtilsWrapper;
 
 /**
  * A ComplexShapeNode is a complex prepackaged shape that appears as a leaf node in the UI, even if it is composed
@@ -619,11 +628,6 @@ export declare class Context {
      * other UI state.
      */
     get insertionParent(): ContainerNode;
-    /**
-     * @returns The currently viewed page.
-     * To change the current page, call {@link Viewport.bringIntoView} with an artboard or other content on that page.
-     */
-    get currentPage(): PageNode;
 }
 
 /**
@@ -689,7 +693,7 @@ export declare class Editor {
     /**
      * @returns the root of the document.
      */
-    get documentRoot(): ExpressRootNode;
+    get documentRoot(): BaseNode;
     /**
      * @returns an ellipse node with default x/y radii, a black fill, and no initial stroke.
      * Transform values default to 0.
@@ -780,7 +784,7 @@ export declare class Editor {
     createPath(path: string): PathNode;
 }
 
-export declare const editor: ExpressEditor;
+export declare const editor: ExpressEditorWrapper;
 
 /**
  * This enum represents the supported editor events.
@@ -828,11 +832,36 @@ export declare type EventHandlerId = string;
 declare const expressApiModule: ApiModuleExport;
 export default expressApiModule;
 
-declare class ExpressColorUtils extends ColorUtils {}
+declare class ExpressColorUtilsWrapper extends ColorUtils {}
 
-declare class ExpressEditor extends Editor {}
+/**
+ * Contains The Express specific APIs related to the current selection state.
+ */
+export declare class ExpressContext extends Context {
+    /**
+     * @returns The currently viewed page.
+     * To change the current page, call {@link ExpressViewport.bringIntoView} with an artboard or other content on that page.
+     */
+    get currentPage(): PageNode;
+}
 
-declare class ExpressFonts extends Fonts {}
+/**
+ * Entry point for Express specific APIs that read or modify the document's content.
+ */
+export declare class ExpressEditor extends Editor {
+    /**
+     * User's current selection context
+     */
+    get context(): ExpressContext;
+    /**
+     * @returns the root of the document.
+     */
+    get documentRoot(): ExpressRootNode;
+}
+
+declare class ExpressEditorWrapper extends ExpressEditor {}
+
+declare class ExpressFontsWrapper extends Fonts {}
 
 /**
  * An ExpressRootNode represents the root node of the document's "scenegraph" artwork tree. The root contains a collection
@@ -848,7 +877,27 @@ export declare class ExpressRootNode extends BaseNode {
     get pages(): PageList;
 }
 
-declare class ExpressViewport extends Viewport {}
+/**
+ * Represents the area of the canvas that is currently visible on-screen.
+ */
+export declare class ExpressViewport {
+    /**
+     * Adjusts the viewport to make the node's bounds visible on-screen, assuming all bounds are within the artboard bounds.
+     * Makes the node's {@link ArtboardNode} or {@link PageNode} visible if they were not already visible
+     * (which may result in {@link Context.selection} being cleared). It is strongly recommended
+     * to further draw user's attention to the node, set it as the {@link Context.selection} following this call.
+     *
+     * After this call, the value of {@link Context.insertionParent} will always be the node containing {@link ArtboardNode}.
+     *
+     * Note that the node might still not appear visible if:
+     *   - Its animation settings make it invisible at the beginning of the {@link ArtboardNode} "scene".
+     *   - It is obscured underneath other artwork in the z-order.
+     *   - It is hidden by a {@link GroupNode}'s mask or similar cropping.
+     */
+    bringIntoView(node: VisualNode): void;
+}
+
+declare class ExpressViewportWrapper extends ExpressViewport {}
 
 /**
  * Base interface representing any fill in the scenegraph. See {@link FillableNode}.
@@ -923,7 +972,7 @@ export declare class Fonts {
     fromPostscriptName(postscriptName: string): Promise<AvailableFont | undefined>;
 }
 
-export declare const fonts: ExpressFonts;
+export declare const fonts: ExpressFontsWrapper;
 
 /**
  * A GridCellNode represents the media aspect of a grid cell. Unlike MediaContainerNodes, grid cells cannot be
@@ -1024,7 +1073,17 @@ declare interface IFillableNode {
  * ImageRectangleNodes cannot be created directly; use {@link Editor.createImageContainer} to create the entire
  * container structure together.
  */
-export declare class ImageRectangleNode extends MediaRectangleNode {}
+export declare class ImageRectangleNode extends MediaRectangleNode {
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Fetches the bitmap image resource used by this node. This will wait for the bitmap to be available if necessary.
+     */
+    fetchBitmapImage(): Promise<BitmapImage>;
+}
 
 /**
  * Interface for nodes that contain media.
@@ -1903,6 +1962,13 @@ export declare type SolidColorStrokeWithOptionalType = Omit<SolidColorStroke, "t
     Partial<Pick<SolidColorStroke, "type">>;
 
 /**
+ * StandaloneTextContentModel represents a complete piece of text content contained within a single {@link StandaloneTextNode}.
+ */
+export declare class StandaloneTextContentModel extends TextNodeContentModel {
+    get allTextNodes(): Readonly<Iterable<StandaloneTextNode>>;
+}
+
+/**
  * A StandaloneTextNode represents text that is displayed *entirely* within one single frame in the scenegraph (in
  * contrast to {@link ThreadedTextNode}, where text may flow across several separate display "frames").
  * The StandaloneTextNode does not directly hold the text content and styles – instead it refers to a {@link TextNodeContentModel}.
@@ -1910,6 +1976,16 @@ export declare type SolidColorStrokeWithOptionalType = Omit<SolidColorStroke, "t
  * To create a new StandaloneTextNode, see {@link Editor.createText}.
  */
 export declare class StandaloneTextNode extends TextNode {
+    /**
+     * Always returns true for this StandaloneTextNode, indicating that it is not part of a multi-frame text flow.
+     */
+    isStandaloneText(): this is StandaloneTextNode;
+    /**
+     * The model containing the complete text string and its styles, all which will be visible within the bounds of
+     * this specific StandaloneTextNode.
+     *
+     */
+    get fullContent(): StandaloneTextContentModel;
     get nextTextNode(): undefined;
     get layout(): Readonly<AutoWidthTextLayout | AutoHeightTextLayout | UnsupportedTextLayout>;
     /**
@@ -2279,7 +2355,7 @@ export declare abstract class TextNode extends Node {
      * encountered before.
      *
      */
-    get fullContent(): TextNodeContentModel;
+    abstract get fullContent(): TextNodeContentModel;
     /**
      * Helper method to determine if the text is standalone.
      */
@@ -2329,7 +2405,7 @@ export declare abstract class TextNode extends Node {
  * split across multiple {@link ThreadedTextNode} frames for display.
  * Use this model to get or modify the text string and the style ranges applied to it.
  */
-export declare class TextNodeContentModel extends TextContentModel {
+export declare abstract class TextNodeContentModel extends TextContentModel {
     /**
      * Get ordered list of all {@link TextNode}s that display this text content in the scenegraph. This might be a single
      * {@link StandaloneTextNode} *or* a list of one or more {@link ThreadedTextNode}s. In the case of threaded text, the
@@ -2339,7 +2415,7 @@ export declare class TextNodeContentModel extends TextContentModel {
      *
      * All linked ThreadedTextNodes that share a single TextContentModel must remain together within the same artboard.
      */
-    get allTextNodes(): Readonly<Iterable<TextNode>>;
+    abstract get allTextNodes(): Readonly<Iterable<TextNode>>;
 }
 
 /**
@@ -2394,6 +2470,18 @@ export declare enum TextStyleSource {
 }
 
 /**
+ * ThreadedTextContentModel represents a complete piece of text content that is split across multiple
+ * {@link ThreadedTextNode} frames for display. This subclass provides a mutable {@link allFrames} list
+ * that supports adding, removing, and reordering text frames.
+ *
+ * The append and insert operations will automatically parent the new frame to the same parent as the
+ * reference frame and place it in the correct z-order.
+ */
+export declare class ThreadedTextContentModel extends TextNodeContentModel {
+    get allTextNodes(): Readonly<Iterable<ThreadedTextNode>>;
+}
+
+/**
  * A ThreadedTextNode represents a text display frame in the scenegraph which is a subset of longer text that flows across
  * multiple such "frames". Because of this, the TextNode does not directly hold the text content and styles –
  * instead it refers to a {@link TextNodeContentModel}, which may be shared across multiple ThreadedTextNode frames.
@@ -2403,6 +2491,22 @@ export declare enum TextStyleSource {
  * APIs are not yet available to create multi-frame text flows. To create *non*-threaded text, use {@link Editor.createText}.
  */
 export declare class ThreadedTextNode extends TextNode {
+    /**
+     * Always returns true for this ThreadedTextNode, indicating that it is part of a multi-frame text flow.
+     */
+    isThreadedText(): this is ThreadedTextNode;
+    /**
+     * The model containing the complete text string and its styles, only part of which may be visible within the bounds of
+     * this specific ThreadedTextNode "frame." The full text content flow may be split across multiple frames, and/or it may be clipped if a
+     * fixed-size frame using {@link AreaTextLayout} does not fit all the (remaining) text.
+     *
+     * Note: When traversing the scenegraph in search of text content, bear in mind that multiple ThreadedTextNodes may refer to the
+     * same single {@link ThreadedTextContentModel}; this can give the impression that the same text is duplicated multiple times when it is
+     * not. Use {@link ThreadedTextContentModel}.id to determine whether a given piece of text content is unique or if it's already been
+     * encountered before.
+     *
+     */
+    get fullContent(): ThreadedTextContentModel;
     get nextTextNode(): ThreadedTextNode | undefined;
     get layout(): Readonly<AreaTextLayout>;
     /**
@@ -2459,27 +2563,7 @@ export declare interface UnsupportedTextLayout {
     type: TextLayout.magicFit | TextLayout.circular;
 }
 
-/**
- * Represents the area of the canvas that is currently visible on-screen.
- */
-export declare class Viewport {
-    /**
-     * Adjusts the viewport to make the node's bounds visible on-screen, assuming all bounds are within the artboard bounds.
-     * Makes the node's {@link ArtboardNode} or {@link PageNode} visible if they were not already visible
-     * (which may result in {@link Context.selection} being cleared). It is strongly recommended
-     * to further draw user's attention to the node, set it as the {@link Context.selection} following this call.
-     *
-     * After this call, the value of {@link Context.insertionParent} will always be the node containing {@link ArtboardNode}.
-     *
-     * Note that the node might still not appear visible if:
-     *   - Its animation settings make it invisible at the beginning of the {@link ArtboardNode} "scene".
-     *   - It is obscured underneath other artwork in the z-order.
-     *   - It is hidden by a {@link GroupNode}'s mask or similar cropping.
-     */
-    bringIntoView(node: VisualNode): void;
-}
-
-export declare const viewport: ExpressViewport;
+export declare const viewport: ExpressViewportWrapper;
 
 /**
  * Visual effects that can be applied to a text node.

@@ -727,7 +727,9 @@ describe("AddOnBuilder", () => {
 
                 const data = stubInterface<Buffer>();
                 readFileStub.withArgs(path.join(options.addOnDirectory, "gitignore")).returns(data);
-                appendFileStub.withArgs(path.join(options.addOnDirectory, ".gitignore"), data).returns();
+                appendFileStub
+                    .withArgs(path.join(options.addOnDirectory, ".gitignore"), data as Uint8Array<ArrayBuffer>)
+                    .returns();
                 unlinkStub.withArgs(path.join(options.addOnDirectory, "gitignore")).returns();
 
                 // _updateManifest() stubs.
@@ -773,7 +775,13 @@ describe("AddOnBuilder", () => {
                 assert.equal(readFileStub.calledWith(path.join(options.addOnDirectory, "gitignore")), true);
 
                 assert.equal(appendFileStub.callCount, 1);
-                assert.equal(appendFileStub.calledWith(path.join(options.addOnDirectory, ".gitignore"), data), true);
+                assert.equal(
+                    appendFileStub.calledWith(
+                        path.join(options.addOnDirectory, ".gitignore"),
+                        data as Uint8Array<ArrayBuffer>
+                    ),
+                    true
+                );
 
                 assert.equal(unlinkStub.callCount, 1);
                 assert.equal(unlinkStub.calledWith(path.join(options.addOnDirectory, "gitignore")), true);
@@ -1082,7 +1090,9 @@ describe("AddOnBuilder", () => {
 
             const data = stubInterface<Buffer>();
             readFileStub.withArgs(path.join(options.addOnDirectory, "gitignore")).returns(data);
-            appendFileStub.withArgs(path.join(options.addOnDirectory, ".gitignore"), data).returns();
+            appendFileStub
+                .withArgs(path.join(options.addOnDirectory, ".gitignore"), data as Uint8Array<ArrayBuffer>)
+                .returns();
             unlinkStub.withArgs(path.join(options.addOnDirectory, "gitignore")).returns();
 
             // _updateManifest() stubs.
@@ -1254,7 +1264,9 @@ describe("AddOnBuilder", () => {
 
             const data = stubInterface<Buffer>();
             readFileStub.withArgs(path.join(options.addOnDirectory, "gitignore")).returns(data);
-            appendFileStub.withArgs(path.join(options.addOnDirectory, ".gitignore"), data).returns();
+            appendFileStub
+                .withArgs(path.join(options.addOnDirectory, ".gitignore"), data as Uint8Array<ArrayBuffer>)
+                .returns();
             unlinkStub.withArgs(path.join(options.addOnDirectory, "gitignore")).returns();
 
             // _updateManifest() stubs.
