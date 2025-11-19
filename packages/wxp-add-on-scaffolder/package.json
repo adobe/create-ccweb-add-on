@@ -34,7 +34,7 @@
         "inversify": "6.0.1",
         "prompts": "2.4.2",
         "reflect-metadata": "0.1.13",
-        "string-template": "3.4.0",
+        "string-template": "1.0.0",
         "tslib": "2.7.0",
         "uuid": "8.3.1"
     },

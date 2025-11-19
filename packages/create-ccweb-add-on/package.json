@@ -53,7 +53,7 @@
         "prompts": "2.4.2",
         "reflect-metadata": "0.1.13",
         "semver": "7.7.1",
-        "string-template": "3.4.0",
+        "string-template": "1.0.0",
         "tslib": "2.7.0",
         "validate-npm-package-name": "3.0.0"
     },
