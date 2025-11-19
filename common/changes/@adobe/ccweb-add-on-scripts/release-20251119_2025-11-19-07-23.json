@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-scripts",
+      "comment": "Add console override script during build step, to filter add-on console logs",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-scripts"
+}

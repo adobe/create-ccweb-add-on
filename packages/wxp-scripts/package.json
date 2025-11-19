@@ -1,6 +1,6 @@
 {
     "name": "@adobe/ccweb-add-on-scripts",
-    "version": "3.3.0",
+    "version": "3.4.0",
     "author": "Adobe",
     "license": "MIT",
     "description": "Scripts for Adobe Creative Cloud Web Add-on.",
@@ -78,6 +78,6 @@
         "sinon": "9.2.1",
         "ts-node": "10.9.2",
         "ts-sinon": "2.0.1",
-        "typescript": "5.7.3"
+        "typescript": "5.9.3"
     }
 }

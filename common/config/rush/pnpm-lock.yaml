@@ -48,10 +48,10 @@ importers:
         version: 9.2.1
       ts-node:
         specifier: 10.9.2
-        version: 10.9.2(@types/node@18.18.2)(typescript@5.7.3)
+        version: 10.9.2(@types/node@18.18.2)(typescript@5.9.3)
       typescript:
-        specifier: 5.7.3
-        version: 5.7.3
+        specifier: 5.9.3
+        version: 5.9.3
 
   ../../packages/create-ccweb-add-on:
     dependencies:
@@ -166,13 +166,13 @@ importers:
         version: 9.2.1
       ts-node:
         specifier: 10.9.2
-        version: 10.9.2(@types/node@18.18.2)(typescript@5.7.3)
+        version: 10.9.2(@types/node@18.18.2)(typescript@5.9.3)
       ts-sinon:
         specifier: 2.0.1
         version: 2.0.1
       typescript:
-        specifier: 5.7.3
-        version: 5.7.3
+        specifier: 5.9.3
+        version: 5.9.3
 
   ../../packages/wxp-add-on-scaffolder:
     dependencies:
@@ -269,13 +269,13 @@ importers:
         version: 9.2.1
       ts-node:
         specifier: 10.9.2
-        version: 10.9.2(@types/node@18.18.2)(typescript@5.7.3)
+        version: 10.9.2(@types/node@18.18.2)(typescript@5.9.3)
       ts-sinon:
         specifier: 2.0.1
         version: 2.0.1
       typescript:
-        specifier: 5.7.3
-        version: 5.7.3
+        specifier: 5.9.3
+        version: 5.9.3
 
   ../../packages/wxp-analytics:
     dependencies:
@@ -345,13 +345,13 @@ importers:
         version: 9.2.1
       ts-node:
         specifier: 10.9.2
-        version: 10.9.2(@types/node@18.18.2)(typescript@5.7.3)
+        version: 10.9.2(@types/node@18.18.2)(typescript@5.9.3)
       ts-sinon:
         specifier: 2.0.1
         version: 2.0.1
       typescript:
-        specifier: 5.7.3
-        version: 5.7.3
+        specifier: 5.9.3
+        version: 5.9.3
 
   ../../packages/wxp-core:
     dependencies:
@@ -436,13 +436,13 @@ importers:
         version: 9.2.1
       ts-node:
         specifier: 10.9.2
-        version: 10.9.2(@types/node@18.18.2)(typescript@5.7.3)
+        version: 10.9.2(@types/node@18.18.2)(typescript@5.9.3)
       ts-sinon:
         specifier: 2.0.1
         version: 2.0.1
       typescript:
-        specifier: 5.7.3
-        version: 5.7.3
+        specifier: 5.9.3
+        version: 5.9.3
 
   ../../packages/wxp-scripts:
     dependencies:
@@ -563,13 +563,13 @@ importers:
         version: 9.2.1
       ts-node:
         specifier: 10.9.2
-        version: 10.9.2(@types/node@18.18.2)(typescript@5.7.3)
+        version: 10.9.2(@types/node@18.18.2)(typescript@5.9.3)
       ts-sinon:
         specifier: 2.0.1
         version: 2.0.1
       typescript:
-        specifier: 5.7.3
-        version: 5.7.3
+        specifier: 5.9.3
+        version: 5.9.3
 
   ../../packages/wxp-sdk-types:
     dependencies:
@@ -591,10 +591,10 @@ importers:
         version: 2.8.0
       ts-node:
         specifier: 10.9.2
-        version: 10.9.2(@types/node@18.18.2)(typescript@5.7.3)
+        version: 10.9.2(@types/node@18.18.2)(typescript@5.9.3)
       typescript:
-        specifier: 5.7.3
-        version: 5.7.3
+        specifier: 5.9.3
+        version: 5.9.3
 
   ../../packages/wxp-ssl:
     dependencies:
@@ -691,13 +691,13 @@ importers:
         version: 9.2.1
       ts-node:
         specifier: 10.9.2
-        version: 10.9.2(@types/node@18.18.2)(typescript@5.7.3)
+        version: 10.9.2(@types/node@18.18.2)(typescript@5.9.3)
       ts-sinon:
         specifier: 2.0.1
         version: 2.0.1
       typescript:
-        specifier: 5.7.3
-        version: 5.7.3
+        specifier: 5.9.3
+        version: 5.9.3
 
 packages:
 
@@ -4795,7 +4795,7 @@ packages:
     engines: {node: '>=0.6'}
     dev: false
 
-  /ts-node@10.9.2(@types/node@18.18.2)(typescript@5.7.3):
+  /ts-node@10.9.2(@types/node@18.18.2)(typescript@5.9.3):
     resolution: {integrity: sha512-f0FFpIdcHgn8zcPSbf1dRevwt047YMnaiJM3u2w2RewrB+fob/zePZcrOyQoLMMO7aBIddLcQIEK5dYjkLnGrQ==}
     hasBin: true
     peerDependencies:
@@ -4821,7 +4821,7 @@ packages:
       create-require: 1.1.1
       diff: 4.0.2
       make-error: 1.3.6
-      typescript: 5.7.3
+      typescript: 5.9.3
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
     dev: true
@@ -4869,8 +4869,8 @@ packages:
       mime-types: 2.1.35
     dev: false
 
-  /typescript@5.7.3:
-    resolution: {integrity: sha512-84MVSjMEHP+FQRPy3pX9sTVV/INIex71s9TL2Gm5FG/WG1SqXeKyZ0k7/blY/4FdOzI12CBy1vGc4og/eus0fw==}
+  /typescript@5.9.3:
+    resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
     engines: {node: '>=14.17'}
     hasBin: true
     dev: true

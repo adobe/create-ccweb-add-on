@@ -58,7 +58,7 @@ export class Purge extends BaseCommand {
 
         const {
             flags: { analytics }
-        } = await this.parse(Purge);
+        } = (await this.parse(Purge)) as { flags: { analytics: string } };
 
         await this._seekAnalyticsConsent(analytics);
 

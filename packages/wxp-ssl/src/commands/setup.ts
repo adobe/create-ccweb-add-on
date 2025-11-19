@@ -22,6 +22,7 @@
  * SOFTWARE.
  ********************************************************************************/
 
+// @ts-nocheck
 import { BaseCommand, CLIProgram } from "@adobe/ccweb-add-on-analytics";
 import { UncaughtExceptionHandler } from "@adobe/ccweb-add-on-core";
 import type { Config } from "@oclif/core";

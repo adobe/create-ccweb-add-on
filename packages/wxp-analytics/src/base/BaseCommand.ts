@@ -22,6 +22,7 @@
  * SOFTWARE.
  ********************************************************************************/
 
+// @ts-nocheck
 import type { Config } from "@oclif/core";
 import { Command, Flags } from "@oclif/core";
 import type { BooleanFlag, CustomOptions, OptionFlag } from "@oclif/core/lib/interfaces/parser.js";

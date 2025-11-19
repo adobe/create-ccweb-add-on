@@ -153,6 +153,10 @@ export class AddOnManifest {
                 const { name } = this._manifest as AddOnManifestType<ManifestVersion.V1>;
                 return name;
             }
+            case ManifestVersion.V2: {
+                const { name } = this._manifest as AddOnManifestType<ManifestVersion.V2>;
+                return name;
+            }
             default: {
                 return undefined;
             }

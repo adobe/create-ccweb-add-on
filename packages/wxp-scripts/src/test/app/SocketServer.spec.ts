@@ -50,6 +50,7 @@ import { StartCommandOptions } from "../../models/StartCommandOptions.js";
 import { AddOnManifestReader } from "../../utilities/AddOnManifestReader.js";
 import { FileChangeTracker } from "../../utilities/FileChangeTracker.js";
 import { createManifest } from "../test-utilities.js";
+import { GlobalOverrides } from "../../utilities/GlobalOverrides.js";
 
 describe("SocketServer", () => {
     let sandbox: SinonSandbox;
@@ -164,6 +165,8 @@ describe("SocketServer", () => {
                         }
                     });
                 });
+                const overrideGlobalConsoleStub = sandbox.stub(GlobalOverrides, "overrideGlobalConsole");
+                sandbox.stub(manifestReader, "getManifest").returns(manifest);
 
                 await socketServer.start(addOnDirectory, server, options);
 
@@ -206,6 +209,7 @@ describe("SocketServer", () => {
                         true
                     );
                     assert.equal(analyticsService.postEvent.callCount, 1);
+                    assert.equal(overrideGlobalConsoleStub.calledWith(manifest, addOnDirectory), true);
                 }
 
                 const cliScriptMessage = {
@@ -274,6 +278,8 @@ describe("SocketServer", () => {
                     }
                 });
             });
+            const overrideGlobalConsoleStub = sandbox.stub(GlobalOverrides, "overrideGlobalConsole");
+            sandbox.stub(manifestReader, "getManifest").returns(manifest);
 
             await socketServer.start(addOnDirectory, server, options);
 
@@ -315,6 +321,7 @@ describe("SocketServer", () => {
                 }),
                 true
             );
+            assert.equal(overrideGlobalConsoleStub.calledWith(manifest, addOnDirectory), true);
 
             const cliScriptMessage = {
                 messageVersion: 1,

@@ -1,6 +1,6 @@
 {
     "name": "@adobe/ccweb-add-on-manifest",
-    "version": "3.3.0",
+    "version": "3.4.0",
     "author": "Adobe",
     "license": "MIT",
     "description": "Manifest models and validation rules for Adobe Creative Cloud Web Add-on.",
@@ -58,6 +58,6 @@
         "rimraf": "3.0.2",
         "sinon": "9.2.1",
         "ts-node": "10.9.2",
-        "typescript": "5.7.3"
+        "typescript": "5.9.3"
     }
 }
