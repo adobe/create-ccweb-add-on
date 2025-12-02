@@ -217,10 +217,18 @@ describe("StartCommandExecutor", () => {
 
                 assert.equal(logger.warning.callCount, 1);
                 assert.equal(
-                    logger.warning.calledWith(
-                        "You can now sideload your add-on by enabling the Developer Mode in the Add-ons panel.",
-                        { prefix: "\n", postfix: "\n" }
-                    ),
+                    logger.warning
+                        .getCall(0)
+                        .calledWith(
+                            "You can now sideload your add-on by enabling the Developer Mode in the Add-ons panel by visiting:",
+                            { prefix: "\n" }
+                        ),
+                    true
+                );
+
+                assert.equal(logger.success.callCount, 1);
+                assert.equal(
+                    logger.success.getCall(0).calledWith("https://www.adobe.com/go/addon-cli", { postfix: "\n" }),
                     true
                 );
 

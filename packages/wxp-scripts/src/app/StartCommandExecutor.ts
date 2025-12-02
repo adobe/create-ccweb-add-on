@@ -199,8 +199,9 @@ export class StartCommandExecutor implements CommandExecutor<StartCommandOptions
             format(LOGS.sideloadAddOn, {
                 appName: addOnDirectory.rootDirName
             }),
-            { prefix: LOGS.newLine, postfix: LOGS.newLine }
+            { prefix: LOGS.newLine }
         );
+        this._logger.success(LOGS.addOnTestingUrl, { postfix: LOGS.newLine });
     }
 }
 
@@ -209,7 +210,8 @@ const LOGS = {
     startingServer: "Starting Server ...",
     startingHttpServer: "Starting HTTPS Server ...",
     startingWebSocketServer: "Starting WSS Server ...",
-    sideloadAddOn: "You can now sideload your add-on by enabling the Developer Mode in the Add-ons panel.",
+    addOnTestingUrl: "https://www.adobe.com/go/addon-cli",
+    sideloadAddOn: "You can now sideload your add-on by enabling the Developer Mode in the Add-ons panel by visiting:",
     manifestValidationFailed: "Add-on manifest validation failed.",
     buildError: "Error while generating build."
 };
