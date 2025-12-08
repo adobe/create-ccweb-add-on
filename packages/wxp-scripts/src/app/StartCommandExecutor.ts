@@ -191,6 +191,7 @@ export class StartCommandExecutor implements CommandExecutor<StartCommandOptions
 
      /**
      * Display success logs with the next steps.
+     * @param options - {@link StartCommandOptions} Options used for the 'start' command.
      */
      private _displaySuccess() {
         this._logger.success(LOGS.continueTestingAddOn, { prefix: LOGS.newLine });
