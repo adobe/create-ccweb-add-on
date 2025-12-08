@@ -215,15 +215,17 @@ describe("StartCommandExecutor", () => {
                 assert.equal(logger.information.callCount, 1);
                 assert.equal(logger.information.getCall(0).calledWith("Starting Server ..."), true);
 
-                assert.equal(logger.warning.callCount, 1);
+                assert.equal(logger.success.callCount, 1);
                 assert.equal(
-                    logger.warning.calledWith(
-                        "You can now sideload your add-on by enabling the Developer Mode in the Add-ons panel.",
-                        { prefix: "\n", postfix: "\n" }
-                    ),
+                    logger.success
+                        .getCall(0)
+                        .calledWith(
+                            "Continue testing your add-on in Adobe Express by accessing the link: https://www.adobe.com/go/addon-cli",
+                            { prefix: "\n" }
+                        ),
                     true
                 );
-
+                
                 const addonDirectory = new AddOnDirectory(options.srcDirectory, manifest);
 
                 const analyticsServiceEventData = [
