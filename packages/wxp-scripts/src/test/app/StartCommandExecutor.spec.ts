@@ -225,7 +225,7 @@ describe("StartCommandExecutor", () => {
                         ),
                     true
                 );
-                
+
                 const addonDirectory = new AddOnDirectory(options.srcDirectory, manifest);
 
                 const analyticsServiceEventData = [
