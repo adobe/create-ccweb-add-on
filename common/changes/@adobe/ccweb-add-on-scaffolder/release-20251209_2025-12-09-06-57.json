@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-scaffolder",
+      "comment": "introduce mobile.share entrypoint and minor fixes to scripts package",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-scaffolder"
+}
