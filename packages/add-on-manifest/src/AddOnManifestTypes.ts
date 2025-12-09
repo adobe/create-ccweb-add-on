@@ -181,6 +181,10 @@ export enum EntrypointType {
      */
     MOBILE_MORE = "mobile.more",
     /**
+     * Mobile share entrypoint type.
+     */
+    MOBILE_SHARE = "mobile.share",
+    /**
      * Schedule entrypoint type.
      */
     SCHEDULE = "schedule",

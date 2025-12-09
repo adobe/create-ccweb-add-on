@@ -166,7 +166,7 @@ export class StartCommandExecutor implements CommandExecutor<StartCommandOptions
 
         await this._socketServer.start(addOnDirectory, server, options);
 
-        this._displaySuccess(addOnDirectory);
+        this._displaySuccess();
 
         const analyticsEventData = [
             "--addOnName",
@@ -191,16 +191,10 @@ export class StartCommandExecutor implements CommandExecutor<StartCommandOptions
 
     /**
      * Display success logs with the next steps.
-     * @param addOnDirectory - {@link AddOnDirectory} Information about the Add-on.
      * @param options - {@link StartCommandOptions} Options used for the 'start' command.
      */
-    private _displaySuccess(addOnDirectory: AddOnDirectory) {
-        this._logger.warning(
-            format(LOGS.sideloadAddOn, {
-                appName: addOnDirectory.rootDirName
-            }),
-            { prefix: LOGS.newLine, postfix: LOGS.newLine }
-        );
+    private _displaySuccess() {
+        this._logger.success(LOGS.continueTestingAddOn, { prefix: LOGS.newLine });
     }
 }
 
@@ -209,7 +203,8 @@ const LOGS = {
     startingServer: "Starting Server ...",
     startingHttpServer: "Starting HTTPS Server ...",
     startingWebSocketServer: "Starting WSS Server ...",
-    sideloadAddOn: "You can now sideload your add-on by enabling the Developer Mode in the Add-ons panel.",
+    continueTestingAddOn:
+        "Continue testing your add-on in Adobe Express by accessing the link: https://www.adobe.com/go/addon-cli",
     manifestValidationFailed: "Add-on manifest validation failed.",
     buildError: "Error while generating build."
 };
