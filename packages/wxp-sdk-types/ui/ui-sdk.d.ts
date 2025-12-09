@@ -887,7 +887,7 @@ export declare type DisableDragToDocument = () => void;
  */
 declare interface Document_2 {
     /**
-     * Add image/PSD/AI assets to the current page
+     * Add image/PSD/AI/SVG assets to the current page
      */
     addImage(blob: Blob, attributes?: MediaAttributes, importAddOnData?: ImportAddOnData): Promise<void>;
     /**
@@ -1139,6 +1139,10 @@ export declare enum EntrypointType {
      * Mobile more entrypoint type.
      */
     MOBILE_MORE = "mobile.more",
+    /**
+     * Mobile share entrypoint type.
+     */
+    MOBILE_SHARE = "mobile.share",
     /**
      * Schedule entrypoint type.
      */
