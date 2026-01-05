@@ -1,6 +1,6 @@
 {
     "name": "@adobe/ccweb-add-on-ssl",
-    "version": "3.5.0",
+    "version": "3.5.1",
     "author": "Adobe",
     "license": "MIT",
     "description": "SSL scripts for Adobe Creative Cloud Web Add-on.",

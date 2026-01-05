@@ -912,7 +912,6 @@ declare interface Document_2 {
      */
     getPagesMetadata(options: PageMetadataOptions): Promise<PageMetadata[]>;
     /**
-     * @experimental - Experimental API
      * Get the currently selected page ids.
      */
     getSelectedPageIds(): Promise<string[]>;

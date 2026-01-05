@@ -321,6 +321,7 @@ export interface AdditionalAddOnInfo {
     name?: string;
     icon?: IconType[];
     visibility?: string;
+    addOnSubmittedDate?: string; // latest date when the add-on build was uploaded
 }
 
 export interface AddOnInfo {

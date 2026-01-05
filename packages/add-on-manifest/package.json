@@ -1,6 +1,6 @@
 {
     "name": "@adobe/ccweb-add-on-manifest",
-    "version": "3.5.0",
+    "version": "3.5.1",
     "author": "Adobe",
     "license": "MIT",
     "description": "Manifest models and validation rules for Adobe Creative Cloud Web Add-on.",
