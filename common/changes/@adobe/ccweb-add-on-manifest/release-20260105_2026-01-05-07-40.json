@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-manifest",
+      "comment": "added addOnSubmittedDate field in the additionalInfo to support API deprecation",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-manifest"
+}

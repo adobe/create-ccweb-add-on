@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-sdk-types",
+      "comment": "Expose canExportMedia as experimental and stabilise getSelectedPageIds API",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-sdk-types"
+}
