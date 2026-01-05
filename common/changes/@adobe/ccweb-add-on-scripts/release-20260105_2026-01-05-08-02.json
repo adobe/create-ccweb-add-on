@@ -2,7 +2,7 @@
   "changes": [
     {
       "packageName": "@adobe/ccweb-add-on-scripts",
-      "comment": "bump version due to manifest update",
+      "comment": "Manifest updates",
       "type": "minor"
     }
   ],
