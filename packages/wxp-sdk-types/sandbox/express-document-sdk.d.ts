@@ -84,6 +84,7 @@ declare namespace ApiConstants {
         TextLayout,
         TextScriptStyle,
         EditorEvent,
+        ResizeBehavior,
         VisualEffectType,
         TextStyleSource,
         ParagraphListType,
@@ -554,6 +555,22 @@ export declare class ColorUtils {
 export declare const colorUtils: ExpressColorUtilsWrapper;
 
 /**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * An interface for arbitrary resize operations regardless of whether given a width or height when using {@link Node.resize}.
+ */
+declare interface CommonResizeOptions {
+    /**
+     * Whether to try to avoid scaling the content's visual styling (e.g. stroke width, corner detailing, etc.).
+     * Note that some kinds of content may not be able to avoid rescaling in some scenarios.
+     */
+    avoidScalingVisualDetailsIfPossible: boolean;
+}
+
+/**
  * A ComplexShapeNode is a complex prepackaged shape that appears as a leaf node in the UI, even if it is composed
  * of multiple separate paths.
  */
@@ -849,13 +866,7 @@ export declare class ExpressContext extends Context {
  * Entry point for Express specific APIs that read or modify the document's content.
  */
 export declare class ExpressEditor extends Editor {
-    /**
-     * User's current selection context
-     */
     get context(): ExpressContext;
-    /**
-     * @returns the root of the document.
-     */
     get documentRoot(): ExpressRootNode;
 }
 
@@ -980,6 +991,17 @@ export declare const fonts: ExpressFontsWrapper;
  * media rectangle child when those actions are applied.
  */
 export declare class GridCellNode extends Node implements IMediaContainerNode {
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Proxy resizing of the MediaRectangleNode *inside* this grid cell. The enclosing grid layout keeps
+     * the crop window (and thus the overall GridCellNode/MediaContainerNode bounds) fixed in position.
+     * *Warning:* This will not change the bounds reported by this GridCellNode itself.
+     */
+    resize(options: ResizeOptions): void;
     /**
      * Always throws as it's not possible to clone a single grid slot.
      * Use the parent grid container instead.
@@ -1449,60 +1471,9 @@ declare class Node extends VisualNode implements INodeBounds {
      * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
      *
      * @experimental
-     * Changes the width to the given value by visually *scaling* the entire content larger or smaller on both axes to
-     * preserve its existing aspect ratio, keeping its top-left corner ({@link topLeftLocal}) at a fixed location.
-     *
-     * Scaling changes the size of visual styling elements such as stroke width, corner detailing, and font size.
-     * Contrast this to *resizing* operations (such as {@link resizeToFitWithin}), which adjust the bounding box of an
-     * element while trying to preserve the existing size of visual detailing such as strokes, corners, and fonts.
-     *
-     * Rescaling becomes baked into the updated values of fields such as stroke weight, rectangle width, etc. (it is not
-     * a separate, persistent scale factor multiplier).
+     * Resizes this node based on the given {@link ResizeOptions}.
      */
-    rescaleProportionalToWidth(width: number): void;
-    /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
-     * Changes the height to the given value by visually *scaling* the entire content larger or smaller on both axes to
-     * preserve its existing aspect ratio. See {@link rescaleProportionalToWidth} documentation for additional explanation.
-     */
-    rescaleProportionalToHeight(height: number): void;
-    /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
-     * Resizes the node to fit entirely *within* a box of the given dimensions, keeping its top-left corner ({@link topLeftLocal})
-     * at a fixed location. Nodes with a fixed aspect ratio may leave unused space on one axis as a result, but nodes
-     * with flexible aspect ratio will be resized to the exact box size specified.
-     *
-     * Resizing attempts to preserve the existing size of visual styling elements such as stroke width, corner detailing,
-     * and font size as much as possible. Contrast with *rescaling* (such as {@link rescaleProportionalToWidth}), which
-     * always changes the size of visual detailing in exact proportion to the change in overall bounding box size. This
-     * API may still produce *some* degree of rescaling if necessary for certain shapes with fixed corner/edge detailing
-     * to fit the box better.
-     *
-     * @see resizeToCover
-     */
-    resizeToFitWithin(width: number, height: number): void;
-    /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
-     * Resizes the node to completely *cover* a box of the given dimensions, keeping its top-left corner ({@link topLeftLocal})
-     * at a fixed location. Nodes with a fixed aspect ratio may extend outside the box on one axis as a result, but
-     * nodes with flexible aspect ratio will be resized to the exact box size specified. See {@link resizeToFitWithin}
-     * documentation for additional explanation.
-     *
-     * @see resizeToFitWithin
-     */
-    resizeToCover(width: number, height: number): void;
+    resize(options: ResizeOptions): void;
     /**
      * Creates a copy of this node and its entire subtree of descendants.
      *
@@ -1843,6 +1814,111 @@ export declare class RectangleNode extends FillableNode implements IRectangularN
  */
 declare interface RemoveListStyleInput extends BaseParagraphListStyle {
     type: ParagraphListType.none;
+}
+
+/**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * An interface for rescaling the node based on a given height when using {@link Node.resize}.
+ */
+declare interface RescaleProportionalToHeightOptions extends CommonResizeOptions {
+    behavior: ResizeBehavior.proportional;
+    height: number;
+    /** Instead of providing a width, it will be calculated by multiplying the given height by the current aspect ratio. */
+    width?: never;
+}
+
+/**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * An interface for rescaling the node based on a given width when using {@link Node.resize}.
+ */
+declare interface RescaleProportionalToWidthOptions extends CommonResizeOptions {
+    behavior: ResizeBehavior.proportional;
+    width: number;
+    /** Instead of providing a height, it will be calculated by multiplying the given width by the current aspect ratio. */
+    height?: never;
+}
+
+/**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * An enum for controlling the behavior of {@link Node.resize}.
+ */
+export declare enum ResizeBehavior {
+    /**
+     * Resizes the node to fit entirely *within* a box of the given dimensions, keeping its {@link topLeftLocal}
+     * at a fixed location. Nodes with a fixed aspect ratio may leave unused space on one axis as a result,
+     * but nodes with flexible aspect ratio will be resized to the exact box size specified.
+     */
+    contain = "contain",
+    /**
+     * Resizes the node to completely *cover* a box of the given dimensions, keeping its {@link topLeftLocal}
+     * at a fixed location. Nodes with a fixed aspect ratio may extend outside the box on one axis as a result,
+     * but nodes with flexible aspect ratio will be resized to the exact box size specified.
+     */
+    cover = "cover",
+    /**
+     * Resizes the node to the given width or height while preserving its current aspect ratio, keeping its
+     * {@link topLeftLocal} at a fixed location.
+     */
+    proportional = "proportional"
+}
+
+/**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * A type union for providing the necessary arguments to {@link Node.resize}.
+ *
+ * Note that some nodes only support proportional resizing. In some cases this is always true (e.g. images) while in
+ * other cases it is due to the current visual details (e.g. the stroke being too thick to shrink the size of a shape).
+ */
+export declare type ResizeOptions =
+    | RescaleProportionalToWidthOptions
+    | RescaleProportionalToHeightOptions
+    | ResizeUsingWidthOptions
+    | ResizeUsingHeightOptions;
+
+/**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * An interface for resizing the node based on a given height when using {@link Node.resize}.
+ */
+declare interface ResizeUsingHeightOptions extends CommonResizeOptions {
+    behavior: ResizeBehavior.contain | ResizeBehavior.cover;
+    height: number;
+    /** If a width is not provided, it will be calculated by multiplying the given height by the current aspect ratio. */
+    width?: number;
+}
+
+/**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * An interface for resizing the node based on a given width when using {@link Node.resize}.
+ */
+declare interface ResizeUsingWidthOptions extends CommonResizeOptions {
+    behavior: ResizeBehavior.contain | ResizeBehavior.cover;
+    width: number;
+    /** If a height is not provided, it will be calculated by multiplying the given width by the current aspect ratio. */
+    height?: number;
 }
 
 /**

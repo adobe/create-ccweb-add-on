@@ -1315,7 +1315,8 @@ export declare interface JpgRenditionOptions extends RenditionOptions {
      */
     quality?: number;
     /**
-     * Requested size
+     * The desired dimensions for the image rendition.
+     * NOTE: Only downscaling is supported on mobile and chrome OS devices.
      */
     requestedSize?: {
         width?: number;
@@ -1750,7 +1751,8 @@ export declare interface PngRenditionOptions extends RenditionOptions {
      */
     backgroundColor?: number;
     /**
-     * Requested size
+     * The desired dimensions for the image rendition.
+     * NOTE: Only downscaling is supported on mobile and chrome OS devices.
      */
     requestedSize?: {
         width?: number;
