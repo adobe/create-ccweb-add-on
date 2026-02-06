@@ -88,7 +88,8 @@ declare namespace ApiConstants {
         VisualEffectType,
         TextStyleSource,
         ParagraphListType,
-        OrderedListNumbering
+        OrderedListNumbering,
+        CreateRenditionFormat
     };
 }
 
@@ -171,6 +172,23 @@ export declare class ArtboardNode extends VisualNode implements Readonly<IRectan
      * The children of an Artboard are all subclasses of Node (not just the more minimal BaseNode or VisualNode).
      */
     get allChildren(): Readonly<Iterable<Node>>;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Helper to recursively traverse *all* the exposed scenegraph content within the subtree of this node.
+     * Every container node and every leaf node will be visited via a pre-order tree traversal.
+     * Although once called the list of direct descendants is static, changes to further descendants may appear while
+     * iterating depending on when the operation occurs relative to the parent being yielded.
+     * Note that the root node (i.e. what this API was called on) is not visited.
+     *
+     * The descendants of an Artboard are all subclasses of Node (not just the more minimal BaseNode or VisualNode).
+     *
+     * Warning: Processing text content via this API can be error-prone. Use {@link VisualNode.allTextContent}
+     */
+    get allDescendants(): Readonly<Iterable<Node>>;
     /**
      * The artboards's regular children (does not include any "background layer" content if present; use {@link allChildren}
      * for a read-only view that includes background content). Use the methods on this `children` ItemList object to get,
@@ -393,7 +411,7 @@ export declare class BitmapImage {
      * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
      *
      * @experimental
-     * Fetches the bitmap data as a Blob. This will wait for the bitmap to be available if necessary.
+     * Fetches the bitmap data as a Blob. Waits up to 1 minute for the bitmap to be available if necessary.
      */
     data(): Promise<Blob>;
 }
@@ -648,6 +666,60 @@ export declare class Context {
 }
 
 /**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * The format of the rendition output.
+ */
+export declare enum CreateRenditionFormat {
+    png = "png",
+    jpeg = "jpeg"
+}
+
+/**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * An interface for configuring {@link VisualNode.createRendition}.
+ */
+export declare interface CreateRenditionOptions {
+    /**
+     * Whether to output in PNG or JPEG format.  Defaults to PNG.
+     */
+    format?: CreateRenditionFormat;
+    /**
+     * The scale factor to apply to the content before it is rendered.
+     */
+    scale?: number;
+}
+
+/**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * An interface for the result of {@link VisualNode.createRendition}.
+ */
+export declare interface CreateRenditionResult {
+    /**
+     * The PNG or JPEG data for the rendition.
+     */
+    blob?: Blob;
+    /**
+     * The bounds of the rendition in the global coordinate space.
+     * This may be larger than the {@link VisualNode.boundsLocal} due to rotations, borders, filters, or other effects.
+     * Only provided if the {@link VisualNode} is not orphaned.
+     *
+     */
+    drawBoundsGlobal?: Rect;
+}
+
+/**
  * Entry point for APIs that read or modify the document's content.
  */
 export declare class Editor {
@@ -788,6 +860,25 @@ export declare class Editor {
      * @returns a stroke configured with the given options.
      */
     makeStroke(options?: Partial<SolidColorStroke>): SolidColorStroke;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * @param parentNode - The parent node that will contain the threaded text node. This must be a container node (e.g., ArtboardNode, GroupNode) that is attached to the document.
+     * @param textContent - The initial text content for the threaded text node.
+     * @param geometry - The geometry of the threaded text node.
+     * @returns A new ThreadedTextNode that is part of a threaded text flow.
+     *
+     * @throws if parentNode is not provided or is not a valid container node.
+     * @throws if textContent is empty or invalid.
+     */
+    createThreadedText(
+        parentNode: ContainerNode,
+        textContent: string,
+        geometry?: TextFrameAreaGeometry
+    ): ThreadedTextNode;
     /**
      * @returns a path node with a default stroke and no initial fill.
      * @param path - a string representing any [SVG path element](https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths).
@@ -1409,6 +1500,23 @@ declare class Node extends VisualNode implements INodeBounds {
      * The children of a Node are always other Node classes (never the more minimal BaseNode).
      */
     get allChildren(): Readonly<Iterable<Node>>;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Helper to recursively traverse *all* the exposed scenegraph content within the subtree of this node.
+     * Every container node and every leaf node will be visited via a pre-order tree traversal.
+     * Although once called the list of direct descendants is static, changes to further descendants may appear while
+     * iterating depending on when the operation occurs relative to the parent being yielded.
+     * Note that the root node (i.e. what this API was called on) is not visited.
+     *
+     * The descendants of a Node are always other Node classes (never the more minimal BaseNode).
+     *
+     * Warning: Processing text content via this API can be error-prone. Use {@link VisualNode.allTextContent}
+     */
+    get allDescendants(): Readonly<Iterable<Node>>;
     get boundsInParent(): Readonly<Rect>;
     boundsInNode(targetNode: VisualNode): Readonly<Rect>;
     get translation(): Readonly<Point>;
@@ -1553,6 +1661,37 @@ export declare class PageNode extends BaseNode implements IRectangularNode {
      * To create new artboards, see {@link ArtboardList.addArtboard}.
      */
     get artboards(): ArtboardList;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Helper to recursively traverse *all* the exposed scenegraph content within the subtree of this node.
+     * Every container node and every leaf node will be visited via a pre-order tree traversal.
+     * Although once called the list of direct descendants is static, changes to further descendants may appear while
+     * iterating depending on when the operation occurs relative to the parent being yielded.
+     * Note that the root node (i.e. what this API was called on) is not visited.
+     *
+     * Warning: Processing text content via this API can be error-prone. Use {@link VisualNode.allTextContent}
+     */
+    get allDescendants(): Readonly<Iterable<VisualNode>>;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Helper to process all text content that is found as part of or within this node. This can be hard to do correctly
+     * via manual tree traversal since multiple {@link ThreadedTextNode} can share a single {@link TextContentModel}.
+     *
+     * This iterator returns a single result per TextContentModel that is at least partially displayed within this node,
+     * even if that content is split across several separate TextNode "frames". If this node is or contains some but not
+     * all of the display frames of an overall TextContentModel, that model is still included as a result.
+     *
+     * Note that visibleRanges and visibleText may not be sorted as TextNode "frames" can appear in any order in the scenegraph.
+     */
+    get allTextContent(): Readonly<Iterable<TextContent>>;
     /**
      * The width of the node.
      *
@@ -2172,6 +2311,32 @@ declare enum TextAlignment {
 }
 
 /**
+ * <InlineAlert slots="text" variant="warning"/>
+ *
+ * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+ *
+ * @experimental
+ * The values yielded by {@link VisualNode.allTextContent} and {@link PageNode.allTextContent}.
+ */
+export declare interface TextContent {
+    textContentModel: TextContentModel;
+    /**
+     * An unsorted list of the subranges of the related text content model that are visible within the node.
+     *
+     * Since a single text content model can be displayed across multiple TextNode "frames", any of which could be
+     * outside of the node, the union of all the subranges in this value may still be a subset of the total range.
+     */
+    visibleRanges: TextRange[];
+    /**
+     * An unsorted list of the parts of the related text content model that are visible within the node.
+     *
+     * Since a single text content model can be displayed across multiple TextNode "frames", any of which could be
+     * outside of the node, the union of all the text in this value may still be a subset of the total text.
+     */
+    visibleText: string[];
+}
+
+/**
  * TextContentModel is an abstract base class representing a complete piece of text content.
  * Use this model to get or modify the text string and the style ranges applied to it.
  */
@@ -2332,6 +2497,15 @@ export declare abstract class TextContentModel {
      * the character styles to use only AvailableFonts.
      */
     hasUnavailableFonts(): boolean;
+}
+
+/**
+ * Geometry for an area text frame in pixels.
+ * @experimental
+ */
+export declare interface TextFrameAreaGeometry {
+    width: number;
+    height: number;
 }
 
 /**
@@ -2558,12 +2732,23 @@ export declare enum TextStyleSource {
  * ThreadedTextContentModel represents a complete piece of text content that is split across multiple
  * {@link ThreadedTextNode} frames for display. This subclass provides a mutable {@link allFrames} list
  * that supports adding, removing, and reordering text frames.
- *
- * The append and insert operations will automatically parent the new frame to the same parent as the
- * reference frame and place it in the correct z-order.
  */
 export declare class ThreadedTextContentModel extends TextNodeContentModel {
     get allTextNodes(): Readonly<Iterable<ThreadedTextNode>>;
+    get frames(): ThreadedTextList;
+}
+
+export declare class ThreadedTextList extends ReadOnlyItemList<ThreadedTextNode> {
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * @param geometry - The geometry of the threaded text node in pixels (width and height).
+     * @returns A new ThreadedTextNode that is part of a threaded text flow.
+     */
+    addFrame(geometry?: TextFrameAreaGeometry): ThreadedTextNode;
 }
 
 /**
@@ -2572,8 +2757,6 @@ export declare class ThreadedTextContentModel extends TextNodeContentModel {
  * instead it refers to a {@link TextNodeContentModel}, which may be shared across multiple ThreadedTextNode frames.
  *
  * All linked ThreadedTextNodes that share a single TextContentModel must remain together within the same artboard.
- *
- * APIs are not yet available to create multi-frame text flows. To create *non*-threaded text, use {@link Editor.createText}.
  */
 export declare class ThreadedTextNode extends TextNode {
     /**
@@ -2670,6 +2853,15 @@ declare enum VisualEffectType {
  */
 export declare class VisualNode extends BaseNode implements IVisualNodeBounds {
     /**
+     * Returns a read-only list of all children of the node. General-purpose content containers such as ArtboardNode or
+     * GroupNode also provide a mutable {@link ContainerNode.children} list. Other nodes with a more specific structure can
+     * hold children in various discrete "slots"; this `allChildren` list includes *all* such children and reflects their
+     * overall display z-order.
+     *
+     * The children of a VisualNode are always other VisualNode classes (never the more minimal BaseNode).
+     */
+    get allChildren(): Readonly<Iterable<VisualNode>>;
+    /**
      * The highest ancestor that still has visual presence in the document. Typically an Artboard, but for orphaned
      * content, it will be the root of the deleted content (which might be this node itself).
      *
@@ -2678,10 +2870,54 @@ export declare class VisualNode extends BaseNode implements IVisualNodeBounds {
      * meaningful comparison or conversion between the bounds or coordinate spaces of such nodes.
      */
     get visualRoot(): VisualNode;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Helper to recursively traverse *all* the exposed scenegraph content within the subtree of this node.
+     * Every container node and every leaf node will be visited via a pre-order tree traversal.
+     * Although once called the list of direct descendants is static, changes to further descendants may appear while
+     * iterating depending on when the operation occurs relative to the parent being yielded.
+     * Note that the root node (i.e. what this API was called on) is not visited.
+     *
+     * Warning: Processing text content via this API can be error-prone. Use {@link VisualNode.allTextContent}
+     */
+    get allDescendants(): Readonly<Iterable<VisualNode>>;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Helper to process all text content that is found as part of or within this node. This can be hard to do correctly
+     * via manual tree traversal since multiple {@link ThreadedTextNode} can share a single {@link TextContentModel}.
+     *
+     * This iterator returns a single result per TextContentModel that is at least partially displayed within this node,
+     * even if that content is split across several separate TextNode "frames". If this node is or contains some but not
+     * all of the display frames of an overall TextContentModel, that model is still included as a result.
+     *
+     * Note that visibleRanges and visibleText may not be sorted as TextNode "frames" can appear in any order in the scenegraph.
+     */
+    get allTextContent(): Readonly<Iterable<TextContent>>;
     get boundsLocal(): Readonly<Rect>;
     get centerPointLocal(): Readonly<Point>;
     get topLeftLocal(): Readonly<Point>;
     localPointInNode(localPoint: Point, targetNode: VisualNode): Readonly<Point>;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Generates a rendition of this node and its descendants.
+     *
+     * If this node contains images, it will wait for the best quality to be available before capturing.
+     * As such, there is a 20s timeout before an error is thrown to prevent indefinite waiting.
+     *
+     */
+    createRendition(options?: CreateRenditionOptions): Promise<CreateRenditionResult>;
 }
 
 export {};
