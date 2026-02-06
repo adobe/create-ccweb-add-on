@@ -29,6 +29,8 @@ import { DEFAULT_OUTPUT_DIRECTORY, ITypes as ICoreTypes, isNullOrWhiteSpace } fr
 import type { AddOnManifest, ManifestError, ManifestValidationResult } from "@adobe/ccweb-add-on-manifest";
 import { inject, injectable, named } from "inversify";
 import "reflect-metadata";
+import fs from "fs-extra";
+import path from "path";
 import format from "string-template";
 import { AnalyticsErrorMarkers, AnalyticsSuccessMarkers } from "../AnalyticsMarkers.js";
 import { ITypes } from "../config/inversify.types.js";
@@ -80,8 +82,59 @@ export class BuildCommandExecutor implements CommandExecutor<BuildCommandOptions
      * @returns Promise.
      */
     async execute(options: BuildCommandOptions): Promise<boolean> {
+        await this._validateSWCDependencies();
         await this._cleanCommandExecutor.execute();
         return this._build(options);
+    }
+
+    /**
+     * Validate the Spectrum Web Components dependencies of the project.
+     * Ensure that all @spectrum-web-components/* and @swc-react/* dependencies are using the same versions.
+     */
+    private async _validateSWCDependencies(): Promise<void> {
+        const packageJsonPath = path.join(process.cwd(), "package.json");
+        /*if (!fs.existsSync(packageJsonPath)) {
+            return;
+        }*/
+        const packageJson = await fs.readJson(packageJsonPath);
+        const dependencies = { ...(packageJson.dependencies || {}), ...(packageJson.devDependencies || {}) } as Record<
+            string,
+            string
+        >;
+
+        const errors: string[] = [];
+        const packagesToValidate = ["@spectrum-web-components/", "@swc-react/"];
+        packagesToValidate.forEach(prefix => {
+            this._validateDependencyGroup(dependencies, prefix, errors);
+        });
+        if (errors.length > 0) {
+            this._logger.error(LOGS.swcDependenciesVersionMismatch);
+            errors.forEach(error => this._logger.error(error));
+            void this._analyticsService.postEvent(
+                AnalyticsErrorMarkers.SCRIPTS_BUILD_COMMAND_ERROR,
+                LOGS.swcDependenciesVersionMismatch,
+                false
+            );
+            process.exit(1);
+        }
+    }
+
+    private _validateDependencyGroup(dependencies: Record<string, string>, prefix: string, errors: string[]): void {
+        const versionToPackagesMap = new Map<string, string[]>();
+
+        for (const [pkg, version] of Object.entries(dependencies)) {
+            if (pkg.startsWith(prefix)) {
+                const packages = versionToPackagesMap.get(version) || [];
+                packages.push(pkg);
+                versionToPackagesMap.set(version, packages);
+            }
+        }
+        if (versionToPackagesMap.size > 1) {
+            const versionDetails = Array.from(versionToPackagesMap.entries())
+                .map(([version, packages]) => `- ${version}: ${packages.join(", ")}`)
+                .join("\n");
+            errors.push(`All ${prefix}* dependencies must use the same version. Found versions:\n${versionDetails}`);
+        }
     }
 
     private _onValidationFailed = async (failedResult: ManifestValidationResult) => {
@@ -162,5 +215,6 @@ const LOGS = {
     buildingSourceDirectory: "Building source directory {srcDirectory}/ to {DEFAULT_OUTPUT_DIRECTORY}/ ...",
     done: "Done.",
     manifestValidationFailed: "Add-on manifest validation failed.",
-    buildFailed: "Build Generation Failed."
+    buildFailed: "Build Generation Failed.",
+    swcDependenciesVersionMismatch: "Spectrum Web Components dependencies version mismatch."
 };

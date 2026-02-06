@@ -458,5 +458,154 @@ describe("BuildCommandExecutor", () => {
                 true
             );
         });
+
+        const swcTestCases = [
+            {
+                title: "should succeed when SWC dependencies are valid",
+                packageJsonExists: true,
+                packageJsonContent: {
+                    dependencies: {
+                        "@spectrum-web-components/button": "1.0.0",
+                        "@swc-react/button": "1.0.0"
+                    },
+                    devDependencies: {
+                        "@spectrum-web-components/textfield": "1.0.0",
+                        "@swc-react/textfield": "1.0.0"
+                    }
+                },
+                shouldFail: false
+            },
+            {
+                title: "should succeed when package.json does not exist",
+                packageJsonExists: false,
+                shouldFail: false
+            },
+            {
+                title: "should succeed when package.json has no dependencies",
+                packageJsonExists: true,
+                packageJsonContent: {},
+                shouldFail: false
+            },
+            {
+                title: "should exit when @spectrum-web-components dependencies have mismatched versions",
+                packageJsonExists: true,
+                packageJsonContent: {
+                    dependencies: {
+                        "@spectrum-web-components/button": "1.0.0"
+                    },
+                    devDependencies: {
+                        "@spectrum-web-components/textfield": "1.0.1"
+                    }
+                },
+                shouldFail: true,
+                expectedErrorCount: 2,
+                firstErrorMessage: "Spectrum Web Components dependencies version mismatch."
+            },
+            {
+                title: "should exit when @swc-react dependencies have mismatched versions",
+                packageJsonExists: true,
+                packageJsonContent: {
+                    dependencies: {
+                        "@swc-react/button": "1.0.0"
+                    },
+                    devDependencies: {
+                        "@swc-react/textfield": "1.0.1"
+                    }
+                },
+                shouldFail: true,
+                expectedErrorCount: 2,
+                firstErrorMessage: "Spectrum Web Components dependencies version mismatch."
+            },
+            {
+                title: "should exit with multiple errors when both dependency groups have mismatched versions",
+                packageJsonExists: true,
+                packageJsonContent: {
+                    dependencies: {
+                        "@spectrum-web-components/button": "1.0.0",
+                        "@swc-react/button": "2.0.0"
+                    },
+                    devDependencies: {
+                        "@spectrum-web-components/textfield": "1.0.1",
+                        "@swc-react/textfield": "2.0.1"
+                    }
+                },
+                shouldFail: true,
+                expectedErrorCount: 3,
+                firstErrorMessage: "Spectrum Web Components dependencies version mismatch."
+            }
+        ];
+
+        swcTestCases.forEach(testCase => {
+            it(testCase.title, async () => {
+                const options = new BuildCommandOptions("data", "tsc", true);
+                const packageJsonPath = path.join(process.cwd(), "package.json");
+
+                if (testCase.packageJsonExists) {
+                    sandbox.stub(fs, "readJson").resolves(testCase.packageJsonContent);
+                }
+
+                sandbox.stub(cleanCommandExecutor, "execute").resolves();
+                scriptManager.cleanDirectory.withArgs(DEFAULT_OUTPUT_DIRECTORY).resolves();
+                scriptManager.transpile.withArgs(options.transpiler).resolves(true);
+
+                const distPath = path.resolve(DEFAULT_OUTPUT_DIRECTORY);
+                const manifestPath = path.resolve(path.join(DEFAULT_OUTPUT_DIRECTORY, MANIFEST_JSON));
+
+                const fsExistsSyncStub = sandbox.stub(fs, "existsSync");
+                fsExistsSyncStub.withArgs(distPath).returns(true);
+                fsExistsSyncStub.withArgs(manifestPath).returns(true);
+                fsExistsSyncStub.withArgs(packageJsonPath).returns(testCase.packageJsonExists);
+
+                const fsReadFileSyncStub = sandbox.stub(fs, "readFileSync");
+                const addOnManifest = createManifest();
+                fsReadFileSyncStub.returns(JSON.stringify(addOnManifest.manifestProperties));
+
+                const lstatSyncStub = sandbox.stub(fs, "lstatSync");
+                lstatSyncStub.withArgs(path.resolve(DEFAULT_OUTPUT_DIRECTORY)).returns(<Stats>{
+                    isDirectory: () => {
+                        return true;
+                    }
+                });
+                lstatSyncStub.withArgs(manifestPath).returns(<Stats>{
+                    isFile: () => {
+                        return true;
+                    }
+                });
+                (addOnManifest.manifestProperties.entryPoints as AddOnManifestEntrypoint[]).forEach(entryPoint => {
+                    const entryPointPath = path.join(DEFAULT_OUTPUT_DIRECTORY, entryPoint.main);
+                    fsExistsSyncStub.withArgs(entryPointPath).returns(true);
+                    lstatSyncStub.withArgs(entryPointPath).returns(<Stats>{
+                        isFile: () => {
+                            return true;
+                        }
+                    });
+                });
+
+                sandbox.stub(manifestReader, "getManifest").returns(addOnManifest);
+                const processExitStub = sandbox.stub(process, "exit");
+
+                if (testCase.shouldFail) {
+                    processExitStub.throws();
+                    await expect(buildCommandExecutor.execute(options)).to.be.rejectedWith();
+
+                    assert.equal(processExitStub.callCount, 1);
+                    assert.equal(logger.error.callCount, testCase.expectedErrorCount);
+                    assert.equal(logger.error.getCall(0).calledWith(testCase.firstErrorMessage), true);
+                    assert.equal(analyticsService.postEvent.callCount, 1);
+                    assert.equal(
+                        analyticsService.postEvent.calledWith(
+                            AnalyticsErrorMarkers.SCRIPTS_BUILD_COMMAND_ERROR,
+                            testCase.firstErrorMessage,
+                            false
+                        ),
+                        true
+                    );
+                } else {
+                    const isBuildSuccessful = await buildCommandExecutor.execute(options);
+                    assert.equal(isBuildSuccessful, true);
+                    assert.equal(logger.error.callCount, 0);
+                }
+            });
+        });
     });
 });
