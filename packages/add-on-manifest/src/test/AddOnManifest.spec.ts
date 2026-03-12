@@ -226,5 +226,9 @@ function verifyCommonManifestFields(
             manifest.requirements.trustedPartnerApis.formSubmission,
             testManifest.requirements.trustedPartnerApis.formSubmission
         );
+        assert.equal(
+            manifest.requirements.trustedPartnerApis.epsonPrint,
+            testManifest.requirements.trustedPartnerApis.epsonPrint
+        );
     }
 }

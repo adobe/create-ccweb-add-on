@@ -45,6 +45,7 @@ export type TrustedPartnerApis = {
     readonly toastNotifications?: boolean;
     readonly tiktokcml?: boolean;
     readonly formSubmission?: boolean;
+    readonly epsonPrint?: boolean;
 };
 
 export type RequirementsV2 = {

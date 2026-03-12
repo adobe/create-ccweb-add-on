@@ -181,7 +181,8 @@ export const RequirementSchemaV2 = {
                 toastNotifications: { type: "boolean" },
                 addOnLifecycle: { type: "boolean" },
                 tiktokcml: { type: "boolean" },
-                formSubmission: { type: "boolean" }
+                formSubmission: { type: "boolean" },
+                epsonPrint: { type: "boolean" }
             },
             required: [],
             additionalProperties: false

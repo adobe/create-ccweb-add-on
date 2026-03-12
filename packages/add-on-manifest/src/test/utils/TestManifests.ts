@@ -206,7 +206,8 @@ export function getTestManifestV2(privileged?: boolean): AddOnManifestV2 {
                 addOnLifecycle: false,
                 formSubmission: true,
                 toastNotifications: false,
-                tiktokcml: true
+                tiktokcml: true,
+                epsonPrint: true
             }
         },
         entryPoints: [
