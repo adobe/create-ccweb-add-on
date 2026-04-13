@@ -115,6 +115,13 @@ export class AddOnManifestValidator {
                         isValidSchema = false;
                     }
                 }
+                if (!manifest.requirements?.trustedPartnerApis?.allowPayment) {
+                    if (entrypoint.permissions?.payment !== undefined) {
+                        this._logError("payment permission is not allowed for the Add-on entrypoint: ", entrypoint.id);
+                        validationErrors.push(OTHER_MANIFEST_ERRORS.RestrictedPaymentPermission);
+                        isValidSchema = false;
+                    }
+                }
             });
         }
         if (this._manifestVersion > ManifestVersion.V1) {

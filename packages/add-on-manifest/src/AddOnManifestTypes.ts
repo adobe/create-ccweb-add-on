@@ -46,6 +46,7 @@ export type TrustedPartnerApis = {
     readonly tiktokcml?: boolean;
     readonly formSubmission?: boolean;
     readonly epsonPrint?: boolean;
+    readonly allowPayment?: boolean;
 };
 
 export type RequirementsV2 = {
@@ -98,6 +99,7 @@ export type Permissions = {
     readonly camera?: string;
     readonly microphone?: string;
     readonly clipboard?: string[];
+    readonly payment?: string;
 };
 
 export type Command = {
@@ -138,7 +140,8 @@ export type ManifestRequirements = RequirementsV1 | RequirementsV2;
 export enum Allow {
     camera = "camera",
     microphone = "microphone",
-    clipboard = "clipboard"
+    clipboard = "clipboard",
+    payment = "payment"
 }
 /**
  * Types of entrypoints that add-ons support.
@@ -300,6 +303,10 @@ export const OTHER_MANIFEST_ERRORS: ManifestErrorType = {
     RestrictedFormsSandboxProperty: {
         instancePath: "/entryPoints/permissions/sandbox",
         message: `Sandbox property "allow-forms" is not allowed for this AddOn`
+    },
+    RestrictedPaymentPermission: {
+        instancePath: "/entryPoints/permissions/payment",
+        message: `Permission "payment" is not allowed for this AddOn`
     },
     RestrictedScriptEntrypoint: {
         instancePath: "/entryPoints/type",

@@ -123,7 +123,8 @@ export const EntrypointSchemaV2 = {
                 oauth: { type: "array", items: { type: "string" } },
                 microphone: { type: "string" },
                 camera: { type: "string" },
-                clipboard: { type: "array", items: { type: "string", pattern: clipboardPattern } }
+                clipboard: { type: "array", items: { type: "string", pattern: clipboardPattern } },
+                payment: { type: "string" }
             },
             required: [],
             additionalProperties: false
@@ -182,7 +183,8 @@ export const RequirementSchemaV2 = {
                 addOnLifecycle: { type: "boolean" },
                 tiktokcml: { type: "boolean" },
                 formSubmission: { type: "boolean" },
-                epsonPrint: { type: "boolean" }
+                epsonPrint: { type: "boolean" },
+                allowPayment: { type: "boolean" }
             },
             required: [],
             additionalProperties: false

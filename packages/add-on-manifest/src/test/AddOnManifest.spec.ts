@@ -230,5 +230,9 @@ function verifyCommonManifestFields(
             manifest.requirements.trustedPartnerApis.epsonPrint,
             testManifest.requirements.trustedPartnerApis.epsonPrint
         );
+        assert.equal(
+            manifest.requirements.trustedPartnerApis.allowPayment,
+            testManifest.requirements.trustedPartnerApis.allowPayment
+        );
     }
 }
