@@ -421,8 +421,7 @@ export declare enum AuthorizationStatus {
     POPUP_CLOSED = "POPUP_CLOSED",
     POPUP_TIMEOUT = "POPUP_TIMEOUT",
     FAILED = "FAILED",
-    IFRAME_LOAD_FAILED = "IFRAME_LOAD_FAILED",
-    RESTRICTED_CLIENT_ID = "RESTRICTED_CLIENT_ID"
+    IFRAME_LOAD_FAILED = "IFRAME_LOAD_FAILED"
 }
 
 /**
@@ -716,7 +715,6 @@ declare namespace Constants {
         PlatformType,
         ColorPickerPlacement,
         FileSizeLimitUnit,
-        SizeUnit,
         AuthorizationStatus
     };
 }
@@ -889,11 +887,6 @@ export declare type DisableDragToDocument = () => void;
  */
 declare interface Document_2 {
     /**
-     * @experimental - Experimental API
-     * Review and Approval workflow
-     */
-    readonly reviewAndApproval: ReviewAndApproval;
-    /**
      * Add image/PSD/AI/SVG assets to the current page
      */
     addImage(blob: Blob, attributes?: MediaAttributes, importAddOnData?: ImportAddOnData): Promise<void>;
@@ -952,11 +945,6 @@ declare interface Document_2 {
      * Run print quality check
      */
     runPrintQualityCheck(options: PrintQualityCheckOptions): void;
-    /**
-     * @experimental - Experimental API
-     * @returns true if the document is a presentation document.
-     */
-    isPresentation(): Promise<boolean>;
 }
 export { Document_2 as Document };
 
@@ -1154,10 +1142,6 @@ export declare enum EntrypointType {
      * Mobile share entrypoint type.
      */
     MOBILE_SHARE = "mobile.share",
-    /**
-     * Review and approval entrypoint type.
-     */
-    REVIEW_AND_APPROVAL = "review-and-approval",
     /**
      * Schedule entrypoint type.
      */
@@ -1556,11 +1540,6 @@ export declare interface PageMetadata {
      */
     hasAnimatedContent: boolean;
     /**
-     * Page size in units
-     * NOTE: This size is same as seen in UI in Resize Panel.
-     */
-    sizeInUnits: PageSizeInUnits;
-    /**
      * The page's background color in ARGB format (32-bit integer)
      */
     backgroundARGB?: number;
@@ -1600,25 +1579,6 @@ export declare interface PageRendition extends Rendition {
      * Page metadata
      */
     metadata: PageMetadata;
-}
-
-/**
- * Represents the size of the page in units.
- * NOTE: This size is same as seen in UI in Resize Panel.
- */
-export declare interface PageSizeInUnits {
-    /**
-     * Width of the page in units
-     */
-    width: number;
-    /**
-     * Height of the page in units
-     */
-    height: number;
-    /**
-     * Unit of the page size
-     */
-    unit: SizeUnit;
 }
 
 /**
@@ -1982,13 +1942,6 @@ export declare interface RenditionOptions extends RangeOptions {
 }
 
 /**
- * Rendition options for review asset export.
- * Mirrors the service-side RenditionOptions for Review and Approval workflow — no page range, full document only.
- * @experimental - Experimental interface
- */
-export declare interface RenditionOptionsReviewAndApproval extends Omit<RenditionOptions, "range" | "pageIds"> {}
-
-/**
  * Rendition Type
  */
 export declare enum RenditionType {
@@ -1996,43 +1949,6 @@ export declare enum RenditionType {
      * Rendition of the whole page
      */
     page = "page"
-}
-
-/**
- * Interface for Review and Approval workflow operations
- * @experimental - Experimental API
- */
-export declare interface ReviewAndApproval {
-    /**
-     * Sets the template review configuration
-     * @param options - Configuration options for template review
-     * @returns Promise resolving to the configuration response
-     */
-    setTemplateReviewConfig(options: SetTemplateReviewConfigOptions): Promise<void>;
-    /**
-     * Deletes the template review configuration
-     * @returns Promise that resolves when configuration is deleted
-     */
-    deleteTemplateReviewConfig(): Promise<void>;
-    /**
-     * Starts a review request
-     * @param options - Options for the review request
-     * @returns Promise resolving to the review request response
-     */
-    startReviewRequest(options: StartReviewRequestOptions): Promise<StartReviewRequestResponse>;
-    /**
-     * Cancels an ongoing review request
-     * @returns Promise that resolves when request is cancelled
-     */
-    cancelReviewRequest(): Promise<void>;
-}
-
-export declare enum ReviewStatus {
-    REVIEW_NOT_STARTED = "REVIEW_NOT_STARTED",
-    REVIEW_REQUESTED_IN_PROGRESS = "REVIEW_REQUESTED_IN_PROGRESS",
-    REVIEW_REQUESTED = "REVIEW_REQUESTED",
-    AUTHOR_RE_EDIT = "AUTHOR_RE_EDIT",
-    APPROVED = "APPROVED"
 }
 
 export declare interface Runtime {
@@ -2112,38 +2028,7 @@ export declare interface SearchAction extends PanelAction {
     searchString: string;
 }
 
-/**
- * Options for setting template review configuration
- * @experimental - Experimental interface
- */
-export declare interface SetTemplateReviewConfigOptions {
-    /** Review Workflow ID to configure */
-    reviewWorkflowId: string;
-}
-
 export declare type SimpleDialogOptions = AlertDialogOptions | InputDialogOptions;
-
-/**
- * Units for the page size
- */
-export declare enum SizeUnit {
-    /**
-     * Pixel
-     */
-    pixel = "px",
-    /**
-     * Centimeter
-     */
-    centimeter = "cm",
-    /**
-     * Millimeter
-     */
-    millimeter = "mm",
-    /**
-     * Inch
-     */
-    inch = "in"
-}
 
 /**
  * Mime type details for importing media
@@ -2153,35 +2038,6 @@ export declare interface SourceMimeTypeInfo {
      * Mime type of the source asset
      */
     sourceMimeType?: SupportedMimeTypes;
-}
-
-/**
- * Options for starting a review request
- * @experimental - Experimental interface
- */
-export declare interface StartReviewRequestOptions {
-    /**
-     * Add-on's unique identifier for this review.
-     * Add-on generates this UUID to correlate with their external system.
-     */
-    reviewRequestId: string;
-    /** Rendition options specifying format for exporting review assets */
-    renditionOptions: RenditionOptionsReviewAndApproval;
-}
-
-/**
- * Response from starting a review request
- * @experimental - Experimental interface
- */
-export declare interface StartReviewRequestResponse {
-    /** URL for the add-on to POST review decisions to */
-    decisionSubmissionWebhookUrl: string;
-    /** ID of the document in the review workflow */
-    documentId: string;
-    /** Status after operation */
-    status: ReviewStatus;
-    /** Exported renditions of the document for review */
-    renditions: Blob[];
 }
 
 export declare enum SupportedMimeTypes {

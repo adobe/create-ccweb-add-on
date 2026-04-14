@@ -550,18 +550,14 @@ describe("ManifestSchema Validations - Version 2", () => {
         assert.equal(typeof testManifest.requirements.trustedPartnerApis?.expressPrint === "boolean", true);
         assert.equal(typeof testManifest.requirements.trustedPartnerApis?.toastNotifications === "boolean", true);
         assert.equal(typeof testManifest.requirements.trustedPartnerApis?.addOnLifecycle === "boolean", true);
-        assert.equal(typeof testManifest.requirements.trustedPartnerApis?.epsonPrint === "boolean", true);
         assert.equal(typeof testManifest.requirements.trustedPartnerApis?.formSubmission === "boolean", true);
         assert.equal(typeof testManifest.requirements.trustedPartnerApis?.tiktokcml === "boolean", true);
-        assert.equal(typeof testManifest.requirements.trustedPartnerApis?.allowPayment === "boolean", true);
         assert.equal(testManifest.requirements.trustedPartnerApis?.messaging, false);
         assert.equal(testManifest.requirements.trustedPartnerApis?.expressPrint, true);
         assert.equal(testManifest.requirements.trustedPartnerApis?.addOnLifecycle, false);
-        assert.equal(testManifest.requirements.trustedPartnerApis?.epsonPrint, true);
         assert.equal(testManifest.requirements.trustedPartnerApis?.toastNotifications, false);
         assert.equal(testManifest.requirements.trustedPartnerApis?.tiktokcml, true);
         assert.equal(testManifest.requirements.trustedPartnerApis?.formSubmission, true);
-        assert.equal(testManifest.requirements.trustedPartnerApis?.allowPayment, true);
     });
 
     it("should have at least one entrypoint", () => {
@@ -749,88 +745,11 @@ describe("ManifestSchema Validations - Version 2", () => {
         assert.equal(validationResult.errorDetails?.[0], OTHER_MANIFEST_ERRORS.RestrictedFormsSandboxProperty);
     });
 
-    it("should succeed for 'payment' permission with trusted flag or privileged", () => {
-        const manifest = getTestManifestV2();
-        const testManifest = {
-            ...manifest,
-            requirements: {
-                ...manifest.requirements,
-                trustedPartnerApis: {
-                    allowPayment: true
-                }
-            },
-            entryPoints: [
-                {
-                    ...manifest.entryPoints[0],
-                    permissions: {
-                        payment: "*"
-                    }
-                }
-            ]
-        };
-        let additionalAddOnInfo = { ...additionInfo, privileged: false };
-        let validationResult = validator.validateManifestSchema(testManifest, additionalAddOnInfo);
-        assert.equal(validationResult.success, true);
-        assert.equal(validationResult.errorDetails, undefined);
-
-        const manifestWithoutTrustedApi = {
-            ...testManifest,
-            requirements: {
-                ...testManifest.requirements,
-                trustedPartnerApis: {}
-            }
-        };
-
-        additionalAddOnInfo = { ...additionInfo, privileged: true };
-        validationResult = validator.validateManifestSchema(manifestWithoutTrustedApi, additionalAddOnInfo);
-        assert.equal(validationResult.success, true);
-        assert.equal(validationResult.errorDetails, undefined);
-    });
-
-    it("should fail and return error response if 'payment' permission is used for entrypoint without the trusted flag", () => {
-        const manifest = getTestManifestV2();
-        const testManifest = {
-            ...manifest,
-            requirements: {
-                ...manifest.requirements,
-                trustedPartnerApis: {
-                    allowPayment: false
-                }
-            },
-            entryPoints: [
-                {
-                    ...manifest.entryPoints[0],
-                    permissions: {
-                        payment: "*"
-                    }
-                }
-            ]
-        };
-        const additionalAddOnInfo = { ...additionInfo, privileged: false };
-        let validationResult = validator.validateManifestSchema(testManifest, additionalAddOnInfo);
-        assert.equal(validationResult.success, false);
-        assert.notEqual(validationResult.errorDetails, undefined);
-        assert.equal(validationResult.errorDetails?.[0], OTHER_MANIFEST_ERRORS.RestrictedPaymentPermission);
-
-        const manifestWithoutTrustedApi = {
-            ...testManifest,
-            requirements: {
-                ...testManifest.requirements,
-                trustedPartnerApis: {}
-            }
-        };
-        validationResult = validator.validateManifestSchema(manifestWithoutTrustedApi, additionalAddOnInfo);
-        assert.equal(validationResult.success, false);
-        assert.notEqual(validationResult.errorDetails, undefined);
-        assert.equal(validationResult.errorDetails?.[0], OTHER_MANIFEST_ERRORS.RestrictedPaymentPermission);
-    });
-
     it("should have a valid entry point type", () => {
         const validTypePatterns = [
             "panel",
             "mobile.media.audio",
             "mobile.your-stuff.files",
-            "review-and-approval",
             "contextual.replace",
             "contextual.upload",
             "contextual.bulk-create"

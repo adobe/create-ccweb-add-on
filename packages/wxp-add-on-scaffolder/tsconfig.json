@@ -26,6 +26,6 @@
         "useUnknownInCatchVariables": false,
         "isolatedDeclarations": true
     },
-    "exclude": ["node_modules", "src/test/**/*"],
+    "exclude": ["node_modules"],
     "include": ["src/**/*"]
 }

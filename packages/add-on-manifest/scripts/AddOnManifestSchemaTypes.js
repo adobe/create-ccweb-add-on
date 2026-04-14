@@ -23,7 +23,7 @@
  ********************************************************************************/
 
 const typePattern =
-    "^(panel|script|share|content-hub|content-hub-home|mobile.your-stuff.files|mobile.media.audio|mobile.more|mobile.share|schedule|contextual.replace|contextual.upload|contextual.bulk-create|command|import-hub|quick-action|review-and-approval)$";
+    "^(panel|script|share|content-hub|content-hub-home|mobile.your-stuff.files|mobile.media.audio|mobile.more|mobile.share|schedule|contextual.replace|contextual.upload|contextual.bulk-create|command|import-hub|quick-action)$";
 const sandboxPattern = "^(allow-popups|allow-presentation|allow-downloads|allow-popups-to-escape-sandbox|allow-forms)$";
 const clipboardPattern = "^(clipboard-write|clipboard-read)$";
 const iconPattern = "^(lightest|light|medium|dark|darkest|all)$";
@@ -123,8 +123,7 @@ export const EntrypointSchemaV2 = {
                 oauth: { type: "array", items: { type: "string" } },
                 microphone: { type: "string" },
                 camera: { type: "string" },
-                clipboard: { type: "array", items: { type: "string", pattern: clipboardPattern } },
-                payment: { type: "string" }
+                clipboard: { type: "array", items: { type: "string", pattern: clipboardPattern } }
             },
             required: [],
             additionalProperties: false
@@ -182,9 +181,7 @@ export const RequirementSchemaV2 = {
                 toastNotifications: { type: "boolean" },
                 addOnLifecycle: { type: "boolean" },
                 tiktokcml: { type: "boolean" },
-                formSubmission: { type: "boolean" },
-                epsonPrint: { type: "boolean" },
-                allowPayment: { type: "boolean" }
+                formSubmission: { type: "boolean" }
             },
             required: [],
             additionalProperties: false
