@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-core",
+      "comment": "Added a permission for payment behind a trusted partner flag allowPayment.",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-core"
+}
