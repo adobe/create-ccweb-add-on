@@ -1,6 +1,6 @@
 {
   "name": "@adobe/ccweb-add-on-analytics",
-  "version": "1.0.0",
+  "version": "3.9.0",
   "author": "Adobe",
   "license": "MIT",
   "description": "Analytics libraries for Adobe Creative Cloud Web Add-on.",
@@ -24,7 +24,7 @@
     "test": "c8 mocha && c8 check-coverage"
   },
   "dependencies": {
-    "@adobe/ccweb-add-on-core": "workspace:*",
+    "@adobe/ccweb-add-on-core": "3.9.0",
     "@oclif/core": "4.2.8",
     "@swc/helpers": "0.5.17",
     "axios": "1.8.4",
