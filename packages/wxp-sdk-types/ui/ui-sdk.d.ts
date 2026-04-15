@@ -175,7 +175,12 @@ export declare enum AppEvent {
     /**
      * triggered when the document's export permission status changes in review and approval workflow.
      */
-    documentExportAllowedChange = "documentExportAllowedChange"
+    documentExportAllowedChange = "documentExportAllowedChange",
+
+    /**
+     * triggered when the host delivers review settings (or related) updates to the add-on.
+     */
+    updateReviewSettings = "updateReviewSettings"
 }
 
 export declare type AppEventHandlerType<Event extends AppEventType> = (data: AppEventsTypeMap[Event]) => void;
@@ -197,6 +202,9 @@ declare interface AppEventsTypeMap {
     [AppEvent.documentPublishedLinkAvailable]: DocumentPublishedLinkAvailableEventData;
     [AppEvent.documentTitleChange]: DocumentTitleChangeEventData;
     [AppEvent.documentExportAllowedChange]: DocumentExportAllowedChangeEventData;
+
+    /** Delivered when the host sends review settings (or related) updates to the add-on. */
+    [AppEvent.updateReviewSettings]: undefined;
 }
 
 export declare type AppEventType = keyof AppEventsTypeMap & string;
