@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-scripts",
+      "comment": "Introduce supportsDarkTheme trusted partner flag in the manifest",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-scripts"
+}
