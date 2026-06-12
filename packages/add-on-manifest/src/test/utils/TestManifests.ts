@@ -208,7 +208,8 @@ export function getTestManifestV2(privileged?: boolean): AddOnManifestV2 {
                 toastNotifications: false,
                 tiktokcml: true,
                 epsonPrint: true,
-                allowPayment: true
+                allowPayment: true,
+                supportsDarkTheme: false
             }
         },
         entryPoints: [

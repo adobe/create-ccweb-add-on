@@ -554,6 +554,7 @@ describe("ManifestSchema Validations - Version 2", () => {
         assert.equal(typeof testManifest.requirements.trustedPartnerApis?.formSubmission === "boolean", true);
         assert.equal(typeof testManifest.requirements.trustedPartnerApis?.tiktokcml === "boolean", true);
         assert.equal(typeof testManifest.requirements.trustedPartnerApis?.allowPayment === "boolean", true);
+        assert.equal(typeof testManifest.requirements.trustedPartnerApis?.supportsDarkTheme === "boolean", true);
         assert.equal(testManifest.requirements.trustedPartnerApis?.messaging, false);
         assert.equal(testManifest.requirements.trustedPartnerApis?.expressPrint, true);
         assert.equal(testManifest.requirements.trustedPartnerApis?.addOnLifecycle, false);
@@ -562,6 +563,7 @@ describe("ManifestSchema Validations - Version 2", () => {
         assert.equal(testManifest.requirements.trustedPartnerApis?.tiktokcml, true);
         assert.equal(testManifest.requirements.trustedPartnerApis?.formSubmission, true);
         assert.equal(testManifest.requirements.trustedPartnerApis?.allowPayment, true);
+        assert.equal(testManifest.requirements.trustedPartnerApis?.supportsDarkTheme, false);
     });
 
     it("should have at least one entrypoint", () => {

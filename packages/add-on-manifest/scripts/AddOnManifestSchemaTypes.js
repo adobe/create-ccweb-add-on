@@ -184,7 +184,8 @@ export const RequirementSchemaV2 = {
                 tiktokcml: { type: "boolean" },
                 formSubmission: { type: "boolean" },
                 epsonPrint: { type: "boolean" },
-                allowPayment: { type: "boolean" }
+                allowPayment: { type: "boolean" },
+                supportsDarkTheme: { type: "boolean" }
             },
             required: [],
             additionalProperties: false

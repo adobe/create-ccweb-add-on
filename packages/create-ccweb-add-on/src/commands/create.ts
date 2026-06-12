@@ -88,15 +88,15 @@ export class Create extends BaseCommand {
             flags: { entrypoint, template, analytics, verbose }
         } = await this.parse(Create);
 
-        await this._seekAnalyticsConsent(analytics);
+        await this._seekAnalyticsConsent(analytics as string | undefined);
 
         console.log();
 
         const options = new CLIOptions(
-            entrypoint.toLowerCase() as EntrypointType,
-            name,
-            template.toLowerCase(),
-            verbose
+            (entrypoint as string).toLowerCase() as EntrypointType,
+            name as string,
+            (template as string).toLowerCase(),
+            verbose as boolean
         );
 
         await this._addOnFactory.create(options);

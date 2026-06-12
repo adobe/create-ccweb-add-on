@@ -234,5 +234,9 @@ function verifyCommonManifestFields(
             manifest.requirements.trustedPartnerApis.allowPayment,
             testManifest.requirements.trustedPartnerApis.allowPayment
         );
+        assert.equal(
+            manifest.requirements.trustedPartnerApis.supportsDarkTheme,
+            testManifest.requirements.trustedPartnerApis.supportsDarkTheme
+        );
     }
 }

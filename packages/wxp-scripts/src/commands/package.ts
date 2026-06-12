@@ -86,9 +86,14 @@ export class Package extends BaseCommand {
 
         const { flags } = await this.parse(Package);
 
-        await this._seekAnalyticsConsent(flags.analytics);
+        await this._seekAnalyticsConsent(flags.analytics as string | undefined);
 
-        const options = new PackageCommandOptions(flags.src, flags.use, !flags["no-rebuild"], flags.verbose);
+        const options = new PackageCommandOptions(
+            flags.src as string,
+            flags.use as string,
+            !flags["no-rebuild"],
+            flags.verbose as boolean
+        );
         await this._commandExecutor.execute(options);
     }
 

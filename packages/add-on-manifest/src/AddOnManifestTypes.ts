@@ -47,6 +47,7 @@ export type TrustedPartnerApis = {
     readonly formSubmission?: boolean;
     readonly epsonPrint?: boolean;
     readonly allowPayment?: boolean;
+    readonly supportsDarkTheme?: boolean;
 };
 
 export type RequirementsV2 = {

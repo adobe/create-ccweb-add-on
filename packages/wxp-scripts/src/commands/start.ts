@@ -107,9 +107,15 @@ export class Start extends BaseCommand {
             flags: { src, use, hostname, port, analytics, verbose }
         } = await this.parse(Start);
 
-        await this._seekAnalyticsConsent(analytics);
+        await this._seekAnalyticsConsent(analytics as string | undefined);
 
-        const options = new StartCommandOptions(src, use, hostname, parseInt(port), verbose);
+        const options = new StartCommandOptions(
+            src as string,
+            use as string,
+            hostname as string,
+            parseInt(port as string),
+            verbose as boolean
+        );
         await this._commandValidator.validate(options);
         await this._commandExecutor.execute(options, this._expressApp);
     }
