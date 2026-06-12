@@ -46,10 +46,7 @@ export type ManifestEntrypointType<T extends ManifestVersion> = ManifestEntrypoi
  * Defines the getter methods for Manifest Entrypoint field
  */
 export class AddOnManifestEntrypoint {
-    constructor(
-        private _manifestVersion: number,
-        private _entrypoint: ManifestEntrypoint
-    ) {
+    constructor(private _manifestVersion: number, private _entrypoint: ManifestEntrypoint) {
         switch (this._manifestVersion) {
             case ManifestVersion.V1: {
                 this._entrypoint = _entrypoint as ManifestEntrypointType<ManifestVersion.V1>;

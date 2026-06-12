@@ -27,31 +27,35 @@
  * Please note, document sandbox runtime exposes only a subset of functionalities
  * exposed by standard Web APIs.
  */
-var console: Console;
+declare global {
+    var console: Console;
 
-interface Console {
-    log(msg?: any, ...subst: any[]): void;
-    info(msg?: any, ...subst: any[]): void;
-    warn(msg?: any, ...subst: any[]): void;
-    error(msg?: any, ...subst: any[]): void;
-    debug(msg?: any, ...subst: any[]): void;
-    clear(): void;
-    assert(assertion?: boolean, msg?: string, ...subst: any[]): void;
+    interface Console {
+        log(msg?: any, ...subst: any[]): void;
+        info(msg?: any, ...subst: any[]): void;
+        warn(msg?: any, ...subst: any[]): void;
+        error(msg?: any, ...subst: any[]): void;
+        debug(msg?: any, ...subst: any[]): void;
+        clear(): void;
+        assert(assertion?: boolean, msg?: string, ...subst: any[]): void;
+    }
+
+    interface Blob {
+        readonly size: number;
+        readonly type: string;
+        arrayBuffer(): Promise<ArrayBuffer>;
+        slice(start?: number, end?: number, contentType?: string): Blob;
+        text(): Promise<string>;
+    }
+
+    interface BlobPropertyBag {
+        type?: string;
+    }
+
+    var Blob: {
+        prototype: Blob;
+        new (blobParts?: BlobPart[], options?: BlobPropertyBag): Blob;
+    };
 }
 
-interface Blob {
-    readonly size: number;
-    readonly type: string;
-    arrayBuffer(): Promise<ArrayBuffer>;
-    slice(start?: number, end?: number, contentType?: string): Blob;
-    text(): Promise<string>;
-}
-
-interface BlobPropertyBag {
-    type?: string;
-}
-
-var Blob: {
-    prototype: Blob;
-    new (blobParts?: BlobPart[], options?: BlobPropertyBag): Blob;
-};
+export {};

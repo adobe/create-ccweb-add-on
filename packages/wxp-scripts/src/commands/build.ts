@@ -80,9 +80,9 @@ export class Build extends BaseCommand {
             flags: { src, use, analytics, verbose }
         } = await this.parse(Build);
 
-        await this._seekAnalyticsConsent(analytics as string | undefined);
+        await this._seekAnalyticsConsent(analytics);
 
-        const options = new BuildCommandOptions(src as string, use as string, verbose as boolean);
+        const options = new BuildCommandOptions(src, use, verbose);
         await this._commandExecutor.execute(options);
     }
 

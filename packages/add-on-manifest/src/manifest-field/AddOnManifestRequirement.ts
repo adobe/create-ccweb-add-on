@@ -45,10 +45,7 @@ export type ManifestRequirementType<T extends ManifestVersion> = ManifestRequire
 export class AddOnManifestRequirement {
     private _apps: AddOnManifestApp[] = [];
 
-    constructor(
-        private _manifestVersion: number,
-        private _requirements: ManifestRequirements
-    ) {
+    constructor(private _manifestVersion: number, private _requirements: ManifestRequirements) {
         switch (this._manifestVersion) {
             case ManifestVersion.V1: {
                 this._requirements = this._requirements as ManifestRequirementType<ManifestVersion.V1>;

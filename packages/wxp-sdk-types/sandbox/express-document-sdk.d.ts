@@ -25,90 +25,6 @@
 import { mat2d } from "gl-matrix";
 
 /**
- * A PageNode represents a page in the document, a child of the root node of the document's "scenegraph" artwork tree
- * (see {@link ExpressRootNode}). A page contains one or more artboards, which in turn contain all the page's visual
- * content. If multiple artboards are present, each represents a keyframe "scene" in the page's animation timeline.
- *
- * ActivePageNode represents a Page that is fully loaded and whose contents are all accessible synchronously. Other
- * pages in the document that are not guaranteed to be accessible are represented by the base class, {@link PageNode}.
- * The entire page encompassing {@link Context.selection} and {@link Context.insertionParent} is always guaranteed to
- * be active.
- *
- * An ActivePageNode may be *unloaded* again in the future after the user navigates to view a different page. It is
- * unsafe to hold onto an ActivePageNode reference across an async period of time, since it might become inaccessible
- * any time after the end of the synchronous execution where you first encountered it. Use {@link Editor.keepContentActiveUntil}
- * if you need to work with a page's content asynchronously.
- *
- * To create new pages, see {@link PageList.addPage}.
- */
-export declare class ActivePageNode extends PageNode {
-    /**
-     * Returns a read-only list of all children of the node. This list includes all artboards within the page.
-     */
-    get allChildren(): Readonly<Iterable<ArtboardNode>>;
-    /**
-     * The artboards or "scenes," which hold the page's visual contents. If multiple artboards are present, this list
-     * represents an ordered keyframe sequence in the page's animation timeline.
-     * To create new artboards, see {@link ArtboardList.addArtboard}.
-     */
-    get artboards(): ArtboardList;
-    /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
-     * Helper to recursively traverse *all* the exposed scenegraph content within the subtree of this node.
-     * Every container node and every leaf node will be visited via a pre-order tree traversal.
-     * Although once called the list of direct descendants is static, changes to further descendants may appear while
-     * iterating depending on when the operation occurs relative to the parent being yielded.
-     * Note that the root node (i.e. what this API was called on) is not visited.
-     *
-     * Warning: Processing text content via this API can be error-prone. Use {@link VisualNode.allTextContent}
-     */
-    get allDescendants(): Readonly<Iterable<VisualNode>>;
-    /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
-     * Helper to process all text content that is found as part of or within this node. This can be hard to do correctly
-     * via manual tree traversal since multiple {@link ThreadedTextNode} can share a single {@link TextContentModel}.
-     *
-     * This iterator returns a single result per TextContentModel that is at least partially displayed within this node,
-     * even if that content is split across several separate TextNode "frames". If this node is or contains some but not
-     * all of the display frames of an overall TextContentModel, that model is still included as a result.
-     *
-     * Note that visibleRanges and visibleText may not be sorted as TextNode "frames" can appear in any order in the scenegraph.
-     */
-    get allTextContent(): Readonly<Iterable<TextContent>>;
-    /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
-     * Returns true if the given node is part of this page's visual content (i.e. within its subtree).
-     */
-    hasDescendant(node: VisualNode): boolean;
-    /**
-     * Clones this page, all artboards within it, and all content within those artboards. The cloned page is the same size
-     * as the original. Adds the new page immediately after this one in the pages list. The first artboard in the cloned
-     * page becomes the default target for newly inserted content ({@link Context.insertionParent}) and the viewport
-     * switches to display this artboard.
-     *
-     * The newly created page starts out already "active" initially as well, so you can immediately access its subtree to
-     * modify its content. You should not hold onto this ActivePageNode reference across an async period of time
-     * however, since it might become inaccessible at any point after the initial synchronous block of execution where
-     * it was created. Use {@link Editor.keepContentActiveUntil} if you need to work with this page's content asynchronously.
-     *
-     * @returns the cloned page.
-     */
-    cloneInPlace(): ActivePageNode;
-}
-
-/**
  * AddOnData class provides APIs to read, write, remove private metadata to a Node.
  * This metadata is accessible only to the add-on that has set it.
  */
@@ -286,12 +202,9 @@ export declare class ArtboardNode extends VisualNode implements Readonly<IRectan
     set fill(fill: Fill);
     get fill(): Readonly<Fill>;
     /**
-     * The node's parent. Undefined if the node is an orphan. If you can access an artboard (or its children) in a given
-     * synchronous frame of time, then its parent Page is guaranteed to be an {@link ActivePageNode}, and all other
-     * artboards within the page are synchronously accessible as well.
-     *
+     * The node's parent. Undefined if the node is an orphan.
      */
-    get parent(): ActivePageNode | undefined;
+    get parent(): PageNode | undefined;
     /**
      * The width of the artboard.
      * Shares the same dimensions as the parent {@link PageNode} and other artboards within the parent {@link PageNode}.
@@ -422,7 +335,6 @@ export declare class BaseNode {
      *
      * Although BaseNode's allChildren may yield other BaseNodes, the subclasses Node and ArtboardNode override allChildren
      * to guarantee all their children are full-fledged Node instances.
-     * @deprecated This API will be removed after 2026-07-15. Use `ActivePageNode.allChildren` instead.
      */
     get allChildren(): Readonly<Iterable<BaseNode>>;
     /**
@@ -1026,10 +938,10 @@ declare class ExpressColorUtilsWrapper extends ColorUtils {}
  */
 export declare class ExpressContext extends Context {
     /**
-     * @returns The currently viewed page, which contains {@link Context.selection} and {@link Context.insertionParent}.
+     * @returns The currently viewed page.
      * To change the current page, call {@link ExpressViewport.bringIntoView} with an artboard or other content on that page.
      */
-    get currentPage(): ActivePageNode;
+    get currentPage(): PageNode;
 }
 
 /**
@@ -1741,84 +1653,16 @@ export declare interface OrderedListStyleInput extends BaseParagraphListStyle {
  *
  * PageList also provides APIs for adding/removing pages from the document. PageList is never empty: it is illegal to
  * remove the last remaining page from the list.
- *
- * Pages outside the current viewport are not guaranteed to be fully loaded, thus the PageNode classes returned from
- * this list do not allow accessing the page's content directly. The {@link ActivePageNode} subclass represents a
- * Page that is fully loaded and whose contents are accessible synchronously. The current {@link Context} is always an
- * an ActivePageNode. To load any other pages for access, use the *asynchronous* {@link visitPages} API.
  */
 export declare class PageList extends RestrictedItemList<PageNode> {
-    /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
-     * Visit the given pages asynchronously: loading each one in turn so its content is accessible, and then invoking
-     * your provided `callback` for the resulting fully-accessible {@link ActivePageNode}.
-     *
-     * The callback receives an {@link ActivePageNode}, which provides full access to the page's content tree (artboards
-     * and all descendants). This access is only guaranteed inside the callback; do not hold onto the reference after the
-     * callback returns.
-     *
-     * Visiting many pages can be slow – up to tens of seconds in larger documents. Any feature which visits all pages
-     * in the entire document should include a progress UI so users understand when the operation is still ongoing.
-     *
-     * There is no guarantee more than one of the Pages will be loaded at the same time – there may only be one page
-     * accessible at a time, each visited with sight delays in between. If your `callback` returns long-running
-     * promises, iteration may pause until some of the promises resolve and free up capacity to load the next page(s)
-     * in the visit list.
-     *
-     * Pages may be visited in a different order than provided for performance reasons, but each callback is still called
-     * exactly once per page.
-     *
-     * Use an `async` callback (or return a promise) so `visitPages` waits for all `await` work on each page before
-     * moving on. Do not start async work without awaiting it as it may make the page inactive before your edits run.
-     *
-     * @example
-     * Call a UI iframe API to translate text on each page, then write the result back to the page (no `queueAsyncEdit` needed).
-     * `panelUiProxy.translateText` is a method on your add-on's UI iframe proxy:
-     * ```
-     * await pages.visitPages([...pages], async (page) => {
-     *     // Assume the first child is a text node for now
-     *     const textNode = page.artboards.first.children.item(0) as TextNode;
-     *     const translated = await panelUiProxy.translateText(textNode.fullContent.text);
-     *     textNode.fullContent.text = translated;
-     * });
-     * ```
-     *
-     * @example
-     * Load an image from the host, then add it to the page:
-     * ```
-     * await pages.visitPages([...pages], async (page) => {
-     *     const bitmap = await editor.loadBitmapImage(imageBlob);
-     *     const container = editor.createImageContainer(bitmap);
-     *     page.artboards.first.children.append(container);
-     * });
-     * ```
-     *
-     * @param pages - Pages to visit.
-     * @param callback - Called once per page while that page is active. Document edits are allowed during the
-     *      callback, including after `await` on host APIs (such as `loadBitmapImage`) or UI proxy methods. Use an
-     *      `async` callback so `visitPages` waits until your per-page work finishes.
-     */
-    visitPages(pages: PageNode[], callback: (page: ActivePageNode) => void | Promise<void>): Promise<void>;
-
     /**
      * Create a new page containing a single empty artboard, and add it to the end of the list. The artboard is configured
      * with the same defaults as in {@link ArtboardList.addArtboard}. The page's artboard becomes the default target for
      * newly inserted content ({@link Context.insertionParent}) and the viewport switches to display this artboard.
-     *
-     * The newly created page starts out already "active" initially, so you can immediately access its subtree to
-     * populate it with content. You should not hold onto this ActivePageNode reference across an async period of time
-     * however, since it might become inaccessible at any point after the initial synchronous block of execution where
-     * it was created. Use {@link Editor.keepContentActiveUntil} if you need to work with this page's content asynchronously.
-     *
      * @param geometry - The size of the new page.
-     * @returns the newly created page.
      *
      */
-    addPage(inputGeometry: RectangleGeometry): ActivePageNode;
+    addPage(inputGeometry: RectangleGeometry): PageNode;
 }
 
 /**
@@ -1833,9 +1677,39 @@ export declare class PageNode extends BaseNode implements IRectangularNode {
      * The artboards or "scenes," which hold the page's visual contents. If multiple artboards are present, this list
      * represents an ordered keyframe sequence in the page's animation timeline.
      * To create new artboards, see {@link ArtboardList.addArtboard}.
-     * @deprecated This API will be removed after 2026-07-15. Use `ActivePageNode.artboards` instead.
      */
     get artboards(): ArtboardList;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Helper to recursively traverse *all* the exposed scenegraph content within the subtree of this node.
+     * Every container node and every leaf node will be visited via a pre-order tree traversal.
+     * Although once called the list of direct descendants is static, changes to further descendants may appear while
+     * iterating depending on when the operation occurs relative to the parent being yielded.
+     * Note that the root node (i.e. what this API was called on) is not visited.
+     *
+     * Warning: Processing text content via this API can be error-prone. Use {@link VisualNode.allTextContent}
+     */
+    get allDescendants(): Readonly<Iterable<VisualNode>>;
+    /**
+     * <InlineAlert slots="text" variant="warning"/>
+     *
+     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
+     *
+     * @experimental
+     * Helper to process all text content that is found as part of or within this node. This can be hard to do correctly
+     * via manual tree traversal since multiple {@link ThreadedTextNode} can share a single {@link TextContentModel}.
+     *
+     * This iterator returns a single result per TextContentModel that is at least partially displayed within this node,
+     * even if that content is split across several separate TextNode "frames". If this node is or contains some but not
+     * all of the display frames of an overall TextContentModel, that model is still included as a result.
+     *
+     * Note that visibleRanges and visibleText may not be sorted as TextNode "frames" can appear in any order in the scenegraph.
+     */
+    get allTextContent(): Readonly<Iterable<TextContent>>;
     /**
      * The width of the node.
      *
@@ -1877,7 +1751,7 @@ export declare class PageNode extends BaseNode implements IRectangularNode {
      * page becomes the default target for newly inserted content ({@link Context.insertionParent}) and the viewport
      * switches to display this artboard.
      * @returns the cloned page.
-     * @deprecated This API will be removed after 2026-07-15. Use `ActivePageNode.cloneInPlace` instead.
+     *
      */
     cloneInPlace(): PageNode;
 }
@@ -2242,7 +2116,7 @@ declare enum SceneNodeType {
     imageRectangle = "ImageRectangle",
     /** Type of MediaContainerNode's "media rectangle" child when it is holding an unknown media type */
     unknownMediaRectangle = "UnknownMediaRectangle",
-    /** Type of PageNode, or ActivePageNode */
+    /** Type of PageNode */
     page = "Page",
     /** Type of ComplexShapeNode, representing a complex prepackaged shape with fill and stroke, that appears as a leaf node in the UI */
     complexShape = "ComplexShape",
@@ -2443,7 +2317,7 @@ declare enum TextAlignment {
  * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
  *
  * @experimental
- * The values yielded by {@link VisualNode.allTextContent} and {@link ActivePageNode.allTextContent}.
+ * The values yielded by {@link VisualNode.allTextContent} and {@link PageNode.allTextContent}.
  */
 export declare interface TextContent {
     textContentModel: TextContentModel;
@@ -3028,16 +2902,6 @@ export declare class VisualNode extends BaseNode implements IVisualNodeBounds {
      * Note that visibleRanges and visibleText may not be sorted as TextNode "frames" can appear in any order in the scenegraph.
      */
     get allTextContent(): Readonly<Iterable<TextContent>>;
-    /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
-     * Returns true if the given node is a descendant (i.e. within the subtree) of this node.
-     * Returns false if passed `this` itself, as a node is not inside its own subtree.
-     */
-    hasDescendant(node: VisualNode): boolean;
     get boundsLocal(): Readonly<Rect>;
     get centerPointLocal(): Readonly<Point>;
     get topLeftLocal(): Readonly<Point>;

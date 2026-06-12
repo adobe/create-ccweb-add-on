@@ -60,7 +60,7 @@ export class Clean extends BaseCommand {
             flags: { analytics }
         } = await this.parse(Clean);
 
-        await this._seekAnalyticsConsent(analytics as string | undefined);
+        await this._seekAnalyticsConsent(analytics);
 
         await this._commandExecutor.execute();
     }
