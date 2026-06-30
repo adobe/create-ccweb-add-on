@@ -2215,15 +2215,7 @@ export declare interface TemplateDetails {
  */
 export declare interface UI {
     /**
-     * Current theme of the application.
-     *
-     * Possible values are `"light"` and `"dark"`. Subscribe to
-     * {@link AppEvent.themechange} to react to theme changes at runtime.
-     *
-     * Note: existing marketplace add-ons whose latest build was uploaded before
-     * **August 24, 2026** will continue to receive only `"light"`
-     * regardless of the user's app theme. To opt your add-on in to receiving the real theme,
-     * re-submit a latest build again and validate your UI against both light and dark themes.
+     * Current theme of the application
      */
     readonly theme: string;
     /**
