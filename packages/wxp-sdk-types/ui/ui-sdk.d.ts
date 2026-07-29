@@ -959,7 +959,6 @@ declare interface Document_2 {
      */
     runPrintQualityCheck(options: PrintQualityCheckOptions): void;
     /**
-     * @experimental - Experimental API
      * @returns true if the document is a presentation document.
      */
     isPresentation(): Promise<boolean>;
