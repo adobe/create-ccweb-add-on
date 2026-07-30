@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-sdk-types",
+      "comment": "Removed deprecated APIs, Added functionality for visitPages to return an error in case user cancels the operation, Made visitPages and keepContentActiveDuringAsync stable, Added guidelines for iframe APIs in ACF",
+      "type": "major"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-sdk-types"
+}

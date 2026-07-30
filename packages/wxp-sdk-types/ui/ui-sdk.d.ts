@@ -918,11 +918,19 @@ declare interface Document_2 {
     addAudio(blob: Blob, attributes: MediaAttributes): Promise<void>;
 
     /**
-     * Create renditions
+     * Creates renditions of the document for the specified rendition options and intent.
+     *
+     * Note: This operation may take a noticeable amount of time for large or complex
+     * documents. It is recommended to display a progress indicator (such as a spinner
+     * or progress bar) within the add-on while waiting for the returned promise to resolve.
      */
     createRenditions(renditionOptions: RenditionOptions, renditionIntent?: RenditionIntent): Promise<Rendition[]>;
     /**
      * Get metadata of all or range of pages of the document
+     *
+     * Note: This operation may take a noticeable amount of time for large or complex
+     * documents. It is recommended to display a progress indicator (such as a spinner
+     * or progress bar) within the add-on while waiting for the returned promise to resolve.
      */
     getPagesMetadata(options: PageMetadataOptions): Promise<PageMetadata[]>;
     /**

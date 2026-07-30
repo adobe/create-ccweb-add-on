@@ -159,6 +159,7 @@ declare namespace ApiConstants {
     export {
         ArrowHeadType,
         BlendMode,
+        ErrorNames,
         FillRule,
         FillType,
         SceneNodeType,
@@ -414,17 +415,7 @@ export declare class BaseNode {
      * moved to a different part of the document.
      */
     get id(): string;
-    /**
-     * Returns a read-only list of all children of the node. General-purpose content containers such as ArtboardNode or
-     * GroupNode also provide a mutable {@link ContainerNode.children} list. Other nodes with a more specific structure can
-     * hold children in various discrete "slots"; this `allChildren` list includes *all* such children and reflects their
-     * overall display z-order.
-     *
-     * Although BaseNode's allChildren may yield other BaseNodes, the subclasses Node and ArtboardNode override allChildren
-     * to guarantee all their children are full-fledged Node instances.
-     * @deprecated This API will be removed after 2026-07-15. Use `ActivePageNode.allChildren` instead.
-     */
-    get allChildren(): Readonly<Iterable<BaseNode>>;
+
     /**
      * The node's type.
      */
@@ -807,54 +798,12 @@ export declare interface CreateRenditionResult {
  */
 export declare class Editor {
     /**
-     * Legacy API for scheduling an edit after an asynchronous wait, for cases where the edit only targets
-     * whatever the current selection or {@link Context.insertionParent} happens to be at the end of the await.
-     *
-     * New code should use {@link keepContentActiveDuringAsync} instead, which also keeps any pre-designated
-     * scenenodes accessible across the async gap and safely runs the follow-up edit.
-     *
-     * @example
-     * Load an image from a Blob, then add it to the document using {@link keepContentActiveDuringAsync}:
-     * ```js
-     * async function addImage(blob) {
-     *     const bitmapImage = await editor.loadBitmapImage(blob);
-     *
-     *     await editor.keepContentActiveDuringAsync(
-     *         editor.context.insertionParent,
-     *         async () => {},
-     *         () => {
-     *             const rectangleGeometry = { width: 256, height: 256 };
-     *             const mediaContainerNode = editor.createImageContainer(bitmapImage, {
-     *                 initialSize: rectangleGeometry
-     *             });
-     *             mediaContainerNode.translation = { x: 100, y: 120 };
-     *             editor.context.insertionParent.children.append(mediaContainerNode);
-     *         }
-     *     );
-     * }
-     * ```
-     *
-     * @param lambda - a function which edits the document model.
-     * @returns a Promise that resolves when the lambda has finished running, or rejects if the lambda throws an error.
-     * @deprecated This API will be removed after 2026-07-15. Use {@link keepContentActiveDuringAsync} instead.
-     */
-    queueAsyncEdit(lambda: () => void): Promise<void>;
-    /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * Allow continued access to a subtree of content over an async span of time. Normally, access to any piece of
      * visual content is only guaranteed during the synchronous execution span where you initially encountered it (e.g.
      * by reading the current selection). After that, it may be unloaded from memory at any time. Use this API if you
      * need to maintain access to specific content after awaiting an async operation (such as a server request).
      *
-     * Contrast to {@link queueAsyncEdit}, which you can use after an asynchronous interval to make edits *only* targeting
-     * whatever the current selection or {@link Context.insertionParent} is at the end of the interval – *not* any specific
-     * content that you predetermined earlier.
-     *
-     * Example of typical usage:
+     * Example 1: Typical usage:
      * ```js
      * // Assume translateText() is called from your UI code
      * async function translateText() {
@@ -862,8 +811,8 @@ export declare class Editor {
      *
      *     // Call this immediately after capturing textNode — do NOT await anything before
      *     // calling keepContentActiveDuringAsync, or textNode may become inaccessible.
-     *     // Edits after awaiting the async lambda need to be queued to run at a safe time, and
-     *     // with a guarantee that 'textNode' is still accessible
+     *     // Edits after awaiting the async lambda need to be placed in afterAsyncCallback,
+     *     // where 'textNode' is still guaranteed to be accessible.
      *     await editor.keepContentActiveDuringAsync(
      *         textNode,
      *         async () => {
@@ -883,13 +832,32 @@ export declare class Editor {
      * }
      * ```
      *
+     * Example 2: Load an image from a Blob, then add it to the document:
+     * ```js
+     * async function addImage(blob) {
+     *     const bitmapImage = await editor.loadBitmapImage(blob);
+     *
+     *     await editor.keepContentActiveDuringAsync(
+     *         editor.context.insertionParent,
+     *         async () => {},
+     *         () => {
+     *             const rectangleGeometry = { width: 256, height: 256 };
+     *             const mediaContainerNode = editor.createImageContainer(bitmapImage, {
+     *                 initialSize: rectangleGeometry
+     *             });
+     *             mediaContainerNode.translation = { x: 100, y: 120 };
+     *             editor.context.insertionParent.children.append(mediaContainerNode);
+     *         }
+     *     );
+     * }
+     * ```
+     *
      * @param target - Root of the subtree to keep active.
      * @param asyncLambda - Async function representing the async task(s) to perform while the target content is
      *      guaranteed to remain accessible. Do not make document edits inside this lambda; use `afterAsyncCallback`
      *      instead. The value returned by the lambda is passed to `afterAsyncCallback` for convenience.
      * @param afterAsyncCallback - Callback that is executed after the async lambda has resolved, with the target content
-     *      still guaranteed to be accessible at the time. It is called when edits to the user's document are allowed (i.e.
-     *      there is no need to call {@link queueAsyncEdit} as you would after an explicit `await`). After this callback
+     *      still guaranteed to be accessible at the time. All document edits belong here. After this callback
      *      returns, it is no longer safe to read/write the content, since it may become inaccessible at any later time.
      *      The callback is passed the value that was yielded by the async lambda, for convenience.
      */
@@ -968,11 +936,11 @@ export declare class Editor {
      * Creates a bitmap image resource in the document, which can be displayed in the scenegraph by passing it to {@link createImageContainer}
      * to create a MediaContainerNode. The same BitmapImage can be used to create multiple MediaContainerNodes.
      *
-     * Because the resulting BitmapImage is returned asynchronously, to use it you must schedule an edit lambda to run at a
-     * safe later time in order to call {@link createImageContainer}. Use {@link Editor.keepContentActiveDuringAsync} if you need to work with this page's content asynchronously.
+     * Because the resulting BitmapImage is returned asynchronously, to use it you must call {@link createImageContainer}
+     * inside a {@link Editor.keepContentActiveDuringAsync} `afterAsyncCallback`.
      *
      * Further async steps to upload image resource data may continue in the background after this call's Promise resolves,
-     * but the resulting BitmapImage can be used right away (via the queue API noted above). The local client will act as
+     * but the resulting BitmapImage can be used right away (via the keepContentActiveDuringAsync API noted above). The local client will act as
      * having unsaved changes until all the upload steps have finished.
      *
      * @param bitmapData - Encoded image data in PNG or JPEG format.
@@ -1065,6 +1033,17 @@ export declare class EllipseNode extends FillableNode {
      * Must be at least {@link MIN_DIMENSION} / 2.
      */
     set ry(value: number);
+}
+
+/**
+ * Represents well-known string values for the `error.name` property thrown by various APIs.
+ */
+declare enum ErrorNames {
+    /**
+     * Indicates that an ongoing API operation was cancelled by the user (for example, dismissing
+     * the visitPages progress dialog during an ongoing visit).
+     */
+    userCancelled = "UserCancelledError"
 }
 
 /**
@@ -1805,11 +1784,6 @@ export declare interface OrderedListStyleInput extends BaseParagraphListStyle {
  */
 export declare class PageList extends RestrictedItemList<PageNode> {
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * Visit the given pages asynchronously: loading each one in turn so its content is accessible, and then invoking
      * your provided `callback` for the resulting fully-accessible {@link ActivePageNode}.
      *
@@ -1817,8 +1791,8 @@ export declare class PageList extends RestrictedItemList<PageNode> {
      * and all descendants). This access is only guaranteed inside the callback; do not hold onto the reference after the
      * callback returns.
      *
-     * Visiting many pages can be slow – up to tens of seconds in larger documents. Any feature which visits all pages
-     * in the entire document should include a progress UI so users understand when the operation is still ongoing.
+     * Visiting many pages can be slow – up to tens of seconds in larger documents. A progress dialog UI will be shown to the user
+     * when this API is called and the visit is slow to indicate that the operation is still ongoing.
      *
      * There is no guarantee more than one of the Pages will be loaded at the same time – there may only be one page
      * accessible at a time, each visited with sight delays in between. If your `callback` returns long-running
@@ -1857,6 +1831,9 @@ export declare class PageList extends RestrictedItemList<PageNode> {
      * @param callback - Called once per page while that page is active. Document edits are allowed during the
      *      callback, including after `await` on host APIs (such as `loadBitmapImage`) or UI proxy methods. Use an
      *      `async` callback so `visitPages` waits until your per-page work finishes.
+     * @throws If the user cancels the visit via the progress dialog, rejects with an error where
+     *      `err.name === constants.ErrorNames.userCancelled`. All other rejections originate from the
+     *      developer callback or an internal failure.
      */
     visitPages(pages: PageNode[], callback: (page: ActivePageNode) => void | Promise<void>): Promise<void>;
 
@@ -1885,13 +1862,6 @@ export declare class PageList extends RestrictedItemList<PageNode> {
  * To create new pages, see {@link PageList.addPage}.
  */
 export declare class PageNode extends BaseNode implements IRectangularNode {
-    /**
-     * The artboards or "scenes," which hold the page's visual contents. If multiple artboards are present, this list
-     * represents an ordered keyframe sequence in the page's animation timeline.
-     * To create new artboards, see {@link ArtboardList.addArtboard}.
-     * @deprecated This API will be removed after 2026-07-15. Use `ActivePageNode.artboards` instead.
-     */
-    get artboards(): ArtboardList;
     /**
      * The width of the node.
      *
@@ -1927,15 +1897,6 @@ export declare class PageNode extends BaseNode implements IRectangularNode {
      */
     get name(): string | undefined;
     set name(name: string | undefined);
-    /**
-     * Clones this page, all artboards within it, and all content within those artboards. The cloned page is the same size
-     * as the original. Adds the new page immediately after this one in the pages list. The first artboard in the cloned
-     * page becomes the default target for newly inserted content ({@link Context.insertionParent}) and the viewport
-     * switches to display this artboard.
-     * @returns the cloned page.
-     * @deprecated This API will be removed after 2026-07-15. Use `ActivePageNode.cloneInPlace` instead.
-     */
-    cloneInPlace(): PageNode;
 }
 
 /**
