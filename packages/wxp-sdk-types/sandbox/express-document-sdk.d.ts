@@ -964,11 +964,6 @@ export declare class Editor {
      */
     makeStroke(options?: Partial<SolidColorStroke>): SolidColorStroke;
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * @param parentNode - The parent node that will contain the threaded text node. This must be a container node (e.g., ArtboardNode, GroupNode) that is attached to the document.
      * @param textContent - The initial text content for the threaded text node.
      * @param geometry - The geometry of the threaded text node.
@@ -2645,7 +2640,6 @@ export declare abstract class TextContentModel {
 
 /**
  * Geometry for an area text frame in pixels.
- * @experimental
  */
 export declare interface TextFrameAreaGeometry {
     width: number;
@@ -2884,11 +2878,6 @@ export declare class ThreadedTextContentModel extends TextNodeContentModel {
 
 export declare class ThreadedTextList extends ReadOnlyItemList<ThreadedTextNode> {
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * @param geometry - The geometry of the threaded text node in pixels (width and height).
      * @returns A new ThreadedTextNode that is part of a threaded text flow.
      */
