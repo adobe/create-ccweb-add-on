@@ -758,8 +758,16 @@ export declare interface CurrentPlatformPayload {
 export declare interface CurrentUser {
     /**
      * Get user Id
+     * @deprecated Scheduled for removal on 2026-11-15; after that date this API throws. Use {@link identity}
+     * instead. `identity().userId` returns the current canonical user ID, and `identity().legacyIds` includes
+     * any legacy IDs consolidated into this identity.
      */
     userId(): Promise<string>;
+    /**
+     * @experimental - Experimental API
+     * Returns the current canonical user identity and any legacy user IDs consolidated into it.
+     */
+    identity(): Promise<UserIdentity>;
 
     /**
      * @returns if the current user is a premium user
@@ -2262,6 +2270,21 @@ declare type UnproxyOrClone<T> = T extends RemoteObject<ProxyMarked> ? Local<T> 
  * Callback to unregister iframe from the add-on SDK.
  */
 export declare type UnregisterIframe = () => void;
+
+/**
+ * Represents the current logged-in user identity for the user accessing the host application.
+ */
+export declare interface UserIdentity {
+    /**
+     * SHA-256 hash of the current canonical user ID.
+     */
+    userId: string;
+    /**
+     * SHA-256 hashes of legacy user IDs that were consolidated into the current identity.
+     * Empty for users whose identity has not been consolidated from earlier profiles.
+     */
+    legacyIds: string[];
+}
 
 /**
  * Types of dialog variants supported.
