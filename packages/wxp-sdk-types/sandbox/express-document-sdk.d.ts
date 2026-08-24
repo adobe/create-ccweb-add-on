@@ -2481,11 +2481,6 @@ export declare interface TextContent {
  */
 export declare abstract class TextContentModel {
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * A unique identifier for this node that stays the same when the file is closed & reopened, or if the node is
      * moved to a different part of the document.
      *
@@ -2502,11 +2497,6 @@ export declare abstract class TextContentModel {
     get text(): string;
     set text(textContent: string);
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * Appends a new text string to the end of the text content.
      *
      * @param newText - The text to append.
@@ -2514,11 +2504,6 @@ export declare abstract class TextContentModel {
      */
     appendText(newText: string): void;
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * Inserts a new text string into the text content at the specified index.
      *
      * @param newText - The text to insert.
@@ -2533,11 +2518,6 @@ export declare abstract class TextContentModel {
         style?: CharacterStylesInput | TextStyleSource.beforeInsertionPoint | TextStyleSource.afterInsertionPoint
     ): void;
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * Replaces a range of text with a new text string.
      *
      * @param newText - The text to replace the range with.
@@ -2556,11 +2536,6 @@ export declare abstract class TextContentModel {
             | TextStyleSource.firstReplacedCharacter
     ): void;
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * Deletes a range of text from the content.
      *
      * @param range - The range of text to delete.
@@ -2625,11 +2600,6 @@ export declare abstract class TextContentModel {
      */
     applyParagraphStyles(styles: ParagraphStylesInput, range?: TextRange): void;
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * Returns true if this text contains any fonts unavailable to the current user.
      * Currently, if any unavailable fonts are present, the text content cannot be modified and
      * certain styling changes are limited as well. To remove these restrictions, you must modify
@@ -2836,11 +2806,6 @@ export declare enum TextScriptStyle {
 }
 
 /**
- * <InlineAlert slots="text" variant="warning"/>
- *
- * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
- *
- * @experimental
  * Indicates which existing text to match the style of when inserting new text or replacing text.
  */
 export declare enum TextStyleSource {

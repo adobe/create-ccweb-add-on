@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-sdk-types",
+      "comment": "Stabilize TextContentModel text mutation APIs (appendText, insertText, replaceText, deleteText, hasUnavailableFonts, id) and TextStyleSource; add dark theme opt-in notice to UI.theme",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-sdk-types"
+}
