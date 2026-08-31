@@ -1,7 +1,7 @@
-// To support: system="express" scale="medium" color="light"
+// To support: system="spectrum-two" scale="medium" color="light"
 // import these spectrum web components modules:
-import "@spectrum-web-components/theme/express/scale-medium.js";
-import "@spectrum-web-components/theme/express/theme-light.js";
+import "@spectrum-web-components/theme/spectrum-two/scale-medium.js";
+import "@spectrum-web-components/theme/spectrum-two/theme-light.js";
 import "@spectrum-web-components/theme/scale-medium.js";
 import "@spectrum-web-components/theme/theme-light.js";
 
@@ -46,7 +46,7 @@ export class App extends LitElement {
     render(): TemplateResult {
         // Please note that the below "<sp-theme>" component does not react to theme changes in Express.
         // You may use "this.addOnUISdk.app.ui.theme" to get the current theme and react accordingly.
-        return html` <sp-theme system="express" color="light" scale="medium">
+        return html` <sp-theme system="spectrum-two" color="light" scale="medium">
             <div class="container">
                 <sp-button size="m" @click=${this._handleClick}>Create Rectangle</sp-button>
             </div>
