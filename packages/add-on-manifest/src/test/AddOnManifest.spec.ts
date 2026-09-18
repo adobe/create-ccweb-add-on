@@ -238,5 +238,10 @@ function verifyCommonManifestFields(
             manifest.requirements.trustedPartnerApis.supportsDarkTheme,
             testManifest.requirements.trustedPartnerApis.supportsDarkTheme
         );
+
+        assert.equal(
+            manifest.requirements.trustedPartnerApis.mediaUrlImport,
+            testManifest.requirements.trustedPartnerApis.mediaUrlImport
+        );
     }
 }
