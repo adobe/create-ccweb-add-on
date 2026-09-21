@@ -44,7 +44,6 @@ export type TrustedPartnerApis = {
     readonly addOnLifecycle?: boolean;
     readonly toastNotifications?: boolean;
     readonly tiktokcml?: boolean;
-    readonly mediaUrlImport?: boolean;
     readonly formSubmission?: boolean;
     readonly epsonPrint?: boolean;
     readonly allowPayment?: boolean;

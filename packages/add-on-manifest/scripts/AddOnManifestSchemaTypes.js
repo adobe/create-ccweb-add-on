@@ -182,7 +182,6 @@ export const RequirementSchemaV2 = {
                 toastNotifications: { type: "boolean" },
                 addOnLifecycle: { type: "boolean" },
                 tiktokcml: { type: "boolean" },
-                mediaUrlImport: { type: "boolean" },
                 formSubmission: { type: "boolean" },
                 epsonPrint: { type: "boolean" },
                 allowPayment: { type: "boolean" },
