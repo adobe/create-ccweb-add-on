@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/ccweb-add-on-analytics",
+      "comment": "Add support for mediaUrlImport trusted-partner API flag",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@adobe/ccweb-add-on-analytics"
+}
