@@ -3,7 +3,7 @@
     {
       "packageName": "@adobe/ccweb-add-on-scaffolder",
       "comment": "Add support for mediaUrlImport trusted-partner API flag",
-      "type": "patch"
+      "type": "minor"
     }
   ],
   "packageName": "@adobe/ccweb-add-on-scaffolder"
