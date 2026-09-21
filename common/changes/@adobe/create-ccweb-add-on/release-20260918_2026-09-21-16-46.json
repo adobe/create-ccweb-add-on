@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@adobe/create-ccweb-add-on",
+      "comment": "Add support for mediaUrlImport trusted-partner API flag",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@adobe/create-ccweb-add-on"
+}
