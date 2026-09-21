@@ -553,7 +553,6 @@ describe("ManifestSchema Validations - Version 2", () => {
         assert.equal(typeof testManifest.requirements.trustedPartnerApis?.epsonPrint === "boolean", true);
         assert.equal(typeof testManifest.requirements.trustedPartnerApis?.formSubmission === "boolean", true);
         assert.equal(typeof testManifest.requirements.trustedPartnerApis?.tiktokcml === "boolean", true);
-        assert.equal(typeof testManifest.requirements.trustedPartnerApis?.mediaUrlImport === "boolean", true);
         assert.equal(typeof testManifest.requirements.trustedPartnerApis?.allowPayment === "boolean", true);
         assert.equal(typeof testManifest.requirements.trustedPartnerApis?.supportsDarkTheme === "boolean", true);
         assert.equal(testManifest.requirements.trustedPartnerApis?.messaging, false);
@@ -562,7 +561,6 @@ describe("ManifestSchema Validations - Version 2", () => {
         assert.equal(testManifest.requirements.trustedPartnerApis?.epsonPrint, true);
         assert.equal(testManifest.requirements.trustedPartnerApis?.toastNotifications, false);
         assert.equal(testManifest.requirements.trustedPartnerApis?.tiktokcml, true);
-        assert.equal(testManifest.requirements.trustedPartnerApis?.mediaUrlImport, true);
         assert.equal(testManifest.requirements.trustedPartnerApis?.formSubmission, true);
         assert.equal(testManifest.requirements.trustedPartnerApis?.allowPayment, true);
         assert.equal(testManifest.requirements.trustedPartnerApis?.supportsDarkTheme, false);
