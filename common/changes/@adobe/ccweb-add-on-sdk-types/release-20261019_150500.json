@@ -7,7 +7,7 @@
         },
         {
             "packageName": "@adobe/ccweb-add-on-sdk-types",
-            "comment": "Stabilize BitmapImage.data()",
+            "comment": "Stabilize BitmapImage.data() and ImageRectangleNode.fetchBitmapImage()",
             "type": "minor"
         }
     ],
