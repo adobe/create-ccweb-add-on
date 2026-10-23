@@ -1,0 +1,15 @@
+{
+    "changes": [
+        {
+            "packageName": "@adobe/ccweb-add-on-sdk-types",
+            "comment": "Stabilize VisualNode.createRendition and its options, result, and format types",
+            "type": "minor"
+        },
+        {
+            "packageName": "@adobe/ccweb-add-on-sdk-types",
+            "comment": "Stabilize BitmapImage.data() and ImageRectangleNode.fetchBitmapImage()",
+            "type": "minor"
+        }
+    ],
+    "packageName": "@adobe/ccweb-add-on-sdk-types"
+}

@@ -485,11 +485,6 @@ export declare class BitmapImage {
      */
     get height(): number;
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * Fetches the bitmap data as a Blob. Waits up to 1 minute for the bitmap to be available if necessary.
      */
     data(): Promise<Blob>;
@@ -740,11 +735,6 @@ export declare class Context {
 }
 
 /**
- * <InlineAlert slots="text" variant="warning"/>
- *
- * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
- *
- * @experimental
  * The format of the rendition output.
  */
 export declare enum CreateRenditionFormat {
@@ -753,11 +743,6 @@ export declare enum CreateRenditionFormat {
 }
 
 /**
- * <InlineAlert slots="text" variant="warning"/>
- *
- * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
- *
- * @experimental
  * An interface for configuring {@link VisualNode.createRendition}.
  */
 export declare interface CreateRenditionOptions {
@@ -772,11 +757,6 @@ export declare interface CreateRenditionOptions {
 }
 
 /**
- * <InlineAlert slots="text" variant="warning"/>
- *
- * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
- *
- * @experimental
  * An interface for the result of {@link VisualNode.createRendition}.
  */
 export declare interface CreateRenditionResult {
@@ -1300,11 +1280,6 @@ declare interface IFillableNode {
  */
 export declare class ImageRectangleNode extends MediaRectangleNode {
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * Fetches the bitmap image resource used by this node. Waits up to a minute for the bitmap to be available if necessary.
      */
     fetchBitmapImage(): Promise<BitmapImage>;
@@ -3014,11 +2989,6 @@ export declare class VisualNode extends BaseNode implements IVisualNodeBounds {
     get topLeftLocal(): Readonly<Point>;
     localPointInNode(localPoint: Point, targetNode: VisualNode): Readonly<Point>;
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * Generates a rendition of this node and its descendants.
      *
      * If this node contains images, it will wait for the best quality to be available before capturing.
