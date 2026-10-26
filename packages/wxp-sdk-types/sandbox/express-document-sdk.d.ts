@@ -473,7 +473,8 @@ declare interface BaseParagraphStyles {
 
 /**
  * Represents a bitmap image resource. Use {@link Editor.loadBitmapImage} to create a BitmapImage, and then {@link Editor.createImageContainer}
- * to display it in the document by creating a MediaContainerNode structure.
+ * to display it in the document by creating a MediaContainerNode structure. To get the BitmapImage of an image that is already
+ * in the document, use {@link ImageRectangleNode.fetchBitmapImage}.
  */
 export declare class BitmapImage {
     /**
@@ -738,7 +739,13 @@ export declare class Context {
  * The format of the rendition output.
  */
 export declare enum CreateRenditionFormat {
+    /**
+     * PNG format (lossless). This is the default.
+     */
     png = "png",
+    /**
+     * JPEG format (lossy).
+     */
     jpeg = "jpeg"
 }
 
@@ -763,7 +770,7 @@ export declare interface CreateRenditionResult {
     /**
      * The PNG or JPEG data for the rendition.
      */
-    blob?: Blob;
+    blob: Blob;
     /**
      * The bounds of the rendition in the global coordinate space.
      * This may be larger than the {@link VisualNode.boundsLocal} due to rotations, borders, filters, or other effects.
@@ -1284,11 +1291,6 @@ export declare class ImageRectangleNode extends MediaRectangleNode {
      */
     fetchBitmapImage(): Promise<BitmapImage>;
     /**
-     * <InlineAlert slots="text" variant="warning"/>
-     *
-     * **IMPORTANT:** This is currently ***experimental only*** and should not be used in any add-ons you will be distributing until it has been declared stable. To use it, you will first need to set the `experimentalApis` flag to `true` in the [`requirements`](../../../manifest/index.md#requirements) section of the `manifest.json`.
-     *
-     * @experimental
      * Returns true if the media can be exported based on the user's entitlements.
      */
     canExportMedia(): boolean;
